@@ -1,9 +1,9 @@
 {
   "back": "Back",
   "home": "Home",
-  "empty_folder": "No data available",
-  "load_error": "Failed to load data",
   "empty_folder": "No items in this folder",
   "load_error": "Failed to load files",
+  "file_empty": "File is empty",
+  "file_load_error": "Failed to load file",
   "game_start_message": "Starting mini-game!"
 }

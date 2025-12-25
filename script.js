@@ -21,23 +21,27 @@ const backBtn = document.getElementById('backBtn');
  * ЗАГРУЗКА ЯЗЫКА
  ***********************/
 async function loadLanguage() {
-    let lang = localStorage.getItem('lang');
+    try {
+        let lang = localStorage.getItem('lang');
 
-    // Если язык ещё не сохранён — определяем по браузеру
-    if (!lang) {
-        lang = navigator.language.startsWith('ru') ? 'ru' : 'en';
-        localStorage.setItem('lang', lang);
+        // Если язык ещё не сохранён — определяем по браузеру
+        if (!lang) {
+            lang = navigator.language.startsWith('ru') ? 'ru' : 'en';
+            localStorage.setItem('lang', lang);
+        }
+        const response = await fetch(`languages/${lang}.json`);
+        if (!response.ok) throw new Error('Fetch failed');
+        return await response.json();
+    } catch (err) {
+        console.error('Ошибка загрузки языкового файла', err);
+        return {}; // возвращаем пустой объект, чтобы UI не ломался
     }
-
-    const response = await fetch(`languages/${lang}.json`);
-    return await response.json();
 }
-
 
 /***********************
  * ЗАГРУЗКА FILES.JSON
  ***********************/
-async function loadFiles() {
+async function loadFileTree() {
     try {
         // cache-busting (пока захардкожен)
         const commitHash = 'dev';
@@ -48,6 +52,45 @@ async function loadFiles() {
         return null;
     }
 }
+
+/***********************
+ * ЗАГРУЗКА КОНКРЕТНОГО ФАЙЛА
+ ***********************/
+async function loadFile(file) {
+    try {
+        const extension = file.path.split('.').pop().toLowerCase();
+
+        // Загружаем файл как ArrayBuffer
+        const response = await fetch(`data/${file.path}`);
+        if (!response.ok) throw new Error('Fetch failed');
+
+        // TXT или CSV
+        if (extension === 'txt' || extension === 'csv') {
+            const text = await response.text();
+            const words = text.split(/\r?\n|,/).map(w => w.trim()).filter(Boolean);
+            if (!words.length) throw new Error('EMPTY_FILE');
+            return words;
+        }
+
+        // XLSX
+        if (extension === 'xlsx') {
+            const buffer = await response.arrayBuffer();
+            const workbook = XLSX.read(buffer, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+            const words = rows.flat().map(w => String(w).trim()).filter(Boolean);
+            if (!words.length) throw new Error('EMPTY_FILE');
+            return words;
+        }
+
+        throw new Error('UNSUPPORTED_FORMAT');
+
+    } catch (err) {
+        console.error('Ошибка загрузки файла:', err);
+        throw err;
+    }
+}
+
 
 
 /***********************
@@ -110,11 +153,32 @@ backBtn.onclick = () => {
 /***********************
  * ЗАГЛУШКА ИГРЫ
  ***********************/
-function startGame(file) {
-    alert(
-        `${uiTexts.game_start_message || 'Starting mini-game!'}\n\nФайл: ${file.name}`
-    );
+async function startGame(file) {
+    try {
+        const words = await loadFile(file); // загружаем слова из файла
+        if (!words.length) throw new Error('EMPTY_FILE');
+
+        // Собираем все слова в одну строку для вывода
+        const content = words.join(', '); 
+
+        // Показываем alert с содержимым
+        alert(`${uiTexts.game_start_message}\nFile: ${file.name}\nWords:\n${content}`);
+        
+        // TODO: позже можно передавать words в мини-игру
+        console.log('Words loaded:', words);
+
+    } catch (err) {
+        if (err.message === 'EMPTY_FILE') {
+            alert('Файл пустой!');
+        } else if (err.message === 'UNSUPPORTED_FORMAT') {
+            alert('Неподдерживаемый формат файла!');
+        } else {
+            alert('Ошибка при загрузке файла.');
+        }
+    }
 }
+
+
 
 
 /***********************
@@ -125,7 +189,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     uiTexts = await loadLanguage();
 
     // 2. Загружаем структуру файлов
-    const files = await loadFiles();
+    const files = await loadFileTree();
 
     if (!files) {
         container.textContent = uiTexts.load_error || 'Failed to load files';
