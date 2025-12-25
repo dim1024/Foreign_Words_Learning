@@ -1,64 +1,138 @@
-// Функция определения языка пользователя
+/***********************
+ * ГЛОБАЛЬНОЕ СОСТОЯНИЕ
+ ***********************/
+
+// Тексты интерфейса (ru / en)
+let uiTexts = {};
+
+// Корневой уровень дерева из files.json
+let rootData = [];
+
+// Стек навигации (храним предыдущие уровни)
+let navigationStack = [];
+
+// DOM-элементы
+const container = document.getElementById('fileContainer');
+const homeBtn = document.getElementById('homeBtn');
+const backBtn = document.getElementById('backBtn');
+
+
+/***********************
+ * ЗАГРУЗКА ЯЗЫКА
+ ***********************/
 async function loadLanguage() {
     let lang = localStorage.getItem('lang');
+
+    // Если язык ещё не сохранён — определяем по браузеру
     if (!lang) {
-        // Определяем язык по браузеру
         lang = navigator.language.startsWith('ru') ? 'ru' : 'en';
         localStorage.setItem('lang', lang);
     }
+
     const response = await fetch(`languages/${lang}.json`);
-    const uiTexts = await response.json();
-    return uiTexts;
+    return await response.json();
 }
 
 
-// Загрузка files.json
+/***********************
+ * ЗАГРУЗКА FILES.JSON
+ ***********************/
 async function loadFiles() {
     try {
-        // cache-busting через commit hash
-        const commitHash = "123abc"; // можно временно захардкодить, потом брать автоматически
+        // cache-busting (пока захардкожен)
+        const commitHash = 'dev';
         const response = await fetch(`files.json?v=${commitHash}`);
-        const files = await response.json();
-        return files;
+        return await response.json();
     } catch (err) {
-        console.error(err);
+        console.error('Ошибка загрузки files.json', err);
         return null;
     }
 }
 
-// Рендер кнопок для текущего уровня дерева
-function renderFiles(files, container, uiTexts) {
-    container.innerHTML = ''; // очищаем контейнер
-    if (!files || files.length === 0) {
-        container.innerHTML = `<p>${uiTexts.empty_folder}</p>`;
+
+/***********************
+ * РЕНДЕР ТЕКУЩЕГО УРОВНЯ
+ ***********************/
+function renderLevel(level) {
+    // Очищаем контейнер
+    container.innerHTML = '';
+
+    // Управление видимостью кнопок
+    backBtn.style.display = navigationStack.length ? 'inline-block' : 'none';
+
+    // Если папка пустая
+    if (!level || level.length === 0) {
+        const emptyMsg = document.createElement('p');
+        emptyMsg.textContent = uiTexts.empty_folder || 'No items in this folder';
+        container.appendChild(emptyMsg);
         return;
     }
 
-    files.forEach(item => {
+    // Создаём кнопки папок и файлов
+    level.forEach(item => {
         const btn = document.createElement('button');
         btn.textContent = item.name;
+
         if (item.type === 'folder') {
-            btn.addEventListener('click', () => {
-                renderFiles(item.children, container, uiTexts);
-            });
-        } else if (item.type === 'file') {
-            btn.addEventListener('click', () => {
-                startGame(item, uiTexts); // функция заглушки игры
-            });
+            btn.onclick = () => {
+                // Сохраняем текущий уровень в стек
+                navigationStack.push(level);
+                // Переходим внутрь папки
+                renderLevel(item.children);
+            };
         }
+
+        if (item.type === 'file') {
+            btn.onclick = () => {
+                startGame(item);
+            };
+        }
+
         container.appendChild(btn);
     });
 }
 
-// Инициализация на старте сайта
+
+/***********************
+ * НАВИГАЦИЯ
+ ***********************/
+homeBtn.onclick = () => {
+    navigationStack = [];
+    renderLevel(rootData);
+};
+
+backBtn.onclick = () => {
+    const previousLevel = navigationStack.pop();
+    renderLevel(previousLevel || rootData);
+};
+
+
+/***********************
+ * ЗАГЛУШКА ИГРЫ
+ ***********************/
+function startGame(file) {
+    alert(
+        `${uiTexts.game_start_message || 'Starting mini-game!'}\n\nФайл: ${file.name}`
+    );
+}
+
+
+/***********************
+ * ИНИЦИАЛИЗАЦИЯ САЙТА
+ ***********************/
 window.addEventListener('DOMContentLoaded', async () => {
-    const uiTexts = await loadLanguage();
+    // 1. Загружаем язык
+    uiTexts = await loadLanguage();
+
+    // 2. Загружаем структуру файлов
     const files = await loadFiles();
-    const container = document.getElementById('fileContainer'); // <div id="fileContainer"></div> в index.html
+
     if (!files) {
-        container.innerHTML = `<p>${uiTexts.load_error}</p>`;
+        container.textContent = uiTexts.load_error || 'Failed to load files';
         return;
     }
-    renderFiles(files, container, uiTexts);
-});
 
+    // 3. Сохраняем корень и рендерим
+    rootData = files;
+    renderLevel(rootData);
+});
