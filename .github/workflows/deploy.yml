@@ -3,7 +3,7 @@ name: Deploy GitHub Pages
 on:
   push:
     branches:
-      - main
+      - main  # твоя основная ветка
 
 permissions:
   contents: read
@@ -22,17 +22,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Шаг 1: Проверяем репозиторий
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Шаг 2: Генерация files.json через Python-скрипт
+      - name: Generate files.json
+        run: python generate_files.py
+
+      # Шаг 3: Настройка GitHub Pages
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # Шаг 4: Загружаем артефакт (весь проект)
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
 
+      # Шаг 5: Деплой на GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
