@@ -57,39 +57,57 @@ async function loadFileTree() {
  * ЗАГРУЗКА КОНКРЕТНОГО ФАЙЛА
  ***********************/
 async function loadFile(file) {
-    try {
-        const extension = file.path.split('.').pop().toLowerCase();
+    const extension = file.path.split('.').pop().toLowerCase();
+    const response = await fetch(`data/${file.path}`);          
 
-        // Загружаем файл как ArrayBuffer
-        const response = await fetch(`data/${file.path}`);
-        if (!response.ok) throw new Error('Fetch failed');
+    if (!response.ok) throw new Error('FILE_LOAD_ERROR');        
 
-        // TXT или CSV
-        if (extension === 'txt' || extension === 'csv') {
-            const text = await response.text();
-            const words = text.split(/\r?\n|,/).map(w => w.trim()).filter(Boolean);
-            if (!words.length) throw new Error('EMPTY_FILE');
-            return words;
-        }
+    // TXT / CSV
+    if (extension === 'txt' || extension === 'csv') {            
+        const text = await response.text();                      
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        const pairs = [];
 
-        // XLSX
-        if (extension === 'xlsx') {
-            const buffer = await response.arrayBuffer();
-            const workbook = XLSX.read(buffer, { type: 'array' });
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-            const words = rows.flat().map(w => String(w).trim()).filter(Boolean);
-            if (!words.length) throw new Error('EMPTY_FILE');
-            return words;
-        }
+        lines.forEach(line => {
+            const match = line.match(/^(.+?)[\s,;|:\-—]+(.+)$/);
+            if (!match) return;
+            pairs.push({
+                term: match[1].trim(),
+                translation: match[2].trim()
+            });
+        });
 
-        throw new Error('UNSUPPORTED_FORMAT');
-
-    } catch (err) {
-        console.error('Ошибка загрузки файла:', err);
-        throw err;
+        if (!pairs.length) throw new Error('EMPTY_FILE');
+        return pairs;
     }
+
+    // XLSX
+    if (extension === 'xlsx') {
+        const buffer = await response.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const pairs = [];
+
+        rows.forEach(row => {
+            if (row.length < 2) return;
+            pairs.push({ 
+                term: String(row[0]).trim(),
+                translation: String(row[1]).trim()
+            });
+        });
+
+        if (!pairs.length) throw new Error('EMPTY_FILE');
+        return pairs;    
+    }
+
+    throw new Error('UNSUPPORTED_FORMAT');
+    
 }
+
+
+
+
 
 
 
@@ -127,7 +145,7 @@ function renderLevel(level) {
 
         if (item.type === 'file') {
             btn.onclick = () => {
-                startGame(item);
+                loadAndRunGame(item);
             };
         }
 
@@ -140,11 +158,13 @@ function renderLevel(level) {
  * НАВИГАЦИЯ
  ***********************/
 homeBtn.onclick = () => {
+    closeGame();
     navigationStack = [];
     renderLevel(rootData);
 };
 
 backBtn.onclick = () => {
+    closeGame();
     const previousLevel = navigationStack.pop();
     renderLevel(previousLevel || rootData);
 };
@@ -153,27 +173,25 @@ backBtn.onclick = () => {
 /***********************
  * ЗАГЛУШКА ИГРЫ
  ***********************/
-async function startGame(file) {
+async function loadAndRunGame(file) {
     try {
-        const words = await loadFile(file); // загружаем слова из файла
-        if (!words.length) throw new Error('EMPTY_FILE');
+        const pairs = await loadFile(file); // загружаем слова из файла
+        if (!pairs.length) throw new Error('EMPTY_FILE');
 
-        // Собираем все слова в одну строку для вывода
-        const content = words.join(', '); 
+        // Закрываем игру, если она открыта, чтобы навигация работала
+        closeGame();
 
-        // Показываем alert с содержимым
-        alert(`${uiTexts.game_start_message}\nFile: ${file.name}\nWords:\n${content}`);
+        // Вызываем игру-заглушку с данными
+        window.startGame(file, uiTexts, pairs);
         
-        // TODO: позже можно передавать words в мини-игру
-        console.log('Words loaded:', words);
+        // Лог для разработчика
+        console.log('Pairs:', pairs);
 
     } catch (err) {
         if (err.message === 'EMPTY_FILE') {
-            alert('Файл пустой!');
-        } else if (err.message === 'UNSUPPORTED_FORMAT') {
-            alert('Неподдерживаемый формат файла!');
+            alert(uiTexts.file_empty || 'File is empty');
         } else {
-            alert('Ошибка при загрузке файла.');
+            alert(uiTexts.file_load_error || 'Failed to load file');
         }
     }
 }
@@ -200,3 +218,79 @@ window.addEventListener('DOMContentLoaded', async () => {
     rootData = files;
     renderLevel(rootData);
 });
+
+
+function parsePairsFromText(text) {
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const pairs = [];
+
+    const separators = [';', ',', '|', '—', '-', ':', '\t'];
+
+    lines.forEach(line => {
+        let separator = separators.find(sep => line.includes(sep));
+
+        // если разделитель не найден — используем первый пробел
+        if (!separator) {
+            const firstSpaceIndex = line.indexOf(' ');
+            if (firstSpaceIndex === -1) return;
+
+            const left = line.slice(0, firstSpaceIndex).trim();
+            const right = line.slice(firstSpaceIndex + 1).trim();
+            if (left && right) {
+                pairs.push({ term: left, translation: right });
+            }
+            return;
+        }
+
+        const parts = line.split(separator);
+        if (parts.length < 2) return;
+
+        const left = parts[0].trim();
+        const right = parts.slice(1).join(separator).trim();
+
+        if (left && right) {
+            pairs.push({ term: left, translation: right });
+        }
+    });
+
+    if (!pairs.length) throw new Error('EMPTY_FILE');
+
+    return {
+        pairs,
+        meta: {
+            source: 'txt',
+            count: pairs.length
+        }
+    };
+}
+
+function parsePairsFromXLSX(buffer) {
+    const workbook = XLSX.read(buffer, { type: 'array' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+    const pairs = [];
+
+    rows.forEach(row => {
+        if (!row || row.length < 2) return;
+
+        const left = String(row[0]).trim();
+        const right = String(row[1]).trim();
+
+        if (left && right) {
+            pairs.push({ term: left, translation: right });
+        }
+    });
+
+    if (!pairs.length) throw new Error('EMPTY_FILE');
+
+    return {
+        pairs,
+        meta: {
+            source: 'xlsx',
+            count: pairs.length
+        }
+    };
+}
+
+
