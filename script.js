@@ -127,12 +127,6 @@ async function loadFile(file) {
     
 }
 
-
-
-
-
-
-
 /***********************
  * РЕНДЕР ТЕКУЩЕГО УРОВНЯ
  ***********************/
@@ -188,6 +182,42 @@ function renderLevel(level) {
                     loadAndRunGame(item);
                 }
             };
+        }
+
+        if (item.type === 'file') {
+            // обёртка для файла + кнопки удаления
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'flex';
+            wrapper.style.alignItems = 'center';
+            wrapper.style.gap = '6px';
+
+            btn.onclick = () => {
+                if (item.userFile) {
+                    // Пользовательский файл
+                    loadAndRunUserFile(item.userFile);
+                } else {
+                    loadAndRunGame(item);
+                }
+            };
+
+            wrapper.appendChild(btn);
+
+            // 🗑 только для пользовательских файлов
+            if (item.userFile) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '🗑';
+                deleteBtn.title = uiTexts.delete_confirm || 'Delete';
+
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation(); // ⛔ чтобы не запускалась игра
+                    deleteUserFile(item.userFile);
+                };
+
+                wrapper.appendChild(deleteBtn);
+            }
+
+            container.appendChild(wrapper);
+            return;
         }
 
         container.appendChild(btn);
@@ -296,7 +326,6 @@ async function loadAndRunGame(file) {
     }
 }
 
-
 /***********************
  * ЗАГРУЗКА ПОЛЬЗОВАТЕЛЬСКИХ СЛОВ и другое
  ***********************/
@@ -331,6 +360,36 @@ async function loadAndRunUserFile(userFileObj) {
     }
 }
 
+/***********************
+ * УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЬСКИХ СЛОВ
+ ***********************/
+function deleteUserFile(userFileObj) {
+    const confirmText =
+        uiTexts.delete_confirm || 'Are you sure you want to delete this file?';
+
+    if (!confirm(confirmText)) return;
+
+    // удаляем файл из массива
+    userFiles = userFiles.filter(f => f !== userFileObj);
+
+    closeGame();
+
+    // если файлов больше нет — возвращаемся в корень
+    if (userFiles.length === 0) {
+        navigationStack = [];
+        renderLevel(rootData);
+        return;
+    }
+
+    // иначе остаёмся в папке "Мои слова"
+    const myWordsChildren = userFiles.map(f => ({
+        name: f.name,
+        type: 'file',
+        userFile: f
+    }));
+
+    renderLevel(myWordsChildren);
+}
 
 
 /***********************
