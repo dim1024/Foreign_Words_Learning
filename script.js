@@ -192,14 +192,14 @@ backBtn.onclick = () => {
 
 const addWordsBtn = document.getElementById('addWordsBtn');
 
-addWordsBtn.onclick = () => {
-    // Создаём невидимый input для выбора файла
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.txt,.csv,.xlsx';
-    input.multiple = true;
+    addWordsBtn.onclick = () => {
+        // Создаём невидимый input для выбора файла
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.txt,.csv,.xlsx';
+        input.multiple = true;
 
-    input.onchange = () => {
+        input.onchange = () => {
         if (!input.files) return;
 
         Array.from(input.files).forEach(file => {
@@ -212,31 +212,31 @@ addWordsBtn.onclick = () => {
             userFiles.push({ name: file.name, file });
         });
 
-        // Создаём актуальную папку "Мои слова"
+        // если файлов нет — ничего не делаем
+        if (!userFiles.length) return;
+
+        // виртуальная папка "Мои слова"
         const myWordsFolder = {
             name: uiTexts.my_words || 'My Words',
             type: 'folder',
-            children: userFiles.map(f => ({ name: f.name, type: 'file', userFile: f }))
+            children: userFiles.map(f => ({
+                name: f.name,
+                type: 'file',
+                userFile: f
+            }))
         };
 
-        // Определяем текущий уровень (последний в navigationStack или корень)
-        const currentLevel = navigationStack[navigationStack.length - 1] || rootData;
+        // КЛЮЧЕВОЕ МЕСТО ДЛЯ ПОВЕДЕНИЯ: ЧТОБЫ ВСЕГДА ОТКРЫВАЛАСЬ ПАПКА "МОИ СЛОВА", ПРИ ДОБАВЛЕНИИ НОВЫХ СЛОВ.
+        // Закрываем игру, если она была открыта, чтобы она не мешала навигации.
+        closeGame();
 
-        // Проверяем, находимся ли мы в папке "Мои слова"
-        const inMyWords = currentLevel.some(
-            item => item.name === (uiTexts.my_words || 'My Words') && item.type === 'folder'
-        );
+        // всегда считаем, что "Мои слова" лежит в корне
+        navigationStack = [rootData];
 
-        // Если уже находимся в "My Words", остаёмся в ней
-        if (inMyWords) {
-            // Остаёмся в "Мои слова"
-            renderLevel(myWordsFolder.children)
-        } else {
-            // Иначе добавляем "Мои слова" в корень и переходим в неё
-            renderLevel([myWordsFolder, ...rootData]);
-            navigationStack.push(rootData); // сохраняем предыдущий уровень
-        }
+        // всегда открываем папку "Мои слова"
+        renderLevel(myWordsFolder.children);
     };
+
 
     input.click();
 };
