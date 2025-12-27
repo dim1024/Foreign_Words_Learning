@@ -16,6 +16,8 @@ const container = document.getElementById('fileContainer');
 const homeBtn = document.getElementById('homeBtn');
 const backBtn = document.getElementById('backBtn');
 
+// Пользовательские файлы
+let userFiles = []; // { name: string, file: File }
 
 /***********************
  * ЗАГРУЗКА ЯЗЫКА
@@ -115,6 +117,20 @@ async function loadFile(file) {
  * РЕНДЕР ТЕКУЩЕГО УРОВНЯ
  ***********************/
 function renderLevel(level) {
+
+    // Создаём копию уровня, чтобы не мутировать оригинал
+    let displayLevel = [...level];
+
+    // Добавляем папку "Мои слова" на главном уровне, если есть пользовательские файлы
+    if (level === rootData && userFiles.length) {
+        const userFolder = {
+            name: uiTexts.my_words || 'My Words',
+            type: 'folder',
+            children: userFiles.map(f => ({ name: f.name, type: 'file', userFile: f }))
+        };
+        displayLevel = [userFolder, ...displayLevel];
+    }
+
     // Очищаем контейнер
     container.innerHTML = '';
 
@@ -122,7 +138,7 @@ function renderLevel(level) {
     backBtn.style.display = navigationStack.length ? 'inline-block' : 'none';
 
     // Если папка пустая
-    if (!level || level.length === 0) {
+    if (!displayLevel || level.length === 0) {
         const emptyMsg = document.createElement('p');
         emptyMsg.textContent = uiTexts.empty_folder || 'No items in this folder';
         container.appendChild(emptyMsg);
@@ -130,14 +146,14 @@ function renderLevel(level) {
     }
 
     // Создаём кнопки папок и файлов
-    level.forEach(item => {
+    displayLevel.forEach(item => {
         const btn = document.createElement('button');
         btn.textContent = item.name;
 
         if (item.type === 'folder') {
             btn.onclick = () => {
                 // Сохраняем текущий уровень в стек
-                navigationStack.push(level);
+                navigationStack.push(displayLevel);
                 // Переходим внутрь папки
                 renderLevel(item.children);
             };
@@ -145,7 +161,12 @@ function renderLevel(level) {
 
         if (item.type === 'file') {
             btn.onclick = () => {
-                loadAndRunGame(item);
+                if (item.userFile) {
+                    // Пользовательский файл
+                    loadAndRunUserFile(item.userFile);
+                } else {
+                    loadAndRunGame(item);
+                }
             };
         }
 
@@ -169,6 +190,56 @@ backBtn.onclick = () => {
     renderLevel(previousLevel || rootData);
 };
 
+const addWordsBtn = document.getElementById('addWordsBtn');
+
+addWordsBtn.onclick = () => {
+    // Создаём невидимый input для выбора файла
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.txt,.csv,.xlsx';
+    input.multiple = true;
+
+    input.onchange = () => {
+        if (!input.files) return;
+
+        Array.from(input.files).forEach(file => {
+            // Проверка размера файла (5 МБ)
+            if (file.size > 5 * 1024 * 1024) {
+                alert(uiTexts.file_too_large || 'File is too large');
+                return;
+            }
+            // Добавляем файл в массив
+            userFiles.push({ name: file.name, file });
+        });
+
+        // Создаём актуальную папку "Мои слова"
+        const myWordsFolder = {
+            name: uiTexts.my_words || 'My Words',
+            type: 'folder',
+            children: userFiles.map(f => ({ name: f.name, type: 'file', userFile: f }))
+        };
+
+        // Определяем текущий уровень (последний в navigationStack или корень)
+        const currentLevel = navigationStack[navigationStack.length - 1] || rootData;
+
+        // Проверяем, находимся ли мы в папке "Мои слова"
+        const inMyWords = currentLevel.some(
+            item => item.name === (uiTexts.my_words || 'My Words') && item.type === 'folder'
+        );
+
+        // Если уже находимся в "My Words", остаёмся в ней
+        if (inMyWords) {
+            // Остаёмся в "Мои слова"
+            renderLevel(myWordsFolder.children)
+        } else {
+            // Иначе добавляем "Мои слова" в корень и переходим в неё
+            renderLevel([myWordsFolder, ...rootData]);
+            navigationStack.push(rootData); // сохраняем предыдущий уровень
+        }
+    };
+
+    input.click();
+};
 
 /***********************
  * ЗАГЛУШКА ИГРЫ
@@ -196,6 +267,40 @@ async function loadAndRunGame(file) {
     }
 }
 
+
+/***********************
+ * ЗАГРУЗКА ПОЛЬЗОВАТЕЛЬСКИХ СЛОВ и другое
+ ***********************/
+async function loadAndRunUserFile(userFileObj) {
+    try {
+        const file = userFileObj.file;
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        let pairs;
+
+        if (extension === 'txt' || extension === 'csv') {
+            const text = await file.text();
+            pairs = parsePairsFromText(text).pairs;
+        } else if (extension === 'xlsx') {
+            const buffer = await file.arrayBuffer();
+            pairs = parsePairsFromXLSX(buffer).pairs;
+        } else {
+            throw new Error('UNSUPPORTED_FORMAT');
+        }
+
+        if (!pairs.length) throw new Error('EMPTY_FILE');
+
+        closeGame();
+        window.startGame({ name: file.name }, uiTexts, pairs);
+
+    } catch (err) {
+        if (err.message === 'EMPTY_FILE') {
+            alert(uiTexts.file_empty || 'File is empty');
+        } else {
+            alert(uiTexts.upload_error || 'Failed to upload file');
+        }
+    }
+}
 
 
 

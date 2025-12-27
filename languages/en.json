@@ -5,5 +5,10 @@
   "load_error": "Failed to load files",
   "file_empty": "File is empty",
   "file_load_error": "Failed to load file",
-  "game_start_message": "Starting mini-game!"
+  "game_start_message": "Starting mini-game!",
+  "add_own_words": "Add your words",
+  "my_words": "My Words",
+  "upload_error": "Failed to upload file",
+  "file_too_large": "File is too large",
+  "delete_confirm": "Are you sure you want to delete this file?"
 }
