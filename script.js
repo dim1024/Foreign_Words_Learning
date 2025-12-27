@@ -20,6 +20,26 @@ const backBtn = document.getElementById('backBtn');
 let userFiles = []; // { name: string, file: File }
 
 /***********************
+ * ПРОВЕРКА ИМЕН ПОЛЬЗОВАТЕЛЬСКИХ ФАЙЛОВ НА ДУБЛИКАТЫ
+ ***********************/
+function getUniqueFileName(originalName, existingNames) {
+    const dotIndex = originalName.lastIndexOf('.');
+    const base = dotIndex !== -1 ? originalName.slice(0, dotIndex) : originalName;
+    const ext = dotIndex !== -1 ? originalName.slice(dotIndex) : '';
+
+    let name = originalName;
+    let counter = 2;
+
+    while (existingNames.includes(name)) {
+        name = `${base} (${counter})${ext}`;
+        counter++;
+    }
+
+    return name;
+}
+
+
+/***********************
  * ЗАГРУЗКА ЯЗЫКА
  ***********************/
 async function loadLanguage() {
@@ -208,8 +228,17 @@ const addWordsBtn = document.getElementById('addWordsBtn');
                 alert(uiTexts.file_too_large || 'File is too large');
                 return;
             }
+            
+            // Проверка на дублирующиеся имена файлов пользователя
+            const existingNames = userFiles.map(f => f.name);
+            const uniqueName = getUniqueFileName(file.name, existingNames);
+            
             // Добавляем файл в массив
-            userFiles.push({ name: file.name, file });
+            userFiles.push({
+                name: uniqueName,
+                file
+            });
+
         });
 
         // если файлов нет — ничего не делаем
