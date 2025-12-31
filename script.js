@@ -16,8 +16,42 @@ const container = document.getElementById('fileContainer');
 const homeBtn = document.getElementById('homeBtn');
 const backBtn = document.getElementById('backBtn');
 
+
+
+const myWordsFolder = {
+    name: '',
+    type: 'folder',
+    children: []
+};
+
+function syncMyWordsFolder() {
+    myWordsFolder.name = uiTexts.my_words || 'My Words';
+    myWordsFolder.children = userFiles
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(f => ({
+            name: f.name,
+            type: 'file',
+            userFile: f
+        }));
+}
+
+const USER_WORDS_KEY = 'user_words';
+
+function loadUserWords() {
+    try {
+        return JSON.parse(localStorage.getItem(USER_WORDS_KEY)) || [];
+    } catch {
+        return [];
+    }
+}
+
+function saveUserWords(words) {
+    localStorage.setItem(USER_WORDS_KEY, JSON.stringify(words));
+}
+
 // Пользовательские файлы
-let userFiles = []; // { name: string, file: File }
+let userFiles = loadUserWords();
 
 /***********************
  * ПРОВЕРКА ИМЕН ПОЛЬЗОВАТЕЛЬСКИХ ФАЙЛОВ НА ДУБЛИКАТЫ
@@ -137,12 +171,8 @@ function renderLevel(level) {
 
     // Добавляем папку "Мои слова" на главном уровне, если есть пользовательские файлы
     if (level === rootData && userFiles.length) {
-        const userFolder = {
-            name: uiTexts.my_words || 'My Words',
-            type: 'folder',
-            children: userFiles.map(f => ({ name: f.name, type: 'file', userFile: f }))
-        };
-        displayLevel = [userFolder, ...displayLevel];
+        syncMyWordsFolder();
+        displayLevel = [myWordsFolder, ...displayLevel];
     }
 
     // Очищаем контейнер
@@ -167,7 +197,7 @@ function renderLevel(level) {
         if (item.type === 'folder') {
             btn.onclick = () => {
                 // Сохраняем текущий уровень в стек
-                navigationStack.push(displayLevel);
+                navigationStack.push(level);
                 // Переходим внутрь папки
                 renderLevel(item.children);
             };
@@ -264,10 +294,34 @@ const addWordsBtn = document.getElementById('addWordsBtn');
             const uniqueName = getUniqueFileName(file.name, existingNames);
             
             // Добавляем файл в массив
-            userFiles.push({
-                name: uniqueName,
-                file
-            });
+            (async () => {
+                let parsed;
+
+                if (file.name.endsWith('.txt') || file.name.endsWith('.csv')) {
+                    parsed = parsePairsFromText(await file.text());
+                } else if (file.name.endsWith('.xlsx')) {
+                    parsed = parsePairsFromXLSX(await file.arrayBuffer());
+                } else {
+                    return;
+                }
+
+                userFiles.push({
+                    name: uniqueName,
+                    pairs: parsed.pairs,
+                    meta: parsed.meta
+                });
+
+                saveUserWords(userFiles);
+
+                syncMyWordsFolder();
+                closeGame();
+
+                // ВСЕГДА открываем папку "Мои слова"
+                navigationStack = [rootData];
+                renderLevel(myWordsFolder.children);
+
+            })();
+
 
         });
 
@@ -275,15 +329,8 @@ const addWordsBtn = document.getElementById('addWordsBtn');
         if (!userFiles.length) return;
 
         // виртуальная папка "Мои слова"
-        const myWordsFolder = {
-            name: uiTexts.my_words || 'My Words',
-            type: 'folder',
-            children: userFiles.map(f => ({
-                name: f.name,
-                type: 'file',
-                userFile: f
-            }))
-        };
+        saveUserWords(userFiles);
+        syncMyWordsFolder();
 
         // КЛЮЧЕВОЕ МЕСТО ДЛЯ ПОВЕДЕНИЯ: ЧТОБЫ ВСЕГДА ОТКРЫВАЛАСЬ ПАПКА "МОИ СЛОВА", ПРИ ДОБАВЛЕНИИ НОВЫХ СЛОВ.
         // Закрываем игру, если она была открыта, чтобы она не мешала навигации.
@@ -329,36 +376,20 @@ async function loadAndRunGame(file) {
 /***********************
  * ЗАГРУЗКА ПОЛЬЗОВАТЕЛЬСКИХ СЛОВ и другое
  ***********************/
-async function loadAndRunUserFile(userFileObj) {
-    try {
-        const file = userFileObj.file;
-        const extension = file.name.split('.').pop().toLowerCase();
-
-        let pairs;
-
-        if (extension === 'txt' || extension === 'csv') {
-            const text = await file.text();
-            pairs = parsePairsFromText(text).pairs;
-        } else if (extension === 'xlsx') {
-            const buffer = await file.arrayBuffer();
-            pairs = parsePairsFromXLSX(buffer).pairs;
-        } else {
-            throw new Error('UNSUPPORTED_FORMAT');
-        }
-
-        if (!pairs.length) throw new Error('EMPTY_FILE');
-
-        closeGame();
-        window.startGame({ name: file.name }, uiTexts, pairs);
-
-    } catch (err) {
-        if (err.message === 'EMPTY_FILE') {
-            alert(uiTexts.file_empty || 'File is empty');
-        } else {
-            alert(uiTexts.upload_error || 'Failed to upload file');
-        }
+function loadAndRunUserFile(userFileObj) {
+    if (!userFileObj.pairs || !userFileObj.pairs.length) {
+        alert(uiTexts.file_empty || 'File is empty');
+        return;
     }
+
+    closeGame();
+    window.startGame(
+        { name: userFileObj.name },
+        uiTexts,
+        userFileObj.pairs
+    );
 }
+
 
 /***********************
  * УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЬСКИХ СЛОВ
@@ -371,24 +402,20 @@ function deleteUserFile(userFileObj) {
 
     // удаляем файл из массива
     userFiles = userFiles.filter(f => f !== userFileObj);
+    saveUserWords(userFiles);
+    syncMyWordsFolder();
 
     closeGame();
 
-    // если файлов больше нет — возвращаемся в корень
     if (userFiles.length === 0) {
         navigationStack = [];
         renderLevel(rootData);
-        return;
+    } else {
+        renderLevel(myWordsFolder.children);
     }
 
-    // иначе остаёмся в папке "Мои слова"
-    const myWordsChildren = userFiles.map(f => ({
-        name: f.name,
-        type: 'file',
-        userFile: f
-    }));
 
-    renderLevel(myWordsChildren);
+
 }
 
 
@@ -409,6 +436,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // 3. Сохраняем корень и рендерим
     rootData = files;
+    syncMyWordsFolder();
     renderLevel(rootData);
 });
 
