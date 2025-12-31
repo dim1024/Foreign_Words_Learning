@@ -305,11 +305,23 @@ const addWordsBtn = document.getElementById('addWordsBtn');
                     return;
                 }
 
-                userFiles.push({
+                const newUserFile = {
                     name: uniqueName,
                     pairs: parsed.pairs,
                     meta: parsed.meta
-                });
+                };
+
+                // Проверка суммарного размера всех пользовательских слов
+                const tempUserFiles = [...userFiles, newUserFile];
+                const totalSize = new Blob([JSON.stringify(tempUserFiles)]).size; // размер в байтах
+
+                if (totalSize > 5 * 1024 * 1024) { // 5 МБ
+                    alert(uiTexts.storage_full || 'Cannot save: total words exceed 5MB');
+                    return;
+                }
+
+                // Если ок — добавляем
+                userFiles.push(newUserFile);
 
                 saveUserWords(userFiles);
 

@@ -10,5 +10,6 @@
   "my_words": "My Words",
   "upload_error": "Failed to upload file",
   "file_too_large": "File is too large",
+  "storage_full": "There is no free space left in the word storage. Delete unnecessary files to add new ones",
   "delete_confirm": "Are you sure you want to delete this file?"
 }
