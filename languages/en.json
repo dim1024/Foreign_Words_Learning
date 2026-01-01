@@ -11,5 +11,14 @@
   "upload_error": "Failed to upload file",
   "file_too_large": "File is too large",
   "storage_full": "There is no free space left in the word storage. Delete unnecessary files to add new ones",
-  "delete_confirm": "Are you sure you want to delete this file?"
+  "delete_confirm": "Are you sure you want to delete this file?",
+
+  "preview_count": "Words counted: {total}, Successful: {valid}, Invalid: {invalid}",
+  "empty_term": "(empty)",
+  "empty_translation": "(empty)",
+  "fix_empty_rows_to_load": "Fix all empty rows to load",
+  "confirm_upload": "All good, upload",
+  "cancel_upload": "No, I'll fix the file"
+
+
 }

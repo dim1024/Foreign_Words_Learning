@@ -1,0 +1,36 @@
+#previewModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#previewBox {
+  background: #fff;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+#previewList {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  margin: 10px 0;
+}
+
+.preview-row {
+  display: flex;
+  gap: 8px;
+  padding: 4px 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.preview-row span {
+  width: 50%;
+}

@@ -272,14 +272,14 @@ backBtn.onclick = () => {
 
 const addWordsBtn = document.getElementById('addWordsBtn');
 
-    addWordsBtn.onclick = () => {
-        // Создаём невидимый input для выбора файла
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.txt,.csv,.xlsx';
-        input.multiple = true;
+addWordsBtn.onclick = () => {
+    // Создаём невидимый input для выбора файла
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.txt,.csv,.xlsx';
+    input.multiple = true;
 
-        input.onchange = () => {
+    input.onchange = () => {
         if (!input.files) return;
 
         Array.from(input.files).forEach(file => {
@@ -297,40 +297,49 @@ const addWordsBtn = document.getElementById('addWordsBtn');
             (async () => {
                 let parsed;
 
-                if (file.name.endsWith('.txt') || file.name.endsWith('.csv')) {
-                    parsed = parsePairsFromText(await file.text());
-                } else if (file.name.endsWith('.xlsx')) {
-                    parsed = parsePairsFromXLSX(await file.arrayBuffer());
-                } else {
+                try {
+                    if (file.name.endsWith('.txt') || file.name.endsWith('.csv')) {
+                        parsed = parsePairsFromText(await file.text());
+                    } else if (file.name.endsWith('.xlsx')) {
+                        parsed = parsePairsFromXLSX(await file.arrayBuffer());
+                    } else {
+                        return;
+                    }
+                } catch (e) {
+                    alert(uiTexts.file_empty || 'File is empty');
                     return;
                 }
 
-                const newUserFile = {
-                    name: uniqueName,
-                    pairs: parsed.pairs,
-                    meta: parsed.meta
-                };
+                showUserWordsPreview(parsed.pairs, () => {
 
-                // Проверка суммарного размера всех пользовательских слов
-                const tempUserFiles = [...userFiles, newUserFile];
-                const totalSize = new Blob([JSON.stringify(tempUserFiles)]).size; // размер в байтах
+                    const newUserFile = {
+                        name: uniqueName,
+                        pairs: parsed.pairs,
+                        meta: parsed.meta
+                    };
 
-                if (totalSize > 5 * 1024 * 1024) { // 5 МБ
-                    alert(uiTexts.storage_full || 'Cannot save: total words exceed 5MB');
-                    return;
-                }
+                    // Проверка суммарного размера всех пользовательских слов
+                    const tempUserFiles = [...userFiles, newUserFile];
+                    const totalSize = new Blob([JSON.stringify(tempUserFiles)]).size; // размер в байтах
 
-                // Если ок — добавляем
-                userFiles.push(newUserFile);
+                    if (totalSize > 5 * 1024 * 1024) { // 5 МБ
+                        alert(uiTexts.storage_full || 'Cannot save: total words exceed 5MB');
+                        return;
+                    }
 
-                saveUserWords(userFiles);
+                    // Если ок — добавляем
+                    userFiles.push(newUserFile);
 
-                syncMyWordsFolder();
-                closeGame();
+                    saveUserWords(userFiles);
 
-                // ВСЕГДА открываем папку "Мои слова"
-                navigationStack = [rootData];
-                renderLevel(myWordsFolder.children);
+                    syncMyWordsFolder();
+                    closeGame();
+
+                    // ВСЕГДА открываем папку "Мои слова"
+                    navigationStack = [rootData];
+                    renderLevel(myWordsFolder.children);
+
+                });
 
             })();
 
@@ -425,9 +434,6 @@ function deleteUserFile(userFileObj) {
     } else {
         renderLevel(myWordsFolder.children);
     }
-
-
-
 }
 
 
@@ -457,7 +463,7 @@ function parsePairsFromText(text) {
     const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     const pairs = [];
 
-    const separators = [';', ',', '|', '—', '-', ':', '\t'];
+    const separators = [';', ',', '|', '*', '/', '—', '-', ':', '\t'];
 
     lines.forEach(line => {
         let separator = separators.find(sep => line.includes(sep));
@@ -465,12 +471,19 @@ function parsePairsFromText(text) {
         // если разделитель не найден — используем первый пробел
         if (!separator) {
             const firstSpaceIndex = line.indexOf(' ');
-            if (firstSpaceIndex === -1) return;
+
+            if (firstSpaceIndex === -1) {
+                // Строка без разделителя: берем весь текст как term, перевод пустой
+                pairs.push({ term: line.trim(), translation: '' });
+                return;
+            }
 
             const left = line.slice(0, firstSpaceIndex).trim();
             const right = line.slice(firstSpaceIndex + 1).trim();
-            if (left && right) {
-                pairs.push({ term: left, translation: right });
+
+            // добавляем строки с пустым переводом или пустым словом
+            if (left || right) { // игнорируем только полностью пустые
+                pairs.push({ term: left || '', translation: right || '' });
             }
             return;
         }
@@ -481,8 +494,9 @@ function parsePairsFromText(text) {
         const left = parts[0].trim();
         const right = parts.slice(1).join(separator).trim();
 
-        if (left && right) {
-            pairs.push({ term: left, translation: right });
+        // добавляем строки, где пустое слово или перевод
+        if (left || right) {
+            pairs.push({ term: left || '', translation: right || '' });
         }
     });
 
@@ -505,12 +519,14 @@ function parsePairsFromXLSX(buffer) {
     const pairs = [];
 
     rows.forEach(row => {
-        if (!row || row.length < 2) return;
+        if (!row) return; ///
 
-        const left = String(row[0]).trim();
-        const right = String(row[1]).trim();
+        //  проверяем на null и undefined
+        const left = row[0] != null ? String(row[0]).trim() : '';
+        const right = row[1] != null ? String(row[1]).trim() : '';
 
-        if (left && right) {
+        // добавляем строки, где пустое слово или перевод
+        if (left || right) {
             pairs.push({ term: left, translation: right });
         }
     });
@@ -526,4 +542,70 @@ function parsePairsFromXLSX(buffer) {
     };
 }
 
+/***********************
+ * ПОКАЗЫВАЕТ ПРЕВЬЮ ОКНО ПЕРЕД ЗАГРУЗКОЙ СВОИХ СЛОВ
+ ***********************/
+function showUserWordsPreview(pairs, onConfirm) {
+    const modal = document.getElementById('previewModal');
+    const list = document.getElementById('previewList');
+    const count = document.getElementById('previewCount');
+    const confirmBtn = document.getElementById('confirmPreview');
 
+    list.innerHTML = '';
+
+    // Считаем успешные и ошибочные строки
+    const validPairs = pairs.filter(p => p.term && p.translation);
+    const invalidPairs = pairs.filter(p => !p.term || !p.translation);
+
+    // Счётчик
+    count.textContent = uiTexts.preview_count
+        .replace('{total}', pairs.length)
+        .replace('{valid}', validPairs.length)
+        .replace('{invalid}', invalidPairs.length);
+
+    if (invalidPairs.length > 0) {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = uiTexts.fix_empty_rows_to_load; // "Исправьте все пустые строки, чтобы загрузить"
+    } else {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = uiTexts.confirm_upload; // "Все ок, загрузить"
+    }
+
+    pairs.forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'preview-row';
+
+        const left = document.createElement('span');
+        left.textContent = p.term || uiTexts.empty_term;
+
+        const right = document.createElement('span');
+        right.textContent = p.translation || uiTexts.empty_translation;
+
+        // Подсветка подозрительных строк (пустой перевод)
+        if (!p.translation) {
+            right.style.backgroundColor = '#fe8a8aff';
+            right.title = 'Пустой перевод!';
+        }
+
+        if (!p.term) {
+            left.style.backgroundColor = '#f6dd92ff';
+            left.title = 'Пустое слово!';
+        }
+
+        row.appendChild(left);
+        row.appendChild(right);
+        list.appendChild(row);
+    });
+
+    modal.style.display = 'flex';
+
+    document.getElementById('cancelPreview').onclick = () => {
+        modal.style.display = 'none';
+    };
+
+    document.getElementById('confirmPreview').onclick = () => {
+        if (invalidPairs.length > 0) return; // на всякий случай
+        modal.style.display = 'none';
+        onConfirm();
+    };
+}

@@ -19,6 +19,25 @@
     <!-- Контейнер для папок и файлов -->
     <div id="fileContainer"></div>
 
+    <!-- МОДАЛКА ПРЕДПРОСМОТРА загруженных слов-->
+    <div id="previewModal" style="display:none;">
+        <div id="previewBox">
+            <h3>Проверьте слова</h3>
+
+            <div id="previewList"></div>
+            <div id="previewCount"></div> 
+
+            <div class="preview-actions">
+                <button id="cancelPreview">
+                    Не загружать, файл оформлен неправильно
+                </button>
+                <button id="confirmPreview">
+                    Все ок, загрузить
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Подключаем SheetJS для xlsx -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <!-- Заглушка игры -->
