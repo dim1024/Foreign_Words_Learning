@@ -24,6 +24,12 @@
         <div id="previewBox">
             <h3>Проверьте слова</h3>
 
+              <p id="separatorInfo" style="margin-bottom:10px; font-size:0.9em; color:#555;">
+            Допустимые разделители для TXT/CSV: 
+            <code>;</code>, <code>,</code>, <code>|</code>, <code>*</code>, 
+            <code>/</code>, <code>—</code>, <code>-</code>, <code>:</code>, <code>[TAB]</code>
+        </p>
+
             <div id="previewList"></div>
             <div id="previewCount"></div> 
 
@@ -37,6 +43,107 @@
             </div>
         </div>
     </div>
+
+        <!-- МОДАЛКА ЗАГРУЗКИ СВОИХ СЛОВ -->
+    <div id="uploadModal" style="display:none;">
+        <div id="uploadBox">
+
+            <!-- ВИЗУАЛЬНЫЙ ПРИМЕР -->
+            <div id="formatExamples">
+
+                <div class="example-block">
+                    
+                    <div class="example-title">TXT</div>
+
+                    <div class="example-row ok">
+                        <span>hello</span>
+                        <!-- <span class="arrow">&</span> -->
+                        <span>hola</span>
+                        <span class="icon">✅</span>
+                    </div>
+
+                    <div class="example-row ok">
+                        <span>party</span>
+                        <!-- <span class="arrow">&nbsp;</span> -->
+                        <span>fiesta</span>
+                        <span class="icon">✅</span>
+                    </div>
+
+
+                    <!-- Ошибка: пустой перевод -->
+                    <div class="example-row error">
+                        <span>water</span>
+                        <!-- <span class="arrow">&nbsp;</span> -->
+                        <span></span>
+                        <span class="icon">❌</span>
+                    </div>
+
+                    <!-- Ошибка: пустое слово -->
+                    <div class="example-row error">
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <!-- <span class="arrow">&nbsp;</span> -->
+                        <span>amigo</span>
+                        <span class="icon">❌</span>
+                    </div>
+                </div>
+                
+
+                <div class="example-block">
+                    <div class="example-title">XLSX</div>
+
+                    <table class="example-table">
+                        <tr class="ok">
+                            <td>yes</td>
+                            <td>sí</td>
+                            <td>✅</td>
+                        </tr>
+
+                            <tr class="ok">
+                            <td>goodbye</td>
+                            <td>adiós</td>
+                            <td>✅</td>
+                        </tr>
+
+                        <!-- Ошибка: пустой перевод -->
+                        <tr class="error">
+                            <td>dog</td>
+                            <td></td>
+                            <td>❌</td>
+                        </tr>
+
+                        <!-- Ошибка: пустое слово -->
+                        <tr class="error">
+                            <td></td>
+                            <td>gracias</td>
+                            <td>❌</td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+            
+
+            <!-- DOWNLOAD EXAMPLES -->
+            <div id="downloadExamples">
+                <p>Скачайте примеры файлов для загрузки:</p>
+                <button data-example="txt">📥 TXT</button>
+                <button data-example="xlsx">📥 XLSX</button>
+            </div>
+
+            <!-- DRAG & DROP -->
+            <div id="dropZone">
+                <div id="dropIcon">📂</div>
+            </div>
+
+            <!-- КНОПКИ -->
+            <div class="upload-actions">
+                <button id="uploadFileBtn">Upload</button>
+                <button id="closeUploadModal">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+
 
     <!-- Подключаем SheetJS для xlsx -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>

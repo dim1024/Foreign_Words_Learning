@@ -273,100 +273,9 @@ backBtn.onclick = () => {
 const addWordsBtn = document.getElementById('addWordsBtn');
 
 addWordsBtn.onclick = () => {
-    // Создаём невидимый input для выбора файла
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.txt,.csv,.xlsx';
-    input.multiple = true;
-
-    input.onchange = () => {
-        if (!input.files) return;
-
-        Array.from(input.files).forEach(file => {
-            // Проверка размера файла (5 МБ)
-            if (file.size > 5 * 1024 * 1024) {
-                alert(uiTexts.file_too_large || 'File is too large');
-                return;
-            }
-            
-            // Проверка на дублирующиеся имена файлов пользователя
-            const existingNames = userFiles.map(f => f.name);
-            const uniqueName = getUniqueFileName(file.name, existingNames);
-            
-            // Добавляем файл в массив
-            (async () => {
-                let parsed;
-
-                try {
-                    if (file.name.endsWith('.txt') || file.name.endsWith('.csv')) {
-                        parsed = parsePairsFromText(await file.text());
-                    } else if (file.name.endsWith('.xlsx')) {
-                        parsed = parsePairsFromXLSX(await file.arrayBuffer());
-                    } else {
-                        return;
-                    }
-                } catch (e) {
-                    alert(uiTexts.file_empty || 'File is empty');
-                    return;
-                }
-
-                showUserWordsPreview(parsed.pairs, () => {
-
-                    const newUserFile = {
-                        name: uniqueName,
-                        pairs: parsed.pairs,
-                        meta: parsed.meta
-                    };
-
-                    // Проверка суммарного размера всех пользовательских слов
-                    const tempUserFiles = [...userFiles, newUserFile];
-                    const totalSize = new Blob([JSON.stringify(tempUserFiles)]).size; // размер в байтах
-
-                    if (totalSize > 5 * 1024 * 1024) { // 5 МБ
-                        alert(uiTexts.storage_full || 'Cannot save: total words exceed 5MB');
-                        return;
-                    }
-
-                    // Если ок — добавляем
-                    userFiles.push(newUserFile);
-
-                    saveUserWords(userFiles);
-
-                    syncMyWordsFolder();
-                    closeGame();
-
-                    // ВСЕГДА открываем папку "Мои слова"
-                    navigationStack = [rootData];
-                    renderLevel(myWordsFolder.children);
-
-                });
-
-            })();
-
-
-        });
-
-        // если файлов нет — ничего не делаем
-        if (!userFiles.length) return;
-
-        // виртуальная папка "Мои слова"
-        saveUserWords(userFiles);
-        syncMyWordsFolder();
-
-        // КЛЮЧЕВОЕ МЕСТО ДЛЯ ПОВЕДЕНИЯ: ЧТОБЫ ВСЕГДА ОТКРЫВАЛАСЬ ПАПКА "МОИ СЛОВА", ПРИ ДОБАВЛЕНИИ НОВЫХ СЛОВ.
-        // Закрываем игру, если она была открыта, чтобы она не мешала навигации.
-        closeGame();
-
-        // всегда считаем, что "Мои слова" лежит в корне
-        navigationStack = [rootData];
-
-        // всегда открываем папку "Мои слова"
-        renderLevel(myWordsFolder.children);
-    };
-
-
-    input.click();
+    openUploadModal();
 };
+
 
 /***********************
  * ЗАГЛУШКА ИГРЫ
@@ -436,6 +345,142 @@ function deleteUserFile(userFileObj) {
     }
 }
 
+/***********************
+ * Открытие / закрытие модалки для загрузки пользовательских слов
+ ***********************/
+function openUploadModal() {
+    const modal = document.getElementById('uploadModal');
+    modal.style.display = 'flex';
+
+    // Сбрасываем DropZone, чтобы при повторном открытие не запоминалось предыдущего красного или зеленего состояния
+    const dropZone = document.getElementById('dropZone');
+    if (dropZone) {
+        dropZone.className = '';    // убираем valid/invalid/dragging
+        setDropIcon('idle');        // 📂
+    }
+}
+
+function closeUploadModal() {
+    document.getElementById('uploadModal').style.display = 'none';
+}
+
+/***********************
+ * Проверка файла (формат + размер)
+ ***********************/
+function isValidUserFile(file) {
+    const allowed = ['txt', 'csv', 'xlsx'];
+    const ext = file.name.split('.').pop().toLowerCase();
+
+    if (!allowed.includes(ext)) return false;
+    if (file.size > 5 * 1024 * 1024) return false;
+
+    return true;
+}
+
+/***********************
+ * Drag & Drop значек
+ ***********************/
+function setDropIcon(state) {
+    const icon = document.getElementById('dropIcon');
+    if (!icon) return;
+
+    if (state === 'valid') {
+        icon.textContent = '✅';
+    } else if (state === 'invalid') {
+        icon.textContent = '❌';
+    } else {
+        icon.textContent = '📂';
+    }
+}
+
+/***********************
+ * Drag & Drop логика
+ ***********************/
+(function initDragAndDrop() {
+    const dropZone = document.getElementById('dropZone');
+
+    if (!dropZone) return;
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+
+        const hasFiles = Array.from(e.dataTransfer.types).includes('Files');
+
+        if (hasFiles) {
+            dropZone.className = 'dragging';
+            setDropIcon('idle'); // 📂
+        } else {
+            dropZone.className = 'invalid';
+            setDropIcon('invalid'); // ❌
+        }
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.className = '';
+        setDropIcon('idle'); // 📂
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.className = '';
+
+        const file = e.dataTransfer.files[0];
+
+        if (!file) {
+            setDropIcon('invalid');
+            return;
+        }
+
+        if (!isValidUserFile(file)) {
+            dropZone.className = 'invalid';
+            setDropIcon('invalid'); // ❌
+            setTimeout(() => {
+                dropZone.className = '';
+                setDropIcon('idle'); // сброс
+            }, 500);
+            return;
+        }
+
+        // ✅ только если файл валидный
+        dropZone.className = 'valid';
+        setDropIcon('valid');  // ✅
+
+        // Через 0.8 сек сбрасываем в нормальное состояние
+        setTimeout(() => {
+            dropZone.className = '';
+            setDropIcon('idle'); // 📂
+        }, 1200);
+
+        // Обработка файла
+        setTimeout(() => {
+            closeUploadModal();
+            handleUserFiles([file]);
+        }, 800);
+    });
+})();
+
+
+/***********************
+ * Кнопка Upload (обычный input)
+ ***********************/
+document.getElementById('uploadFileBtn').onclick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.txt,.csv,.xlsx';
+    input.multiple = true;
+
+    input.onchange = () => {
+        if (!input.files) return;
+        closeUploadModal();
+        handleUserFiles(Array.from(input.files));
+    };
+
+    input.click();
+};
+
+//Кнопка Cancel
+document.getElementById('closeUploadModal').onclick = closeUploadModal;
+
 
 /***********************
  * ИНИЦИАЛИЗАЦИЯ САЙТА
@@ -456,6 +501,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     rootData = files;
     syncMyWordsFolder();
     renderLevel(rootData);
+
+    // 4. Добавляем кнопки для скачивания примеров
+    renderExampleDownloads();
 });
 
 
@@ -463,7 +511,7 @@ function parsePairsFromText(text) {
     const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     const pairs = [];
 
-    const separators = [';', ',', '|', '*', '/', '—', '-', ':', '\t'];
+    const separators = [';', ',', '|', '*', '/', ':', '\t'];
 
     lines.forEach(line => {
         let separator = separators.find(sep => line.includes(sep));
@@ -541,6 +589,93 @@ function parsePairsFromXLSX(buffer) {
         }
     };
 }
+
+function handleUserFiles(files) {
+    files.forEach(file => {
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert(uiTexts.file_too_large || 'File is too large');
+            return;
+        }
+
+        const existingNames = userFiles.map(f => f.name);
+        const uniqueName = getUniqueFileName(file.name, existingNames);
+
+        (async () => {
+            let parsed;
+
+            try {
+                if (file.name.endsWith('.txt') || file.name.endsWith('.csv')) {
+                    parsed = parsePairsFromText(await file.text());
+                } else if (file.name.endsWith('.xlsx')) {
+                    parsed = parsePairsFromXLSX(await file.arrayBuffer());
+                } else {
+                    return;
+                }
+            } catch {
+                alert(uiTexts.file_empty || 'File is empty');
+                return;
+            }
+
+            showUserWordsPreview(parsed.pairs, () => {
+
+                const newUserFile = {
+                    name: uniqueName,
+                    pairs: parsed.pairs,
+                    meta: parsed.meta
+                };
+
+                const temp = [...userFiles, newUserFile];
+                const totalSize = new Blob([JSON.stringify(temp)]).size;
+
+                if (totalSize > 5 * 1024 * 1024) {
+                    alert(uiTexts.storage_full);
+                    return;
+                }
+
+                userFiles.push(newUserFile);
+                saveUserWords(userFiles);
+                syncMyWordsFolder();
+
+                closeGame();
+                navigationStack = [rootData];
+                renderLevel(myWordsFolder.children);
+            });
+        })();
+    });
+}
+
+/***********************
+ * для генерации кнопок
+ ***********************/
+function renderExampleDownloads() {
+    const exampleFiles = [
+        { name: 'example.txt', label: 'Пример TXT' },
+        { name: 'example.xlsx', label: 'Пример XLSX' },
+    ];
+
+    const container = document.getElementById('downloadExamples');
+    if (!container) return;
+
+    // удаляем старые кнопки (если есть)
+    container.querySelectorAll('button').forEach(btn => btn.remove());
+
+    exampleFiles.forEach(file => {
+        const btn = document.createElement('button');
+        btn.textContent = file.label;
+
+        btn.onclick = () => {
+            const link = document.createElement('a');
+            link.href = `assets/examples/${file.name}`;
+            link.download = file.name;
+            link.click();
+        };
+
+        container.appendChild(btn);
+    });
+}
+
+
 
 /***********************
  * ПОКАЗЫВАЕТ ПРЕВЬЮ ОКНО ПЕРЕД ЗАГРУЗКОЙ СВОИХ СЛОВ

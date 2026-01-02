@@ -1,7 +1,8 @@
+/* ========================= PREVIEW MODAL ========================= */
 #previewModal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -33,4 +34,158 @@
 
 .preview-row span {
   width: 50%;
+}
+
+/* =========================
+   UPLOAD MODAL (MINIMAL)
+   ========================= */
+
+#uploadModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#uploadBox {
+  background: #fff;
+  width: 90%;
+  max-width: 900px;
+  padding: 20px;
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+/* =========================
+   EXAMPLES
+   ========================= */
+
+#formatExamples {
+  display: flex;
+  gap: 20px;
+}
+
+.example-block {
+  border: 1px solid #ddd;
+  padding: 10px;
+  width: 100%;
+}
+
+.example-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.example-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+}
+
+.example-row.ok {
+  color: #2e7d32;
+}
+
+.example-row.error {
+  color: #c62828;
+}
+
+.example-row .arrow {
+  opacity: 0.6;
+}
+
+.example-row .icon {
+  margin-left: auto;
+}
+
+/* ========================= XLSX TABLE ========================= */
+.example-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.example-table td {
+  border: 1px solid #ccc;
+  padding: 4px;
+}
+
+.example-table tr.ok {
+  background: #e8f5e9;
+}
+
+.example-table tr.error {
+  background: #fdecea;
+}
+
+/* =========================
+   DOWNLOAD EXAMPLES
+   ========================= */
+
+#downloadExamples {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+}
+
+#downloadExamples button {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+/* =========================
+   DROP ZONE
+   ========================= */
+
+#dropZone {
+  grid-column: 1 / -1;
+  border: 2px dashed #aaa;
+  border-radius: 6px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #777;
+  transition: 0.15s;
+}
+
+#dropZone.valid {
+  border-color: #2e7d32;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+#dropZone.invalid {
+  border-color: #c62828;
+  background: #fdecea;
+  color: #c62828;
+}
+
+/* =========================
+   ACTION BUTTONS
+   ========================= */
+
+.upload-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.upload-actions button {
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+#dropZone.dragging {
+  border-color: #4da3ff;
+  background: #f0f7ff;
+  color: #4da3ff;
 }
