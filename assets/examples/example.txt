@@ -1,4 +1,11 @@
-hello hola
-party fiesta
-water agua
-friend amigo
+hello => hola
+party => fiesta
+please => por favor
+to wake up early => madrugar
+letter, menu => carta
+right => derecho, correcto
+good morning => buenos días
+I’m sorry => lo siento
+water => agua
+friend => amigo
+family => familia

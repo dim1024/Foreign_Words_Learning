@@ -511,28 +511,15 @@ function parsePairsFromText(text) {
     const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     const pairs = [];
 
-    const separators = [';', ',', '|', '*', '/', ':', '\t'];
+    // const separators = [';', ',', '|', '*', '/', ':', '\t'];
+    const separators = ['=>', '->'];
 
     lines.forEach(line => {
         let separator = separators.find(sep => line.includes(sep));
 
-        // если разделитель не найден — используем первый пробел
+        // если разделитель не найден — вся строка идет в "term"
         if (!separator) {
-            const firstSpaceIndex = line.indexOf(' ');
-
-            if (firstSpaceIndex === -1) {
-                // Строка без разделителя: берем весь текст как term, перевод пустой
-                pairs.push({ term: line.trim(), translation: '' });
-                return;
-            }
-
-            const left = line.slice(0, firstSpaceIndex).trim();
-            const right = line.slice(firstSpaceIndex + 1).trim();
-
-            // добавляем строки с пустым переводом или пустым словом
-            if (left || right) { // игнорируем только полностью пустые
-                pairs.push({ term: left || '', translation: right || '' });
-            }
+            pairs.push({ term: line, translation: '' });
             return;
         }
 

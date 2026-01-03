@@ -24,12 +24,6 @@
         <div id="previewBox">
             <h3>Проверьте слова</h3>
 
-              <p id="separatorInfo" style="margin-bottom:10px; font-size:0.9em; color:#555;">
-            Допустимые разделители для TXT/CSV: 
-            <code>;</code>, <code>,</code>, <code>|</code>, <code>*</code>, 
-            <code>/</code>, <code>—</code>, <code>-</code>, <code>:</code>, <code>[TAB]</code>
-        </p>
-
             <div id="previewList"></div>
             <div id="previewCount"></div> 
 
@@ -51,40 +45,104 @@
             <!-- ВИЗУАЛЬНЫЙ ПРИМЕР -->
             <div id="formatExamples">
 
+                            <!-- DOWNLOAD EXAMPLES -->
+            <div>         
+                <div>
+                    <p>Скачайте примеры файлов для загрузки:</p>
+
+                </div>
+
+                <div id="downloadExamples">
+                    <button data-example="txt">📥 TXT</button>
+                    <button data-example="xlsx">📥 XLSX</button>
+                </div>
+            </div>  
+
                 <div class="example-block">
                     
                     <div class="example-title">TXT</div>
 
                     <div class="example-row ok">
                         <span>hello</span>
-                        <!-- <span class="arrow">&</span> -->
+                        <span class="arrow">=></span>
                         <span>hola</span>
                         <span class="icon">✅</span>
                     </div>
 
                     <div class="example-row ok">
                         <span>party</span>
-                        <!-- <span class="arrow">&nbsp;</span> -->
+                        <span class="arrow">=></span>
                         <span>fiesta</span>
                         <span class="icon">✅</span>
                     </div>
+
+                    <div class="example-row ok">
+                        <span>please</span>
+                        <span class="arrow">=></span>
+                        <span>por favor</span>
+                        <span class="icon">✅</span>
+                    </div>
+
+                    <div class="example-row ok">
+                        <span>to wake up early</span>
+                        <span class="arrow">=></span>
+                        <span>madrugar</span>
+                        <span class="icon">✅</span>
+                    </div>
+
+                    <div class="example-row ok">
+                        <span>letter, menu</span>
+                        <span class="arrow">=></span>
+                        <span>carta</span>
+                        <span class="icon">✅</span>
+                    </div>
+
+                    <div class="example-row ok">
+                        <span>right</span>
+                        <span class="arrow">=></span>
+                        <span>derecho, correcto</span>
+                        <span class="icon">✅</span>
+                    </div>
+
+                    <div class="example-row ok">
+                        <span>good morning</span>
+                        <span class="arrow">=></span>
+                        <span>buenos días</span>
+                        <span class="icon">✅</span>
+                    </div>
+
+                    <div class="example-row ok">
+                        <span>I’m sorry</span>
+                        <span class="arrow">=></span>
+                        <span>lo siento</span>
+                        <span class="icon">✅</span>
+                    </div>
+                 
 
 
                     <!-- Ошибка: пустой перевод -->
                     <div class="example-row error">
                         <span>water</span>
-                        <!-- <span class="arrow">&nbsp;</span> -->
+                        <span class="arrow">=></span>
                         <span></span>
                         <span class="icon">❌</span>
                     </div>
 
                     <!-- Ошибка: пустое слово -->
                     <div class="example-row error">
-                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=></span>
                         <!-- <span class="arrow">&nbsp;</span> -->
                         <span>amigo</span>
                         <span class="icon">❌</span>
                     </div>
+
+                    <div class="example-row error">
+                        <span>family</span>
+                        <!-- <span class="arrow">=></span> -->
+                        <span>familia</span>
+                        <span class="icon">❌</span>
+                    </div>
+
                 </div>
                 
 
@@ -104,8 +162,38 @@
                             </tr>
 
                             <tr class="ok">
-                                <td>goodbye</td>
-                                <td>adiós</td>
+                                <td>one</td>
+                                <td>uno</td>
+                            </tr>
+                            
+                            <tr class="ok">
+                                <td>thank you</td>
+                                <td>gracias</td>
+                            </tr>
+                            
+                            <tr class="ok">
+                                <td>lifetime</td>
+                                <td>toda la vida</td>
+                            </tr>
+
+                            <tr class="ok">
+                                <td>bank, bench</td>
+                                <td>banco</td>
+                            </tr>
+
+                            <tr class="ok">
+                                <td>light</td>
+                                <td>luz, ligero</td>
+                            </tr>
+
+                            <tr class="ok">
+                                <td>see you later</td>
+                                <td>hasta luego</td>
+                            </tr>
+
+                            <tr class="ok">
+                                <td>how are you</td>
+                                <td>qué tal</td>
                             </tr>
 
                             <tr class="error">
@@ -115,7 +203,7 @@
 
                             <tr class="error">
                                 <td></td>
-                                <td>gracias</td>
+                                <td>adiós</td>
                             </tr>
                         </table>
 
@@ -123,23 +211,27 @@
                         <div class="xlsx-icons">
                             <span class="ok">✅</span>
                             <span class="ok">✅</span>
+                            <span class="ok">✅</span>
+                            <span class="ok">✅</span>
+                            <span class="ok">✅</span>
+                            <span class="ok">✅</span>
+                            <span class="ok">✅</span>
+                            <span class="ok">✅</span>
+                                                       
                             <span class="error">❌</span>
                             <span class="error">❌</span>
                         </div>
                     </div>
                 </div>
-
-
-
             </div>
             
 
-            <!-- DOWNLOAD EXAMPLES -->
+            <!-- DOWNLOAD EXAMPLES
             <div id="downloadExamples">
                 <p>Скачайте примеры файлов для загрузки:</p>
                 <button data-example="txt">📥 TXT</button>
                 <button data-example="xlsx">📥 XLSX</button>
-            </div>
+            </div> -->
 
             <!-- DRAG & DROP -->
             <div id="dropZone">

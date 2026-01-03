@@ -74,7 +74,8 @@
 .example-block {
   border: 1px solid #ddd;
   padding: 10px;
-  width: 100%;
+  /* width: 100%; */
+  width: 290px;
 }
 
 .example-title {
@@ -117,7 +118,7 @@ XLSX TABLE
 .example-table {
   border-collapse: collapse;
   table-layout: fixed;        /* 🔑 важно */
-  width: 150px;               /* изменение ширины колонок*/
+  width: 270px;               /* изменение ширины колонок*/
 }
 
 .example-table col.col-term {
@@ -131,7 +132,7 @@ XLSX TABLE
 .example-table td {
   border: 1px solid #ccc;
   padding: 6px 8px;
-  height: 22px;               /* одинаковая высота строк */
+  height: 18px;               /* одинаковая высота строк */
   vertical-align: middle;
   white-space: normal;          /* разрешаем перенос */
   word-break: break-word;       /* ломаем длинные слова */
@@ -146,7 +147,7 @@ XLSX TABLE
 }
 
 .xlsx-icons span {
-  height: 35px;               /* синхронизация со строкой */
+  height: 32px;               /* синхронизация со строкой */
   display: flex;
   align-items: center;
   justify-content: center;
