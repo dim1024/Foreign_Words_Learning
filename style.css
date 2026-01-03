@@ -105,23 +105,59 @@
   margin-left: auto;
 }
 
-/* ========================= XLSX TABLE ========================= */
+/* ========================= 
+XLSX TABLE 
+========================= */
+
+.xlsx-wrapper {
+  display: flex;
+  align-items: stretch;
+}
+
 .example-table {
-  width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;        /* 🔑 важно */
+  width: 150px;               /* изменение ширины колонок*/
+}
+
+.example-table col.col-term {
+  width: 50%;
+}
+
+.example-table col.col-translation {
+  width: 50%;
 }
 
 .example-table td {
   border: 1px solid #ccc;
-  padding: 4px;
+  padding: 6px 8px;
+  height: 22px;               /* одинаковая высота строк */
+  vertical-align: middle;
+  white-space: normal;          /* разрешаем перенос */
+  word-break: break-word;       /* ломаем длинные слова */
+  overflow-wrap: anywhere;      /* современный вариант */
 }
 
-.example-table tr.ok {
-  background: #e8f5e9;
+/* ИКОНКИ */
+.xlsx-icons {
+  display: flex;
+  flex-direction: column;
+  margin-left: 8px;
 }
 
-.example-table tr.error {
-  background: #fdecea;
+.xlsx-icons span {
+  height: 35px;               /* синхронизация со строкой */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.xlsx-icons .ok {
+  color: #2e7d32;
+}
+
+.xlsx-icons .error {
+  color: #c62828;
 }
 
 /* =========================

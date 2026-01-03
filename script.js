@@ -593,7 +593,7 @@ function parsePairsFromXLSX(buffer) {
 function handleUserFiles(files) {
     files.forEach(file => {
 
-        if (file.size > 5 * 1024 * 1024) {
+        if (file.size > 5 * 1024 * 1024) { // 5 мб
             alert(uiTexts.file_too_large || 'File is too large');
             return;
         }

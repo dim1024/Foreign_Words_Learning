@@ -91,34 +91,45 @@
                 <div class="example-block">
                     <div class="example-title">XLSX</div>
 
-                    <table class="example-table">
-                        <tr class="ok">
-                            <td>yes</td>
-                            <td>sí</td>
-                            <td>✅</td>
-                        </tr>
+                    <div class="xlsx-wrapper">
+                        <table class="example-table">
+                            <colgroup>
+                                <col class="col-term">
+                                <col class="col-translation">
+                            </colgroup>
 
                             <tr class="ok">
-                            <td>goodbye</td>
-                            <td>adiós</td>
-                            <td>✅</td>
-                        </tr>
+                                <td>yes</td>
+                                <td>sí</td>
+                            </tr>
 
-                        <!-- Ошибка: пустой перевод -->
-                        <tr class="error">
-                            <td>dog</td>
-                            <td></td>
-                            <td>❌</td>
-                        </tr>
+                            <tr class="ok">
+                                <td>goodbye</td>
+                                <td>adiós</td>
+                            </tr>
 
-                        <!-- Ошибка: пустое слово -->
-                        <tr class="error">
-                            <td></td>
-                            <td>gracias</td>
-                            <td>❌</td>
-                        </tr>
-                    </table>
+                            <tr class="error">
+                                <td>dog</td>
+                                <td></td>
+                            </tr>
+
+                            <tr class="error">
+                                <td></td>
+                                <td>gracias</td>
+                            </tr>
+                        </table>
+
+                        <!-- ИКОНКИ ВНЕ ТАБЛИЦЫ -->
+                        <div class="xlsx-icons">
+                            <span class="ok">✅</span>
+                            <span class="ok">✅</span>
+                            <span class="error">❌</span>
+                            <span class="error">❌</span>
+                        </div>
+                    </div>
                 </div>
+
+
 
             </div>
             
