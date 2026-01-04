@@ -52,15 +52,24 @@
 
 #uploadBox {
   background: #fff;
-  width: 90%;
-  max-width: 900px;
+
+  /* 🔑 ограничение относительно окна */
+  width: min(900px, 95vw);
+  max-height: 90vh;
+
   padding: 20px;
   border-radius: 6px;
+
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+
   box-sizing: border-box;
+
+  /* 🔑 ВКЛЮЧАЕМ СКРОЛЛ */
+  overflow: auto;
 }
+
 
 /* =========================
    EXAMPLES
@@ -133,11 +142,13 @@ XLSX TABLE
   border: 1px solid #ccc;
   padding: 6px 8px;
   height: 18px;               /* одинаковая высота строк */
+  font-size: 15px; 
   vertical-align: middle;
   white-space: normal;          /* разрешаем перенос */
   word-break: break-word;       /* ломаем длинные слова */
   overflow-wrap: anywhere;      /* современный вариант */
 }
+
 
 /* ИКОНКИ */
 .xlsx-icons {
