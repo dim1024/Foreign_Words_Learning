@@ -11,7 +11,7 @@
 #previewBox {
   background: #fff;
   width: 90%;
-  max-width: 600px;
+  max-width: 330px;
   max-height: 80vh;
   padding: 16px;
   display: flex;
@@ -26,15 +26,24 @@
 }
 
 .preview-row {
-  display: flex;
-  gap: 8px;
-  padding: 4px 8px;
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 12px;
+  padding: 6px 8px;
   border-bottom: 1px solid #eee;
+  align-items: start;
 }
 
 .preview-row span {
-  width: 50%;
+  /* white-space: nowrap;        длиные слова не ломаются, а заменяются точками */
+  overflow: hidden;
+  text-align: left;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
+
+
 
 /* =========================
    UPLOAD MODAL (MINIMAL)
