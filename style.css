@@ -246,3 +246,22 @@ XLSX TABLE
   background: #f0f7ff;
   color: #4da3ff;
 }
+
+/* =========================
+   LANGUAGE SWITCHER
+   ========================= */
+
+#langSwitcher {
+  display: flex;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+#langSwitcher button {
+  font-size: 18px;
+  cursor: pointer;
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px 6px;
+}

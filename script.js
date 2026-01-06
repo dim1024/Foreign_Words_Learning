@@ -77,22 +77,33 @@ function getUniqueFileName(originalName, existingNames) {
  * ЗАГРУЗКА ЯЗЫКА
  ***********************/
 async function loadLanguage() {
-    try {
-        let lang = localStorage.getItem('lang');
+    let lang = localStorage.getItem('lang');
 
-        // Если язык ещё не сохранён — определяем по браузеру
-        if (!lang) {
-            lang = navigator.language.startsWith('ru') ? 'ru' : 'en';
-            localStorage.setItem('lang', lang);
-        }
-        const response = await fetch(`languages/${lang}.json`);
-        if (!response.ok) throw new Error('Fetch failed');
-        return await response.json();
+    // Если язык ещё не сохранён — определяем по браузеру
+    if (!lang) {
+        lang = navigator.language.startsWith('ru') ? 'ru' : 'en';
+        localStorage.setItem('lang', lang);
+    }
+
+    try {
+        // Если нет ключа на другом языке, то берётся из en.json
+        const [enRes, langRes] = await Promise.all([
+            fetch('languages/en.json'),
+            fetch(`languages/${lang}.json`)
+        ]);
+
+        const enTexts = enRes.ok ? await enRes.json() : {};
+        const langTexts = langRes.ok ? await langRes.json() : {};
+
+        // 🔑 fallback: EN ← current language
+        return { ...enTexts, ...langTexts };
+
     } catch (err) {
-        console.error('Ошибка загрузки языкового файла', err);
+        console.error('Language load error', err);
         return {}; // возвращаем пустой объект, чтобы UI не ломался
     }
 }
+
 
 /***********************
  * ЗАГРУЗКА FILES.JSON
@@ -184,7 +195,7 @@ function renderLevel(level) {
     // Если папка пустая
     if (!displayLevel || level.length === 0) {
         const emptyMsg = document.createElement('p');
-        emptyMsg.textContent = uiTexts.empty_folder || 'No items in this folder';
+        emptyMsg.textContent = uiTexts.empty_folder;
         container.appendChild(emptyMsg);
         return;
     }
@@ -236,7 +247,7 @@ function renderLevel(level) {
             if (item.userFile) {
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = '🗑';
-                deleteBtn.title = uiTexts.delete_confirm || 'Delete';
+                deleteBtn.title = uiTexts.delete_confirm;
 
                 deleteBtn.onclick = (e) => {
                     e.stopPropagation(); // ⛔ чтобы не запускалась игра
@@ -296,9 +307,9 @@ async function loadAndRunGame(file) {
 
     } catch (err) {
         if (err.message === 'EMPTY_FILE') {
-            alert(uiTexts.file_empty || 'File is empty');
+            alert(uiTexts.file_empty);
         } else {
-            alert(uiTexts.file_load_error || 'Failed to load file');
+            alert(uiTexts.file_load_error);
         }
     }
 }
@@ -308,7 +319,7 @@ async function loadAndRunGame(file) {
  ***********************/
 function loadAndRunUserFile(userFileObj) {
     if (!userFileObj.pairs || !userFileObj.pairs.length) {
-        alert(uiTexts.file_empty || 'File is empty');
+        alert(uiTexts.file_empty);
         return;
     }
 
@@ -326,7 +337,7 @@ function loadAndRunUserFile(userFileObj) {
  ***********************/
 function deleteUserFile(userFileObj) {
     const confirmText =
-        uiTexts.delete_confirm || 'Are you sure you want to delete this file?';
+        uiTexts.delete_confirm;
 
     if (!confirm(confirmText)) return;
 
@@ -488,6 +499,7 @@ document.getElementById('closeUploadModal').onclick = closeUploadModal;
 window.addEventListener('DOMContentLoaded', async () => {
     // 1. Загружаем язык
     uiTexts = await loadLanguage();
+    applyTranslations();
 
     // 2. Загружаем структуру файлов
     const files = await loadFileTree();
@@ -581,7 +593,7 @@ function handleUserFiles(files) {
     files.forEach(file => {
 
         if (file.size > 5 * 1024 * 1024) { // 5 мб
-            alert(uiTexts.file_too_large || 'File is too large');
+            alert(uiTexts.file_too_large);
             return;
         }
 
@@ -600,7 +612,7 @@ function handleUserFiles(files) {
                     return;
                 }
             } catch {
-                alert(uiTexts.file_empty || 'File is empty');
+                alert(uiTexts.file_empty);
                 return;
             }
 
@@ -637,8 +649,8 @@ function handleUserFiles(files) {
  ***********************/
 function renderExampleDownloads() {
     const exampleFiles = [
-        { name: 'example.txt', label: 'Пример TXT' },
-        { name: 'example.xlsx', label: 'Пример XLSX' },
+        { name: 'example.txt', label: uiTexts.example_txt },
+        { name: 'example.xlsx', label: uiTexts.example_xlsx },
     ];
 
     const container = document.getElementById('downloadExamples');
@@ -706,12 +718,12 @@ function showUserWordsPreview(pairs, onConfirm) {
         // Подсветка подозрительных строк (пустой перевод)
         if (!p.translation) {
             right.style.backgroundColor = '#fe8a8aff';
-            right.title = 'Пустой перевод!';
+            right.title = uiTexts.empty_translation_tooltip;
         }
 
         if (!p.term) {
             left.style.backgroundColor = '#f6dd92ff';
-            left.title = 'Пустое слово!';
+            left.title = uiTexts.empty_term_tooltip;
         }
 
         row.appendChild(left);
@@ -731,3 +743,30 @@ function showUserWordsPreview(pairs, onConfirm) {
         onConfirm();
     };
 }
+
+function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (uiTexts[key]) el.textContent = uiTexts[key];
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.dataset.i18nTitle;
+        if (uiTexts[key]) el.title = uiTexts[key];
+    });
+}
+
+document.querySelectorAll('#langSwitcher button').forEach(btn => {
+    btn.onclick = async () => {
+        const lang = btn.dataset.lang;
+        localStorage.setItem('lang', lang);
+        uiTexts = await loadLanguage();
+        applyTranslations();
+
+        renderLevel(
+            navigationStack.length
+                ? navigationStack[navigationStack.length - 1]
+                : rootData
+        );
+    };
+});

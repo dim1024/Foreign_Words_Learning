@@ -7,13 +7,19 @@
 </head>
 <body>
 
-    <h1>Foreign Words Learning</h1>
+    <h1 data-i18n="app_title"></h1>
 
     <!-- Навигационные кнопки -->
     <div id="navButtons">
-        <button id="homeBtn">Home</button>
-        <button id="backBtn">Back</button>
-        <button id="addWordsBtn">Add Your Words</button>
+        <button id="homeBtn" data-i18n="home"></button>
+        <button id="backBtn" data-i18n="back"></button>
+        <button id="addWordsBtn" data-i18n="add_own_words"></button>
+    </div>
+
+    <!-- Переключение языков -->
+    <div id="langSwitcher">
+        <button data-lang="en" title="English">ENG</button>
+        <button data-lang="ru" title="Русский">RUS</button>
     </div>
 
     <!-- Контейнер для папок и файлов -->
@@ -22,18 +28,14 @@
     <!-- МОДАЛКА ПРЕДПРОСМОТРА загруженных слов-->
     <div id="previewModal" style="display:none;">
         <div id="previewBox">
-            <h3>Проверьте слова</h3>
+            <h3 data-i18n="preview_title"></h3>
 
             <div id="previewList"></div>
             <div id="previewCount"></div> 
 
             <div class="preview-actions">
-                <button id="cancelPreview">
-                    Не загружать, файл оформлен неправильно
-                </button>
-                <button id="confirmPreview">
-                    Все ок, загрузить
-                </button>
+                <button id="cancelPreview" data-i18n="cancel_upload"></button>
+                <button id="confirmPreview"></button>
             </div>
         </div>
     </div>
@@ -48,8 +50,7 @@
                             <!-- DOWNLOAD EXAMPLES -->
             <div>         
                 <div>
-                    <p>Скачайте примеры файлов для загрузки:</p>
-
+                    <p data-i18n="download_examples"></p>
                 </div>
 
                 <div id="downloadExamples">
@@ -60,7 +61,7 @@
 
                 <div class="example-block">
                     
-                    <div class="example-title">TXT</div>
+                    <div class="example-title" data-i18n="format_txt"></div>
 
                     <div class="example-row ok">
                         <span>hello</span>
@@ -147,7 +148,7 @@
                 
 
                 <div class="example-block">
-                    <div class="example-title">XLSX</div>
+                    <div class="example-title" data-i18n="format_xlsx"></div>
 
                     <div class="xlsx-wrapper">
                         <table class="example-table">
@@ -240,10 +241,9 @@
 
             <!-- КНОПКИ -->
             <div class="upload-actions">
-                <button id="uploadFileBtn">Upload</button>
-                <button id="closeUploadModal">Cancel</button>
+                <button id="uploadFileBtn" data-i18n="upload"></button>
+                <button id="closeUploadModal" data-i18n="cancel"></button>
             </div>
-
         </div>
     </div>
 

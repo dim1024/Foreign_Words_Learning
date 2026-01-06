@@ -1,22 +1,33 @@
 {
   "back": "Назад",
-  "home": "Домой",
+  "home": "На главную",
   "empty_folder": "Папка пуста",
   "load_error": "Не удалось загрузить файлы",
   "file_empty": "Файл пустой",
   "file_load_error": "Не удалось загрузить файл",
-  "game_start_message": "Запуск мини-игры!",
+  "file_too_large": "Файл слишком большой",
   "storage_full": "В хранилище слов закончилось свободное место. Удалите ненужные файлы, чтобы добавить новые",
+  "delete_confirm": "Вы уверены, что хотите удалить этот файл?",
+  "add_own_words": "Добавить свои слова",
+  "my_words": "Мои слова",
 
-
-
- 
+  "preview_title": "Проверьте слова",
   "preview_count": "Считано слов: {total}, Успешно: {valid}, Ошибочные: {invalid}",
   "empty_term": "(пусто)",
   "empty_translation": "(пусто)",
+  "empty_term_tooltip": "Пустое слово",
+  "empty_translation_tooltip": "Пустой перевод",
+
   "fix_empty_rows_to_load": "Исправьте все пустые строки, чтобы загрузить",
   "confirm_upload": "Все ок, загрузить",
-  "cancel_upload": "Нет, исправлю файл"
+  "cancel_upload": "Нет, исправлю файл",
 
+  "download_examples": "Скачать примеры файлов:",
+  "example_txt": "Образец TXT",
+  "example_xlsx": "Образец XLSX",
 
+  "upload": "Загрузить",
+  "cancel": "Отмена",
+  "format_txt": "Формат TXT",
+  "format_xlsx": "Формат XLSX"
 }
