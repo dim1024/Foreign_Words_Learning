@@ -763,6 +763,8 @@ document.querySelectorAll('#langSwitcher button').forEach(btn => {
         uiTexts = await loadLanguage();
         applyTranslations();
 
+        renderExampleDownloads();
+
         renderLevel(
             navigationStack.length
                 ? navigationStack[navigationStack.length - 1]
