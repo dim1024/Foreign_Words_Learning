@@ -29,5 +29,10 @@
   "upload": "Upload",
   "cancel": "Cancel",
   "format_txt": "TXT format",
-  "format_xlsx": "XLSX format"
+  "format_xlsx": "XLSX format",
+
+  "study": "Study",
+  "memorize": "Memorize",
+  "close_game": "Close"
+
 }

@@ -265,3 +265,132 @@ XLSX TABLE
   border-radius: 4px;
   padding: 4px 6px;
 }
+
+/* =========================
+   GAME MODAL (mode chooser)
+   ========================= */
+
+.game-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.game-window {
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+
+  padding: 16px;
+  box-sizing: border-box;
+
+  border-radius: 8px;
+
+  width: fit-content;
+  min-width: 220px;           /* минимальная ширина для 2 колонок */
+  max-width: 500px;           /* ограничение на слишком широкое окно */
+  max-height: 90vh;
+}
+
+.game-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.words-table-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  margin: 12px 0;
+  border: 1px solid #ddd;
+
+  display: flex;                /* центрируем таблицу в контейнере */
+  justify-content: center;      /* таблица в середине */
+}
+
+.words-table {
+  border-collapse: separate;
+  border-spacing: 40px 6px; /* расстояние между колонками */
+  table-layout: auto;       /* 🔑 фиксированная ширина колонок */
+  width: auto;               /* подгоняем под wrapper */
+  max-width: 100%;           /* не выходит за пределы окна */
+}
+
+.words-table td {
+  padding: 6px 8px;
+  vertical-align: top;
+
+  white-space: normal;             /* перенос фраз */
+  word-break: break-word;
+  overflow-wrap: break-word;
+
+  text-align: left;                /* слова прижаты к левому краю */
+
+}
+
+@media (max-width: 768px) {
+  .words-table td {
+    max-width: none;
+    padding: 6px 4px;
+    word-break: break-word;
+  }
+}
+
+.game-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.game-actions button {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* =========================
+   GAME STUB
+   ========================= */
+
+.game-stub {
+  position: fixed;
+  inset: 0;
+  background: #f5f5f5;
+  z-index: 2100;
+  padding: 20px;
+}
+
+@media (max-width: 400px) {
+  .game-modal {
+    align-items: stretch;
+  }
+
+  .game-window {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+
+  .words-table-wrapper {
+    flex: 1;
+  }
+
+  .game-actions {
+    flex-direction: column;
+  }
+}

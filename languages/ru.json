@@ -29,5 +29,12 @@
   "upload": "Загрузить",
   "cancel": "Отмена",
   "format_txt": "Формат TXT",
-  "format_xlsx": "Формат XLSX"
+  "format_xlsx": "Формат XLSX",
+
+  "study": "Изучение",
+  "memorize": "Заучивание",
+  "close_game": "Закрыть"
+
+
+
 }
