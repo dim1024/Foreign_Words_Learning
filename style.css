@@ -394,3 +394,124 @@ XLSX TABLE
     flex-direction: column;
   }
 }
+
+/* ===== Top panel ===== */
+.top-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 20px;
+  background: #1e1e1e;
+  color: #fff;
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.top-panel__left,
+.top-panel__center,
+.top-panel__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+
+.site-title {
+  cursor: pointer;
+  font-size: 18px;
+  margin: 0;
+}
+
+/* ===== Main content ===== */
+.main-content {
+  padding: 20px;
+}
+
+/* ===== Language dropdown ===== */
+.lang-select {
+  position: relative;
+}
+
+.lang-dropdown {
+  position: absolute;
+  right: 0;
+  top: 110%;
+
+  background: #2b2b2b;
+  border: 1px solid #444;
+  border-radius: 6px;
+
+  min-width: 120px;
+}
+
+.lang-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  color: #fff;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lang-dropdown button:hover {
+  background: #3a3a3a;
+}
+
+.hidden {
+  display: none;
+}
+
+#addWordsBtn {
+  padding: 6px 10px;
+  background: #2b2b2b;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#addWordsBtn::before {
+  content: "➕ ";
+}
+
+
+/* =========================
+   СТИЛЬ ФАЙЛОВ И ПАПОК
+   ========================= */
+
+/* Общий стиль кнопок */
+.main-content button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fefefe;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.15s;
+}
+
+.main-content button:hover {
+  background: #f0f0f0;
+}
+
+/* Папки */
+.main-content button.folder::before {
+  content: "📁";  /* иконка папки */
+  margin-right: 6px;
+}
+
+/* Файлы */
+.main-content button.file::before {
+  content: "📄";  /* иконка файла */
+  margin-right: 6px;
+}

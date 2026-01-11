@@ -7,23 +7,46 @@
 </head>
 <body>
 
+    <!-- ===== HEADER: navigation & settings ===== -->
+    <header class="top-panel">
+
+        <div class="top-panel__left">
+            <!-- Навигация -->
+            <button id="homeBtn" data-i18n="home"></button>
+            <button id="backBtn" data-i18n="back"></button>
+        </div>
+
+        <div class="top-panel__center">
+            <!-- Название сайта, клик = домой -->
+            <h1 id="siteTitle" class="site-title">Foreign Words</h1>
+        </div>
+
+        <div class="top-panel__right">
+            <!-- Добавить свои слова -->
+            <button id="addWordsBtn" data-i18n="add_own_words"></button>
+
+            <!-- Выбор языка -->
+            <div class="lang-select">
+            <button id="currentLangBtn">
+                <span id="currentLangLabel">EN</span> ▾
+            </button>
+            <div id="langDropdown" class="lang-dropdown hidden">
+                <!-- языки добавляются динамически -->
+            </div>
+            </div>
+        </div>
+
+    </header>
+    <!-- ===== /HEADER ===== -->
+
+
     <h1 data-i18n="app_title"></h1>
 
-    <!-- Навигационные кнопки -->
-    <div id="navButtons">
-        <button id="homeBtn" data-i18n="home"></button>
-        <button id="backBtn" data-i18n="back"></button>
-        <button id="addWordsBtn" data-i18n="add_own_words"></button>
-    </div>
-
-    <!-- Переключение языков -->
-    <div id="langSwitcher">
-        <button data-lang="en" title="English">ENG</button>
-        <button data-lang="ru" title="Русский">RUS</button>
-    </div>
-
     <!-- Контейнер для папок и файлов -->
-    <div id="fileContainer"></div>
+    <main class="main-content">
+        <div id="fileContainer"></div>
+    </main>
+
 
     <!-- МОДАЛКА ПРЕДПРОСМОТРА загруженных слов-->
     <div id="previewModal" style="display:none;">
@@ -255,4 +278,7 @@
     <!-- Основная логика -->
     <script src="script.js"></script>
 </body>
+
+
+
 </html>

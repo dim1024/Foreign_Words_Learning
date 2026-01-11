@@ -104,6 +104,52 @@ async function loadLanguage() {
     }
 }
 
+// ===== Language dropdown =====
+const availableLanguages = [
+  { code: 'en', label: 'English' },
+  { code: 'ru', label: 'Русский' }
+];
+
+const currentLangBtn = document.getElementById('currentLangBtn');
+const currentLangLabel = document.getElementById('currentLangLabel');
+const langDropdown = document.getElementById('langDropdown');
+
+function renderLanguageDropdown(currentLang) {
+  langDropdown.innerHTML = '';
+
+  availableLanguages.forEach(lang => {
+    const btn = document.createElement('button');
+    btn.textContent = lang.label;
+
+    btn.addEventListener('click', async () => {
+        localStorage.setItem('lang', lang.code);
+
+        uiTexts = await loadLanguage();   // 🔑 ВАЖНО
+        applyTranslations();              // 🔑 ВАЖНО
+
+        renderExampleDownloads();         // чтобы тексты обновились
+
+        renderLevel(
+            navigationStack.length
+            ? navigationStack[navigationStack.length - 1]
+            : rootData
+        );
+
+        currentLangLabel.textContent = lang.code.toUpperCase();
+        langDropdown.classList.add('hidden');
+    });
+
+    langDropdown.appendChild(btn);
+  });
+
+  currentLangLabel.textContent = currentLang.toUpperCase();
+}
+
+currentLangBtn.addEventListener('click', () => {
+  langDropdown.classList.toggle('hidden');
+});
+
+
 
 /***********************
  * ЗАГРУЗКА FILES.JSON
@@ -180,6 +226,15 @@ function renderLevel(level) {
     // Создаём копию уровня, чтобы не мутировать оригинал
     let displayLevel = [...level];
 
+    // Сортировка: сначала папки, потом файлы, внутри группы — по имени
+    displayLevel.sort((a, b) => {
+        if (a.type === b.type) {
+            return a.name.localeCompare(b.name); // одинаковый тип → по имени
+        }
+        return a.type === 'folder' ? -1 : 1; // папка выше файла
+    });
+
+
     // Добавляем папку "Мои слова" на главном уровне, если есть пользовательские файлы
     if (level === rootData && userFiles.length) {
         syncMyWordsFolder();
@@ -204,6 +259,8 @@ function renderLevel(level) {
     displayLevel.forEach(item => {
         const btn = document.createElement('button');
         btn.textContent = item.name;
+
+        btn.classList.add(item.type);  // item.type = 'folder' или 'file'
 
         if (item.type === 'folder') {
             btn.onclick = () => {
@@ -501,6 +558,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     uiTexts = await loadLanguage();
     applyTranslations();
 
+    const currentLang = localStorage.getItem('lang') || 'en';
+    renderLanguageDropdown(currentLang);
+
     // 2. Загружаем структуру файлов
     const files = await loadFileTree();
 
@@ -756,19 +816,3 @@ function applyTranslations() {
     });
 }
 
-document.querySelectorAll('#langSwitcher button').forEach(btn => {
-    btn.onclick = async () => {
-        const lang = btn.dataset.lang;
-        localStorage.setItem('lang', lang);
-        uiTexts = await loadLanguage();
-        applyTranslations();
-
-        renderExampleDownloads();
-
-        renderLevel(
-            navigationStack.length
-                ? navigationStack[navigationStack.length - 1]
-                : rootData
-        );
-    };
-});
