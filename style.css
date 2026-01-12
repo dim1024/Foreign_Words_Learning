@@ -604,3 +604,52 @@ XLSX TABLE
 .study-close-btn:hover {
   color: #ff0000;
 }
+
+.memorize-game {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+.memorize-window {
+  background: #fff;
+  width: 320px;
+  min-height: 200px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.memorize-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: none;
+  color: #d32f2f;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+
+
+.memorize-options button {
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid #888;
+  background: #f0f0f0;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.memorize-options button:hover {
+  background: #e0e0e0;
+}
+
