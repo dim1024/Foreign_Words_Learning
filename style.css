@@ -515,3 +515,92 @@ XLSX TABLE
   content: "📄";  /* иконка файла */
   margin-right: 6px;
 }
+
+/* =========================
+   STUDY MODE (MODAL)
+   ========================= */
+
+.study-game {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 3000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.study-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 24px;
+  width: 320px;
+  max-width: 90vw;
+
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+}
+
+.study-term {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.study-translation {
+  font-size: 20px;
+  color: #555;
+}
+
+/* кнопки перелистывания */
+.study-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.study-controls button {
+  font-size: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+/* верхняя кнопка */
+.study-top {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.study-top button {
+  font-size: 16px;
+}
+
+/* нижняя кнопка */
+.study-bottom {
+  margin-top: 16px;
+}
+
+.study-card {
+  position: relative; /* важно для крестика */
+}
+
+/* крестик */
+.study-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  background: none;
+  border: none;
+  color: #d32f2f;
+
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.study-close-btn:hover {
+  color: #ff0000;
+}

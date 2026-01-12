@@ -70,7 +70,7 @@ function startGame(fileData, uiTexts, pairs) {
     const learnBtn = document.createElement('button');
     learnBtn.textContent = uiTexts.study || 'Study';
     learnBtn.onclick = () => {
-        startLearningStub(pairs, uiTexts);
+        startLearningGame(pairs, uiTexts);
     };
 
     const memorizeBtn = document.createElement('button');
@@ -98,27 +98,112 @@ function startGame(fileData, uiTexts, pairs) {
 }
 
 /*********************************
- * ЗАГЛУШКИ ИГР
+ * ИГРЫ на ознакомление и заучивание
  *********************************/
 
-function startLearningStub(pairs, uiTexts) {
+function startLearningGame(pairs, uiTexts) {
     closeGame();
 
+    // 🔀 перемешиваем слова
+    const shuffled = [...pairs].sort(() => Math.random() - 0.5);
+    let index = 0;
+
     gameContainer = document.createElement('div');
-    gameContainer.id = 'gameContainer';
-    gameContainer.className = 'game-stub';
+    gameContainer.className = 'study-game';
+    // клик по тёмному фону — закрыть
+    gameContainer.onclick = closeGame;
 
-    gameContainer.innerHTML = `
-        <h3>${uiTexts.study || 'Study mode'}</h3>
-        <p>${uiTexts.game_start_message || 'Game started'}</p>
-        <p>Words count: ${pairs.length}</p>
-    `;
+    // карточка
+    const card = document.createElement('div');
+    card.className = 'study-card';
 
+    // красный крестик закрытия (внутри окна)
     const closeBtn = document.createElement('button');
-    closeBtn.textContent = uiTexts.close_game || 'Close';
+    closeBtn.className = 'study-close-btn';
+    closeBtn.textContent = '✖';
     closeBtn.onclick = closeGame;
 
-    gameContainer.appendChild(closeBtn);
+    card.appendChild(closeBtn);
+
+    // клик по карточке — не закрывает окно
+    card.onclick = e => e.stopPropagation();
+
+
+    const termEl = document.createElement('div');
+    termEl.className = 'study-term';
+
+    const translationEl = document.createElement('div');
+    translationEl.className = 'study-translation';
+
+    card.appendChild(termEl);
+    card.appendChild(translationEl);
+
+    // обновление карточки
+    function renderCard() {
+        const p = shuffled[index];
+        termEl.textContent = p.term;
+        translationEl.textContent = p.translation;
+    }
+
+    renderCard();
+
+    // кнопки листания
+    const controls = document.createElement('div');
+    controls.className = 'study-controls';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.textContent = '◀';
+    prevBtn.onclick = () => {
+        index = (index - 1 + shuffled.length) % shuffled.length;
+        renderCard();
+    };
+
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = '▶';
+    nextBtn.onclick = () => {
+        index = (index + 1) % shuffled.length;
+        renderCard();
+    };
+
+    controls.appendChild(prevBtn);
+    controls.appendChild(nextBtn);
+
+    // нижние кнопки
+    const bottom = document.createElement('div');
+    bottom.className = 'study-bottom';
+
+    const memorizeBtn = document.createElement('button');
+    memorizeBtn.textContent = uiTexts.memorize || 'Memorize';
+    memorizeBtn.onclick = () => {
+        startMemorizingStub(pairs, uiTexts);
+    };
+
+    bottom.appendChild(memorizeBtn);
+
+    // свайпы
+    let startX = null;
+
+    card.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+    });
+
+    card.addEventListener('touchend', e => {
+        if (startX === null) return;
+        const diff = e.changedTouches[0].clientX - startX;
+
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) prevBtn.click();
+            else nextBtn.click();
+        }
+
+        startX = null;
+    });
+
+    card.appendChild(controls);
+    card.appendChild(bottom);
+
+    gameContainer.appendChild(card);
+
     document.body.appendChild(gameContainer);
 }
 
