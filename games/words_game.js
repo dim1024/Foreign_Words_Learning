@@ -454,7 +454,7 @@ function startMemorizingGame(pairs, uiTexts) {
     }
 
     function showFinished() {
-      
+        launchConfetti();
 
         answersEl.innerHTML = '';
         questionEl.textContent = uiTexts.memorize_finished;
@@ -481,4 +481,58 @@ function startMemorizingGame(pairs, uiTexts) {
     nextQuestion();
 }
 
+function launchConfetti() {
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'fixed';
+    canvas.style.top = 0;
+    canvas.style.left = 0;
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = 9999;
 
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width = window.innerWidth;
+    const H = canvas.height = window.innerHeight;
+
+    const CONFETTI_COUNT = 360; // <- здесь можно менять количество частиц
+    const pieces = [];
+    const colors = ['#FFC107', '#4CAF50', '#2196F3', '#E91E63'];
+
+    for (let i = 0; i < CONFETTI_COUNT; i++) {
+        pieces.push({
+            x: Math.random() * W,
+            y: Math.random() * -H,
+            size: 6 + Math.random() * 4,
+            speed: 2 + Math.random() * 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            tilt: Math.random() * 10
+        });
+    }
+
+    let start = null;
+
+    function draw(timestamp) {
+        if (!start) start = timestamp;
+        const elapsed = timestamp - start;
+
+        ctx.clearRect(0, 0, W, H);
+
+        pieces.forEach(p => {
+            p.y += p.speed;
+            p.x += Math.sin(p.y * 0.05);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.size, p.size);
+        });
+
+        if (elapsed < 1000) {
+            requestAnimationFrame(draw);
+        } else {
+            canvas.remove();
+        }
+    }
+
+    requestAnimationFrame(draw);
+}
