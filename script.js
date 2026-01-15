@@ -11,6 +11,9 @@ let rootData = [];
 // Стек навигации (храним предыдущие уровни)
 let navigationStack = [];
 
+// Текущий уровень/папка (для корректной навигации при смене языка)
+let currentFolder = null;
+
 // DOM-элементы
 const container = document.getElementById('fileContainer');
 const homeBtn = document.getElementById('homeBtn');
@@ -127,11 +130,8 @@ function renderLanguageDropdown(currentLang) {
 
         renderExampleDownloads();         // чтобы тексты обновились
 
-        renderLevel(
-            navigationStack.length
-            ? navigationStack[navigationStack.length - 1]
-            : rootData
-        );
+        // 🔹 используем currentFolder, если он есть
+        renderLevel(currentFolder || rootData);
 
         currentLangLabel.textContent = lang.code.toUpperCase();
         langDropdown.classList.add('hidden');
@@ -286,6 +286,8 @@ function renderLevel(level) {
             btn.onclick = () => {
                 // Сохраняем текущий уровень в стек
                 navigationStack.push(level);
+                // Обновляем текущую папку
+                currentFolder = item.children;
                 // Переходим внутрь папки
                 renderLevel(item.children);
             };
@@ -340,12 +342,14 @@ function renderLevel(level) {
 homeBtn.onclick = () => {
     closeGame();
     navigationStack = [];
+    currentFolder = rootData;  // обновляем текущий уровень
     renderLevel(rootData);
 };
 
 backBtn.onclick = () => {
     closeGame();
     const previousLevel = navigationStack.pop();
+    currentFolder = previousLevel;  // обновляем текущий уровень
     renderLevel(previousLevel || rootData);
 };
 
@@ -589,6 +593,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     // 3. Сохраняем корень и рендерим
     rootData = files;
     syncMyWordsFolder();
+    currentFolder = rootData;
     renderLevel(rootData);
 
     // 4. Добавляем кнопки для скачивания примеров
