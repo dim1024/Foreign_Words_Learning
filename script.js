@@ -16,8 +16,6 @@ const container = document.getElementById('fileContainer');
 const homeBtn = document.getElementById('homeBtn');
 const backBtn = document.getElementById('backBtn');
 
-
-
 const myWordsFolder = {
     name: '',
     type: 'folder',
@@ -25,7 +23,7 @@ const myWordsFolder = {
 };
 
 function syncMyWordsFolder() {
-    myWordsFolder.name = uiTexts.my_words || 'My Words';
+    myWordsFolder.name = uiTexts.my_words;
     myWordsFolder.children = userFiles
         .slice()
         .sort((a, b) => a.name.localeCompare(b.name))
@@ -234,9 +232,8 @@ function renderLevel(level) {
         return a.type === 'folder' ? -1 : 1; // папка выше файла
     });
 
-
-    // Добавляем папку "Мои слова" на главном уровне, если есть пользовательские файлы
-    if (level === rootData && userFiles.length) {
+    // Добавляем папку "Мои слова" на главном уровне всегда. Если надо спрятать когда она пустая, то надо в IF добавить вот такое условие: if (level === rootData && userFiles.length)
+    if (level === rootData) {
         syncMyWordsFolder();
         displayLevel = [myWordsFolder, ...displayLevel];
     }
@@ -244,15 +241,38 @@ function renderLevel(level) {
     // Очищаем контейнер
     container.innerHTML = '';
 
+    // Проверяем, что это папка "Мои слова"
+    const isMyWordsFolder = level === myWordsFolder.children;
+
     // Управление видимостью кнопок
     backBtn.style.display = navigationStack.length ? 'inline-block' : 'none';
 
     // Если папка пустая
-    if (!displayLevel || level.length === 0) {
-        const emptyMsg = document.createElement('p');
-        emptyMsg.textContent = uiTexts.empty_folder;
-        container.appendChild(emptyMsg);
+    if (!displayLevel || displayLevel.length === 0) {
+        if (isMyWordsFolder) {
+            // 🔹 Сначала текст "Папка пуста"
+            const emptyMsg = document.createElement('p');
+            emptyMsg.textContent = uiTexts.empty_folder;
+            container.appendChild(emptyMsg);
+
+            // 🔹 Потом кнопка "Добавить свои слова"
+            const addBtn = document.createElement('button');
+            addBtn.classList.add('add-words-btn');
+            addBtn.textContent = uiTexts.add_own_words;
+            addBtn.onclick = () => openUploadModal();
+            container.appendChild(addBtn);
+        }
+
         return;
+    }
+
+    // Если папка не пустая и это "Мои слова" — кнопка сверху списка файлов
+    if (isMyWordsFolder) {
+        const addBtn = document.createElement('button');
+        addBtn.classList.add('add-words-btn');
+        addBtn.textContent = uiTexts.add_own_words;
+        addBtn.onclick = () => openUploadModal();
+        container.appendChild(addBtn);
     }
 
     // Создаём кнопки папок и файлов
@@ -268,17 +288,6 @@ function renderLevel(level) {
                 navigationStack.push(level);
                 // Переходим внутрь папки
                 renderLevel(item.children);
-            };
-        }
-
-        if (item.type === 'file') {
-            btn.onclick = () => {
-                if (item.userFile) {
-                    // Пользовательский файл
-                    loadAndRunUserFile(item.userFile);
-                } else {
-                    loadAndRunGame(item);
-                }
             };
         }
 
@@ -309,6 +318,8 @@ function renderLevel(level) {
                 deleteBtn.onclick = (e) => {
                     e.stopPropagation(); // ⛔ чтобы не запускалась игра
                     deleteUserFile(item.userFile);
+                    // После удаления рендерим текущую папку заново
+                    renderLevel(myWordsFolder.children);
                 };
 
                 wrapper.appendChild(deleteBtn);
@@ -393,8 +404,7 @@ function loadAndRunUserFile(userFileObj) {
  * УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЬСКИХ СЛОВ
  ***********************/
 function deleteUserFile(userFileObj) {
-    const confirmText =
-        uiTexts.delete_confirm;
+    const confirmText = uiTexts.delete_confirm;
 
     if (!confirm(confirmText)) return;
 
@@ -405,13 +415,20 @@ function deleteUserFile(userFileObj) {
 
     closeGame();
 
-    if (userFiles.length === 0) {
-        navigationStack = [];
-        renderLevel(rootData);
-    } else {
-        renderLevel(myWordsFolder.children);
-    }
+    // 🔹 Рендерим текущую папку (последний элемент стека, если есть) после удаления, чтобы не выкидывало в Home при пустой папке
+    const currentLevel = navigationStack.length ? navigationStack[navigationStack.length - 1] : rootData;
+    renderLevel(currentLevel);
+
+    // // если надо чтобы выкидывало в home надо вместо верхней строки то что ниже
+    // if (userFiles.length === 0) {
+    //     navigationStack = [];
+    //     renderLevel(rootData);
+    // } else {
+    //     renderLevel(myWordsFolder.children);
+    // }
+    
 }
+
 
 /***********************
  * Открытие / закрытие модалки для загрузки пользовательских слов
@@ -565,7 +582,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const files = await loadFileTree();
 
     if (!files) {
-        container.textContent = uiTexts.load_error || 'Failed to load files';
+        container.textContent = uiTexts.load_error;
         return;
     }
 
@@ -815,4 +832,3 @@ function applyTranslations() {
         if (uiTexts[key]) el.title = uiTexts[key];
     });
 }
-
