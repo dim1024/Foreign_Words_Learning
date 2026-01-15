@@ -19,6 +19,12 @@ function closeGame() {
  * Теперь это НЕ игра, а окно выбора режима
  */
 function startGame(fileData, uiTexts, pairs) {
+    // ⛔ создаём локальную копию пар, чтобы можно было отключать слова, не ломая оригинал
+    const localPairs = pairs.map(p => ({
+        ...p,
+        disabled: false
+    }));
+
     closeGame();
 
     gameContainer = document.createElement('div');
@@ -47,18 +53,50 @@ function startGame(fileData, uiTexts, pairs) {
     const table = document.createElement('table');
     table.className = 'words-table';
 
-    pairs.forEach(p => {
+    localPairs.forEach(p => {
         const row = document.createElement('tr');
 
         const tdTerm = document.createElement('td');
         tdTerm.textContent = p.term;
+        tdTerm.className = 'word-cell';
 
         const tdTranslation = document.createElement('td');
         tdTranslation.textContent = p.translation;
+        tdTranslation.className = 'word-cell';
+
+        // кнопка удалить / вернуть
+        const tdAction = document.createElement('td');
+        tdAction.className = 'word-action-cell'; // для выравнивания иконки исключения слова и слов.
+        const toggleBtn = document.createElement('button');
+
+        toggleBtn.innerHTML = '🗑';
+        toggleBtn.className = 'word-toggle-btn delete';
+        toggleBtn.title = 'Исключить слово';
+
+        toggleBtn.onclick = () => {
+            p.disabled = !p.disabled;
+
+            if (p.disabled) {
+                row.classList.add('word-disabled');
+                toggleBtn.innerHTML = '↩';
+                toggleBtn.className = 'word-toggle-btn restore';
+                toggleBtn.title = 'Вернуть слово';
+            } else {
+                row.classList.remove('word-disabled');
+                toggleBtn.innerHTML = '🗑️';
+                toggleBtn.className = 'word-toggle-btn delete';
+                toggleBtn.title = 'Исключить слово';
+            }
+        };
+
+        tdAction.appendChild(toggleBtn);
 
         row.appendChild(tdTerm);
         row.appendChild(tdTranslation);
+        row.appendChild(tdAction);
+
         table.appendChild(row);
+
     });
 
     tableWrapper.appendChild(table);
@@ -70,13 +108,24 @@ function startGame(fileData, uiTexts, pairs) {
     const learnBtn = document.createElement('button');
     learnBtn.textContent = uiTexts.study || 'Study';
     learnBtn.onclick = () => {
-        startLearningGame(pairs, uiTexts);
+        const activePairs = localPairs.filter(p => !p.disabled);
+        if (!activePairs.length) {
+            alert('Нет активных слов');
+            return;
+        }
+        startLearningGame(activePairs, uiTexts);
     };
+
 
     const memorizeBtn = document.createElement('button');
     memorizeBtn.textContent = uiTexts.memorize || 'Memorize';
     memorizeBtn.onclick = () => {
-        startMemorizingGame(pairs, uiTexts);
+        const activePairs = localPairs.filter(p => !p.disabled);
+        if (!activePairs.length) {
+            alert('Нет активных слов');
+            return;
+        }
+        startMemorizingGame(activePairs, uiTexts);
     };
 
     actions.appendChild(learnBtn);

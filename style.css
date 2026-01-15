@@ -331,7 +331,7 @@ XLSX TABLE
 
 .words-table td {
   padding: 6px 8px;
-  vertical-align: top;
+  vertical-align: middle;
 
   white-space: normal;             /* перенос фраз */
   word-break: break-word;
@@ -684,5 +684,83 @@ XLSX TABLE
     vertical-align: middle;
 }
 
+/* =========================
+   КНОПКА УДАЛИТЬ ВЕРНУТЬ СЛОВО
+   ========================= */
+
+.word-disabled {
+    color: #999;
+    position: relative;
+}
+
+.word-disabled td {
+    color: #999;
+}
+
+/* одна линия на всю строку */
+.word-disabled .word-cell {
+    position: relative;
+    color: #999;
+}
+
+.word-disabled .word-cell::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;                 /* чуть выше центра */
+    height: 2px;
+    background: #e53935;      /* яркая линия */
+    pointer-events: none;
+}
 
 
+.word-toggle-btn {
+    display: flex;                 /* центрируем emoji */
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    font-size: 18px;
+    line-height: 1;                /* 🔑 фикс для emoji */
+    padding: 0;
+
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    background: transparent;
+    transition: background 0.2s, transform 0.1s;
+}
+
+
+.word-toggle-btn:hover {
+    transform: scale(1.1);
+}
+
+/* удалить */
+.word-toggle-btn.delete {
+    color: #e53935;
+}
+
+.word-toggle-btn.delete:hover {
+    background: rgba(229, 57, 53, 0.15);
+}
+
+/* вернуть */
+.word-toggle-btn.restore {
+    color: #1b5e20;              /* тёмный, читаемый */
+    background: rgba(76, 175, 80, 0.25);
+}
+
+.word-toggle-btn.restore:hover {
+    background: rgba(76, 175, 80, 0.4);
+}
+
+/* ===== ЯЧЕЙКА С КНОПКОЙ УДАЛИТЬ / ВЕРНУТЬ ===== */
+.word-action-cell {
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+}
