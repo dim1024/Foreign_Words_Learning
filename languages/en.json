@@ -1,7 +1,7 @@
 {
   "back": "Back",
   "home": "Home",
-  "empty_folder": "No items in this folder",
+  "empty_folder": "Folder is empty",
   "load_error": "Failed to load files",
   "file_empty": "File is empty",
   "file_load_error": "Failed to load file",
@@ -36,13 +36,23 @@
   "close_game": "Close",
 
   
-  "dont_know": "Я не знаю77",
-  "memorize_finished": "Отличная работа!77 🎉",
-  "close": "Закрыть77",
-  "repeat": "Повторить77"
+  "dont_know": "I don't know",
+  "memorize_finished": "Great job! 🎉",
+  "close": "Close",
+  "repeat": "Repeat",
+  "frequent_mistakes": "Frequent Mistakes"
+
 
 
 
 
 
 }
+
+
+
+
+
+
+
+

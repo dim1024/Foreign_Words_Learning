@@ -33,7 +33,13 @@
 
   "study": "Изучение",
   "memorize": "Заучивание",
-  "close_game": "Закрыть"
+  "close_game": "Закрыть",
+
+  "dont_know": "Я не знаю",
+  "memorize_finished": "Отличная работа! 🎉",
+  "close": "Закрыть",
+  "repeat": "Повторить",
+  "frequent_mistakes": "Частые ошибки"
 
 
 
