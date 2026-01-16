@@ -320,6 +320,10 @@ XLSX TABLE
     flex-direction: column;
     gap: 6px;
     width: 100%;
+    overflow-y: auto;      /* скролл для длинного списка */
+    margin: 12px 0;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
 }
 
 /* одна строка */
@@ -331,7 +335,7 @@ XLSX TABLE
     padding: 6px 8px;
     align-items: center;
 
-    border-bottom: 1px solid #eee;
+    position: relative; /* опора для линии */
     box-sizing: border-box;
 }
 
@@ -343,10 +347,12 @@ XLSX TABLE
     text-align: left;
     padding-left: 18px;
     padding-right: 8px;
+    position: relative;
+    color: #000;
 }
 
 /* последнюю линию убираем */
-.word-row:last-child {
+.word-row:last-child { 
     border-bottom: none;
 }
 
@@ -706,7 +712,7 @@ XLSX TABLE
 }
 
 /* =========================
-   КНОПКА УДАЛИТЬ ВЕРНУТЬ СЛОВО
+   КНОПКА УДАЛИТЬ/ВЕРНУТЬ СЛОВО
    ========================= */
 
 .word-disabled {
@@ -714,30 +720,10 @@ XLSX TABLE
     position: relative;
 }
 
-.word-disabled td {
-    color: #999;
-}
 
-/* одна линия на всю строку */
-.word-disabled .word-cell {
-    position: relative;
-    color: #999;
-}
-
-.word-disabled .word-cell::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;                 /* чуть выше центра */
-    height: 2px;
-    background: #e53935;      /* яркая линия */
-    pointer-events: none;
-}
-
-
+/* кнопка действия */
 .word-toggle-btn {
-    display: flex;                 /* центрируем emoji */
+    display: flex;    /* центрируем emoji */
     align-items: center;
     justify-content: center;
 
@@ -745,7 +731,7 @@ XLSX TABLE
     height: 32px;
 
     font-size: 18px;
-    line-height: 1;                /* 🔑 фикс для emoji */
+    line-height: 1;    /* 🔑 фикс для emoji */
     padding: 0;
 
     border: none;
@@ -785,3 +771,41 @@ XLSX TABLE
     text-align: center;
     white-space: nowrap;
 }
+
+/* =========================
+   STRIKETHROUGH (GRID)
+   ========================= */
+
+/* линия */
+.word-row::after {
+    content: '';
+    position: absolute;
+
+    left: 12px;          /* отступ слева (как у текста) */
+    right: 52px;         /* не заходим на кнопку */
+
+    top: 50%; /* позиция линии */
+    transform: translateY(-50%) scaleX(0);
+
+    height: 3px; /* толщина линии */
+    background: #e53935;
+
+    transform-origin: left;
+    transition: transform 0.4s ease; /* скорость анимации */
+    
+    pointer-events: none;
+    z-index: 1;
+
+    will-change: transform;
+}
+
+/* активируем линию */
+.word-row.word-disabled::after {
+    transform: translateY(-50%) scaleX(1);
+}
+
+/* приглушаем текст */
+.word-row.word-disabled .word-cell {
+    color: #999;
+}
+
