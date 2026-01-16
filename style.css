@@ -808,3 +808,51 @@ XLSX TABLE
     color: #999;
 }
 
+/* ⚙️ настройки MEMORIZE */
+
+.memorize-settings-btn {
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.memorize-settings-panel {
+  position: absolute;
+  top: 40px;
+  right: 8px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+
+  z-index: 10;
+}
+
+.memorize-repeat-row {
+  display: flex;
+  gap: 6px;
+}
+
+
+.memorize-settings-panel button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.memorize-settings-panel button.active {
+  background: #4CAF50;
+  color: white;
+}
+
+.hidden {
+  display: none !important;
+}

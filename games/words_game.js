@@ -104,7 +104,7 @@ function startGame(fileData, uiTexts, pairs) {
     actions.className = 'game-actions';
 
     const learnBtn = document.createElement('button');
-    learnBtn.textContent = uiTexts.study || 'Study';
+    learnBtn.textContent = uiTexts.study;
     learnBtn.onclick = () => {
         const activePairs = localPairs.filter(p => !p.disabled);
         if (!activePairs.length) {
@@ -116,7 +116,7 @@ function startGame(fileData, uiTexts, pairs) {
 
 
     const memorizeBtn = document.createElement('button');
-    memorizeBtn.textContent = uiTexts.memorize || 'Memorize';
+    memorizeBtn.textContent = uiTexts.memorize;
     memorizeBtn.onclick = () => {
         const activePairs = localPairs.filter(p => !p.disabled);
         if (!activePairs.length) {
@@ -220,7 +220,7 @@ function startLearningGame(pairs, uiTexts) {
     bottom.className = 'study-bottom';
 
     const memorizeBtn = document.createElement('button');
-    memorizeBtn.textContent = uiTexts.memorize || 'Memorize';
+    memorizeBtn.textContent = uiTexts.memorize;
     memorizeBtn.onclick = () => {
         startMemorizingGame(pairs, uiTexts);
     };
@@ -293,46 +293,62 @@ function startMemorizingGame(pairs, uiTexts) {
     closeBtn.style.color = 'red';
     closeBtn.style.fontSize = '20px';
     closeBtn.style.cursor = 'pointer';
-    closeBtn.onclick = closeGame;
+    closeBtn.onclick = () => {
+        document.removeEventListener('click', handleOutsideClick);
+        closeGame();
+    };
     windowBox.appendChild(closeBtn);
 
     // ─── Настройка количества повторений (1–5) прямо в окне режима MEMORIZE
-    const repeatsWrapper = document.createElement('div');
-    repeatsWrapper.style.display = 'flex';
-    repeatsWrapper.style.alignItems = 'center';
-    repeatsWrapper.style.gap = '6px';
-    repeatsWrapper.style.marginBottom = '10px';
-    repeatsWrapper.style.fontSize = '14px';
 
-    const repeatsLabel = document.createElement('span');
-    repeatsLabel.textContent = uiTexts.repeats || 'Repeats:';
+    // ⚙️ кнопка настроек
+    const settingsBtn = document.createElement('button');
+    settingsBtn.textContent = '⚙️';
+    settingsBtn.className = 'memorize-settings-btn';
+    windowBox.appendChild(settingsBtn);
 
-    repeatsWrapper.appendChild(repeatsLabel);
+    // ⚙️ панель настроек (скрыта)
+    const settingsPanel = document.createElement('div');
+    settingsPanel.className = 'memorize-settings-panel hidden';
+
+    const settingsTitle = document.createElement('div');
+    settingsTitle.textContent = uiTexts.word_repetitions;
+    settingsTitle.style.marginBottom = '6px';
+    settingsTitle.style.textAlign = 'center';
+    // settingsTitle.style.fontWeight = 'bold';
+    settingsPanel.appendChild(settingsTitle);
+
+    settingsBtn.onclick = () => {
+        settingsPanel.classList.toggle('hidden');
+    };
+
+    // кнопки количества повторений
+    const repeatRow = document.createElement('div');
+    repeatRow.className = 'memorize-repeat-row';
+    settingsPanel.appendChild(repeatRow);
+    repeatRow.style.display = 'flex';
+    repeatRow.style.justifyContent = 'center';
+    repeatRow.style.gap = '6px';
+    repeatRow.style.marginBottom = '10px';
+
+    
 
     const repeatButtons = [];
-
     for (let i = 1; i <= 5; i++) {
         const btn = document.createElement('button');
         btn.textContent = i;
-        btn.style.padding = '4px 8px';
-        btn.style.cursor = 'pointer';
-        btn.style.borderRadius = '4px';
-        btn.style.border = '1px solid #aaa';
-        btn.style.backgroundColor = i === REQUIRED_QUESTIONS_REPEATS ? '#4CAF50' : '#f0f0f0';
-        btn.style.color = i === REQUIRED_QUESTIONS_REPEATS ? '#fff' : '#000';
+
+        if (i === REQUIRED_QUESTIONS_REPEATS) {
+            btn.classList.add('active');
+        }
 
         btn.onclick = () => {
             REQUIRED_QUESTIONS_REPEATS = i;
             localStorage.setItem('memorizeRepeats', i); // Сохраняем выбор количества повторений в localStorage
 
-            // визуально подсвечиваем выбранную кнопку
-            repeatButtons.forEach(b => {
-                b.style.backgroundColor = '#f0f0f0';
-                b.style.color = '#000';
-            });
-            btn.style.backgroundColor = '#4CAF50';
-            btn.style.color = '#fff';
-
+            repeatButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
             // 🔁 перезапуск игры с новым значением
             memorizeProgress = {};
             pairs.forEach(p => {
@@ -345,11 +361,42 @@ function startMemorizingGame(pairs, uiTexts) {
         };
 
         repeatButtons.push(btn);
-        repeatsWrapper.appendChild(btn);
+        repeatRow.appendChild(btn);
     }
 
-    windowBox.appendChild(repeatsWrapper);
+    // кнопка ОК для закрытия окна настроек
+    const okBtn = document.createElement('button');
+    okBtn.textContent = 'OK';
+    okBtn.style.margin = '4px auto 0';
+    okBtn.style.display = 'block';
+    okBtn.onclick = () => {
+        settingsPanel.classList.add('hidden');
+    };
+    settingsPanel.appendChild(okBtn);
 
+    windowBox.appendChild(settingsPanel);
+
+    // закрытие панели настроек ⚙️ по клику вне её
+    document.addEventListener('click', handleOutsideClick);
+
+    function handleOutsideClick(e) {
+        // если панель скрыта — ничего не делаем
+        if (settingsPanel.classList.contains('hidden')) return;
+
+        // клик был по кнопке ⚙️ или внутри панели — игнорируем
+        if (
+            settingsPanel.contains(e.target) ||
+            settingsBtn.contains(e.target)
+        ) {
+            return;
+        }
+
+        // иначе — закрываем панель
+        settingsPanel.classList.add('hidden');
+    }
+
+
+    
 
     // Вопрос
     const questionEl = document.createElement('div');
@@ -566,7 +613,11 @@ function startMemorizingGame(pairs, uiTexts) {
         closeBtnFinish.textContent = uiTexts.close;
         closeBtnFinish.style.padding = '10px';
         closeBtnFinish.style.borderRadius = '6px';
-        closeBtnFinish.onclick = closeGame;
+        closeBtnFinish.onclick = () => {
+            document.removeEventListener('click', handleOutsideClick);
+            closeGame();
+        };
+
 
         const repeatBtn = document.createElement('button');
         repeatBtn.textContent = uiTexts.repeat;
