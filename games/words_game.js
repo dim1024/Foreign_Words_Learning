@@ -50,27 +50,25 @@ function startGame(fileData, uiTexts, pairs) {
     const tableWrapper = document.createElement('div');
     tableWrapper.className = 'words-table-wrapper';
 
-    const table = document.createElement('table');
-    table.className = 'words-table';
+    const list = document.createElement('div');
+    list.className = 'words-list';
 
     localPairs.forEach(p => {
-        const row = document.createElement('tr');
+        const row = document.createElement('div');
+        row.className = 'word-row';
 
-        const tdTerm = document.createElement('td');
-        tdTerm.textContent = p.term;
-        tdTerm.className = 'word-cell';
+        const term = document.createElement('div');
+        term.textContent = p.term;
+        term.className = 'word-cell';
 
-        const tdTranslation = document.createElement('td');
-        tdTranslation.textContent = p.translation;
-        tdTranslation.className = 'word-cell';
+        const translation = document.createElement('div');
+        translation.textContent = p.translation;
+        translation.className = 'word-cell';
 
         // кнопка удалить / вернуть
-        const tdAction = document.createElement('td');
-        tdAction.className = 'word-action-cell'; // для выравнивания иконки исключения слова и слов.
         const toggleBtn = document.createElement('button');
-
-        toggleBtn.innerHTML = '🗑';
         toggleBtn.className = 'word-toggle-btn delete';
+        toggleBtn.innerHTML = '🗑';
         toggleBtn.title = 'Исключить слово';
 
         toggleBtn.onclick = () => {
@@ -83,23 +81,20 @@ function startGame(fileData, uiTexts, pairs) {
                 toggleBtn.title = 'Вернуть слово';
             } else {
                 row.classList.remove('word-disabled');
-                toggleBtn.innerHTML = '🗑️';
+                toggleBtn.innerHTML = '🗑';
                 toggleBtn.className = 'word-toggle-btn delete';
                 toggleBtn.title = 'Исключить слово';
             }
         };
 
-        tdAction.appendChild(toggleBtn);
+        row.appendChild(term);
+        row.appendChild(translation);
+        row.appendChild(toggleBtn);
 
-        row.appendChild(tdTerm);
-        row.appendChild(tdTranslation);
-        row.appendChild(tdAction);
-
-        table.appendChild(row);
-
+        list.appendChild(row);
     });
 
-    tableWrapper.appendChild(table);
+    tableWrapper.appendChild(list);
 
     // ─── Actions ──────────────────────────
     const actions = document.createElement('div');

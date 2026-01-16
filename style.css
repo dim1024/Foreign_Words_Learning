@@ -311,6 +311,46 @@ XLSX TABLE
   cursor: pointer;
 }
 
+/* =========================
+   WORDS LIST (GRID VERSION)
+   ========================= */
+
+.words-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+/* одна строка */
+.word-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 40px; /* слово | перевод | кнопка */
+    gap: 24px;
+
+    padding: 6px 8px;
+    align-items: center;
+
+    border-bottom: 1px solid #eee;
+    box-sizing: border-box;
+}
+
+/* ячейки слова и перевода */
+.word-cell {
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    text-align: left;
+    padding-left: 18px;
+    padding-right: 8px;
+}
+
+/* последнюю линию убираем */
+.word-row:last-child {
+    border-bottom: none;
+}
+
+
 .words-table-wrapper {
   flex: 1;
   overflow-y: auto;
@@ -321,25 +361,6 @@ XLSX TABLE
   justify-content: center;      /* таблица в середине */
 }
 
-.words-table {
-  border-collapse: separate;
-  border-spacing: 40px 6px; /* расстояние между колонками */
-  table-layout: auto;       /* 🔑 фиксированная ширина колонок */
-  width: auto;               /* подгоняем под wrapper */
-  max-width: 100%;           /* не выходит за пределы окна */
-}
-
-.words-table td {
-  padding: 6px 8px;
-  vertical-align: middle;
-
-  white-space: normal;             /* перенос фраз */
-  word-break: break-word;
-  overflow-wrap: break-word;
-
-  text-align: left;                /* слова прижаты к левому краю */
-
-}
 
 @media (max-width: 768px) {
   .words-table td {
