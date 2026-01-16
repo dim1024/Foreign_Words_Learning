@@ -41,6 +41,7 @@ function startGame(fileData, uiTexts, pairs) {
     const closeBtn = document.createElement('button');
     closeBtn.className = 'game-close-btn';
     closeBtn.textContent = '✖';
+    closeBtn.style.color = 'red';
     closeBtn.onclick = closeGame;
 
     header.appendChild(title);
@@ -331,8 +332,6 @@ function startMemorizingGame(pairs, uiTexts) {
     repeatRow.style.gap = '6px';
     repeatRow.style.marginBottom = '10px';
 
-    
-
     const repeatButtons = [];
     for (let i = 1; i <= 5; i++) {
         const btn = document.createElement('button');
@@ -416,7 +415,7 @@ function startMemorizingGame(pairs, uiTexts) {
 
     // ─── Progress бар цифры прогресса 4/12
     const progressText = document.createElement('div');
-    progressText.style.marginTop = '12px';
+    progressText.style.marginTop = '40px';
     progressText.style.fontSize = '14px';
     progressText.style.color = '#555';
     progressText.textContent = '0 / 0';
@@ -429,6 +428,7 @@ function startMemorizingGame(pairs, uiTexts) {
     progressWrapper.style.backgroundColor = '#eee';
     progressWrapper.style.borderRadius = '5px';
     progressWrapper.style.overflow = 'hidden';
+    progressWrapper.style.marginTop = '6px';
     progressWrapper.style.marginBottom = '15px';
 
     const progressBar = document.createElement('div');
@@ -624,12 +624,11 @@ function startMemorizingGame(pairs, uiTexts) {
         repeatBtn.style.padding = '10px';
         repeatBtn.style.borderRadius = '6px';
         repeatBtn.onclick = () => {
-            memorizeProgress = {};
-            nextQuestion();
+            startMemorizingGame(pairs, uiTexts);
         };
 
-        answersEl.appendChild(closeBtnFinish);
         answersEl.appendChild(repeatBtn);
+        answersEl.appendChild(closeBtnFinish);
     }
 
     nextQuestion();
@@ -681,12 +680,20 @@ function launchConfetti() {
             ctx.fillRect(p.x, p.y, p.size, p.size);
         });
 
-        // время проигрывания анимации    
-        if (elapsed < 2000) {
+        // время проигрывания анимации + плавное затухание в последние мс
+        let fadeDuration = 350; // длительность плавного затухания в мс
+        let confettiDuration = 2000;
+
+        if (elapsed < confettiDuration - fadeDuration) {
+            canvas.style.opacity = '1';
+            requestAnimationFrame(draw);
+        } else if (elapsed < confettiDuration) {
+            canvas.style.opacity = `${1 - (elapsed - confettiDuration + fadeDuration) / fadeDuration}`;
             requestAnimationFrame(draw);
         } else {
             canvas.remove();
         }
+
     }
 
     requestAnimationFrame(draw);
