@@ -39,7 +39,11 @@
   "memorize_finished": "Отличная работа! 🎉",
   "close": "Закрыть",
   "repeat": "Повторить",
+  "exclude_word": "Исключить слово",
+  "restore_word": "Вернуть слово",
+  "no_selected_words": "Нет выбранных слов",
   "frequent_mistakes": "Частые ошибки"
+
 
 
 

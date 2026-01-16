@@ -40,6 +40,9 @@
   "memorize_finished": "Great job! 🎉",
   "close": "Close",
   "repeat": "Repeat",
+  "exclude_word": "Exclude word",
+  "restore_word": "Restore word",
+  "no_selected_words": "No selected words",
   "frequent_mistakes": "Frequent Mistakes"
 
 

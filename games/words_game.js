@@ -71,7 +71,7 @@ function startGame(fileData, uiTexts, pairs) {
         // toggleBtn.innerHTML = '🗑';
         toggleBtn.innerHTML = '🗑️';
         
-        toggleBtn.title = 'Исключить слово';
+        toggleBtn.title = uiTexts.exclude_word;
 
         toggleBtn.onclick = () => {
             p.disabled = !p.disabled;
@@ -81,12 +81,12 @@ function startGame(fileData, uiTexts, pairs) {
                 // toggleBtn.innerHTML = '↩';
                 toggleBtn.innerHTML = '↩️';
                 toggleBtn.className = 'word-toggle-btn restore';
-                toggleBtn.title = 'Вернуть слово';
+                toggleBtn.title = uiTexts.restore_word;
             } else {
                 row.classList.remove('word-disabled');
                 toggleBtn.innerHTML = '🗑️';
                 toggleBtn.className = 'word-toggle-btn delete';
-                toggleBtn.title = 'Исключить слово';
+                toggleBtn.title = uiTexts.exclude_word;
             }
         };
 
@@ -108,7 +108,7 @@ function startGame(fileData, uiTexts, pairs) {
     learnBtn.onclick = () => {
         const activePairs = localPairs.filter(p => !p.disabled);
         if (!activePairs.length) {
-            alert('Нет активных слов');
+            alert(uiTexts.no_selected_words);
             return;
         }
         startLearningGame(activePairs, uiTexts);
@@ -120,7 +120,7 @@ function startGame(fileData, uiTexts, pairs) {
     memorizeBtn.onclick = () => {
         const activePairs = localPairs.filter(p => !p.disabled);
         if (!activePairs.length) {
-            alert('Нет активных слов');
+            alert(uiTexts.no_selected_words);
             return;
         }
         startMemorizingGame(activePairs, uiTexts);
@@ -199,14 +199,14 @@ function startLearningGame(pairs, uiTexts) {
     controls.className = 'study-controls';
 
     const prevBtn = document.createElement('button');
-    prevBtn.textContent = '◀';
+    prevBtn.textContent = '<<';
     prevBtn.onclick = () => {
         index = (index - 1 + shuffled.length) % shuffled.length;
         renderCard();
     };
 
     const nextBtn = document.createElement('button');
-    nextBtn.textContent = '▶';
+    nextBtn.textContent = '>>';
     nextBtn.onclick = () => {
         index = (index + 1) % shuffled.length;
         renderCard();
