@@ -267,7 +267,7 @@ function startMemorizingGame(pairs, uiTexts) {
     closeGame();
     let lastQuestionKey = null;
     let lastPairId = null;
-    const REQUIRED_QUESTIONS_REPEATS = 2; // количество повторений слов или переводов в вопросах
+    let REQUIRED_QUESTIONS_REPEATS = Number(localStorage.getItem('memorizeRepeats')) || 2; // количество повторений слов или переводов в вопросах.
 
     gameContainer = document.createElement('div');
     gameContainer.className = 'memorize-game';
@@ -295,6 +295,61 @@ function startMemorizingGame(pairs, uiTexts) {
     closeBtn.style.cursor = 'pointer';
     closeBtn.onclick = closeGame;
     windowBox.appendChild(closeBtn);
+
+    // ─── Настройка количества повторений (1–5) прямо в окне режима MEMORIZE
+    const repeatsWrapper = document.createElement('div');
+    repeatsWrapper.style.display = 'flex';
+    repeatsWrapper.style.alignItems = 'center';
+    repeatsWrapper.style.gap = '6px';
+    repeatsWrapper.style.marginBottom = '10px';
+    repeatsWrapper.style.fontSize = '14px';
+
+    const repeatsLabel = document.createElement('span');
+    repeatsLabel.textContent = uiTexts.repeats || 'Repeats:';
+
+    repeatsWrapper.appendChild(repeatsLabel);
+
+    const repeatButtons = [];
+
+    for (let i = 1; i <= 5; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.style.padding = '4px 8px';
+        btn.style.cursor = 'pointer';
+        btn.style.borderRadius = '4px';
+        btn.style.border = '1px solid #aaa';
+        btn.style.backgroundColor = i === REQUIRED_QUESTIONS_REPEATS ? '#4CAF50' : '#f0f0f0';
+        btn.style.color = i === REQUIRED_QUESTIONS_REPEATS ? '#fff' : '#000';
+
+        btn.onclick = () => {
+            REQUIRED_QUESTIONS_REPEATS = i;
+            localStorage.setItem('memorizeRepeats', i); // Сохраняем выбор количества повторений в localStorage
+
+            // визуально подсвечиваем выбранную кнопку
+            repeatButtons.forEach(b => {
+                b.style.backgroundColor = '#f0f0f0';
+                b.style.color = '#000';
+            });
+            btn.style.backgroundColor = '#4CAF50';
+            btn.style.color = '#fff';
+
+            // 🔁 перезапуск игры с новым значением
+            memorizeProgress = {};
+            pairs.forEach(p => {
+                memorizeProgress[`${p.term}|word`] = 0;
+                memorizeProgress[`${p.translation}|translation`] = 0;
+            });
+
+            updateProgressBar();
+            nextQuestion();
+        };
+
+        repeatButtons.push(btn);
+        repeatsWrapper.appendChild(btn);
+    }
+
+    windowBox.appendChild(repeatsWrapper);
+
 
     // Вопрос
     const questionEl = document.createElement('div');
@@ -349,7 +404,6 @@ function startMemorizingGame(pairs, uiTexts) {
         memorizeProgress[`${p.translation}|translation`] = 0;
     });
     
-    const MAX_PROGRESS = pairs.length * 2 * REQUIRED_QUESTIONS_REPEATS; // размер прогресс бара
     updateProgressBar();
  
     function getNextQuestion() {
@@ -416,6 +470,8 @@ function startMemorizingGame(pairs, uiTexts) {
     function updateProgressBar() {
         const current = Object.values(memorizeProgress)
             .reduce((sum, v) => sum + v, 0);
+
+        const MAX_PROGRESS = pairs.length * 2 * REQUIRED_QUESTIONS_REPEATS; // размер прогресс бара
 
         // полоска
         const percent = (current / MAX_PROGRESS) * 100;
@@ -574,7 +630,8 @@ function launchConfetti() {
             ctx.fillRect(p.x, p.y, p.size, p.size);
         });
 
-        if (elapsed < 1000) {
+        // время проигрывания анимации    
+        if (elapsed < 2000) {
             requestAnimationFrame(draw);
         } else {
             canvas.remove();
