@@ -758,7 +758,6 @@ XLSX TABLE
 /* вернуть */
 .word-toggle-btn.restore {
     color: #1b5e20;              /* тёмный, читаемый */
-    background: rgba(76, 175, 80, 0.25);
 }
 
 .word-toggle-btn.restore:hover {

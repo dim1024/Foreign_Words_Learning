@@ -311,10 +311,10 @@ function renderLevel(level) {
 
             wrapper.appendChild(btn);
 
-            // 🗑 только для пользовательских файлов
+            // 🗑️ только для пользовательских файлов
             if (item.userFile) {
                 const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = '🗑';
+                deleteBtn.textContent = '🗑️';
                 deleteBtn.title = uiTexts.delete_confirm;
 
                 deleteBtn.onclick = (e) => {

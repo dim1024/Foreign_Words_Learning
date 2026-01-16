@@ -68,7 +68,9 @@ function startGame(fileData, uiTexts, pairs) {
         // кнопка удалить / вернуть
         const toggleBtn = document.createElement('button');
         toggleBtn.className = 'word-toggle-btn delete';
-        toggleBtn.innerHTML = '🗑';
+        // toggleBtn.innerHTML = '🗑';
+        toggleBtn.innerHTML = '🗑️';
+        
         toggleBtn.title = 'Исключить слово';
 
         toggleBtn.onclick = () => {
@@ -76,12 +78,13 @@ function startGame(fileData, uiTexts, pairs) {
 
             if (p.disabled) {
                 row.classList.add('word-disabled');
-                toggleBtn.innerHTML = '↩';
+                // toggleBtn.innerHTML = '↩';
+                toggleBtn.innerHTML = '↩️';
                 toggleBtn.className = 'word-toggle-btn restore';
                 toggleBtn.title = 'Вернуть слово';
             } else {
                 row.classList.remove('word-disabled');
-                toggleBtn.innerHTML = '🗑';
+                toggleBtn.innerHTML = '🗑️';
                 toggleBtn.className = 'word-toggle-btn delete';
                 toggleBtn.title = 'Исключить слово';
             }
