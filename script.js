@@ -25,9 +25,19 @@ const myWordsFolder = {
     children: []
 };
 
+const frequentMistakesFolder = {
+    name: '',
+    type: 'folder',
+    children: [],
+    isFrequentMistakesFolder: true
+};
+
+
 function syncMyWordsFolder() {
     myWordsFolder.name = uiTexts.my_words;
-    myWordsFolder.children = userFiles
+
+    // ВАЖНО: не заменяем массив, а обновляем его (сохраняем ссылку)
+    const mapped = userFiles
         .slice()
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(f => ({
@@ -35,9 +45,72 @@ function syncMyWordsFolder() {
             type: 'file',
             userFile: f
         }));
+
+    myWordsFolder.children.length = 0;
+    myWordsFolder.children.push(...mapped);
+}
+
+function syncFrequentMistakesFolder() {
+    frequentMistakesFolder.name = uiTexts.frequent_mistakes;
+
+    const files = loadFrequentMistakesFiles();
+
+    frequentMistakesFolder.children.length = 0;
+    files
+        .slice()
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach(f => {
+            frequentMistakesFolder.children.push({
+                name: f.name,
+                type: 'file',
+                frequentMistakesFile: f
+            });
+        });
+}
+
+
+
+function saveMistakesFile(mistakesPairs, sourceFileName) {
+    const mistakesFiles = loadFrequentMistakesFiles();
+
+    const date = new Date();
+    const dateStr = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}_${date.getHours().toString().padStart(2,'0')}-${date.getMinutes().toString().padStart(2,'0')}`;
+
+    let baseName = `mistakes_${sourceFileName}_${dateStr}`;
+    baseName = baseName.replace(/[^\w\s-]/g, '');
+
+    let name = baseName;
+    let i = 1;
+    while (mistakesFiles.some(f => f.name === name)) {
+        name = `${baseName} (${i})`;
+        i++;
+    }
+
+    mistakesFiles.push({
+        name,
+        date: date.toISOString(),
+        pairs: mistakesPairs.map(x => ({ term: x.term, translation: x.translation })),
+        source: sourceFileName
+    });
+
+    saveFrequentMistakesFiles(mistakesFiles);
+    syncFrequentMistakesFolder();
+
+    // если пользователь сейчас на главном экране — сразу обновляем
+    if (currentFolder === rootData) {
+        renderLevel(rootData);
+    }
 }
 
 const USER_WORDS_KEY = 'user_words';
+const FREQUENT_MISTAKES_KEY = 'frequent_mistakes_files';
+
+function getTotalStorageSize() {
+    const user = localStorage.getItem(USER_WORDS_KEY) || '';
+    const mistakes = localStorage.getItem(FREQUENT_MISTAKES_KEY) || '';
+    return new Blob([user, mistakes]).size;
+}
+
 
 function loadUserWords() {
     try {
@@ -53,6 +126,19 @@ function saveUserWords(words) {
 
 // Пользовательские файлы
 let userFiles = loadUserWords();
+
+function loadFrequentMistakesFiles() {
+    try {
+        return JSON.parse(localStorage.getItem(FREQUENT_MISTAKES_KEY)) || [];
+    } catch {
+        return [];
+    }
+}
+
+function saveFrequentMistakesFiles(files) {
+    localStorage.setItem(FREQUENT_MISTAKES_KEY, JSON.stringify(files));
+}
+
 
 /***********************
  * ПРОВЕРКА ИМЕН ПОЛЬЗОВАТЕЛЬСКИХ ФАЙЛОВ НА ДУБЛИКАТЫ
@@ -174,22 +260,10 @@ async function loadFile(file) {
     if (!response.ok) throw new Error('FILE_LOAD_ERROR');        
 
     // TXT / CSV
-    if (extension === 'txt' || extension === 'csv') {            
-        const text = await response.text();                      
-        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-        const pairs = [];
-
-        lines.forEach(line => {
-            const match = line.match(/^(.+?)[\s,;|:\-—]+(.+)$/);
-            if (!match) return;
-            pairs.push({
-                term: match[1].trim(),
-                translation: match[2].trim()
-            });
-        });
-
-        if (!pairs.length) throw new Error('EMPTY_FILE');
-        return pairs;
+    if (extension === 'txt' || extension === 'csv') {
+        const text = await response.text();
+        const parsed = parsePairsFromText(text);
+        return parsed.pairs;
     }
 
     // XLSX
@@ -221,6 +295,8 @@ async function loadFile(file) {
  ***********************/
 function renderLevel(level) {
 
+    currentFolder = level;   // 🔥 ВОТ ЭТО КЛЮЧ
+
     // Создаём копию уровня, чтобы не мутировать оригинал
     let displayLevel = [...level];
 
@@ -235,7 +311,18 @@ function renderLevel(level) {
     // Добавляем папку "Мои слова" на главном уровне всегда. Если надо спрятать когда она пустая, то надо в IF добавить вот такое условие: if (level === rootData && userFiles.length)
     if (level === rootData) {
         syncMyWordsFolder();
-        displayLevel = [myWordsFolder, ...displayLevel];
+        syncFrequentMistakesFolder();
+        displayLevel = [myWordsFolder, frequentMistakesFolder, ...displayLevel];
+    }
+
+    if (level === myWordsFolder.children) {
+        syncMyWordsFolder();
+        displayLevel = myWordsFolder.children;
+    }
+
+    if (level === frequentMistakesFolder.children) {
+        syncFrequentMistakesFolder();
+        displayLevel = frequentMistakesFolder.children;
     }
 
     // Очищаем контейнер
@@ -261,6 +348,14 @@ function renderLevel(level) {
             addBtn.textContent = uiTexts.add_own_words;
             addBtn.onclick = () => openUploadModal();
             container.appendChild(addBtn);
+        }
+
+        // Если это "Frequent Mistakes"
+        const isFrequentMistakesFolder = level === frequentMistakesFolder.children;
+        if (isFrequentMistakesFolder) {
+            const emptyMsg = document.createElement('p');
+            emptyMsg.textContent = uiTexts.empty_folder;
+            container.appendChild(emptyMsg);
         }
 
         return;
@@ -302,30 +397,39 @@ function renderLevel(level) {
 
             btn.onclick = () => {
                 if (item.userFile) {
-                    // Пользовательский файл
                     loadAndRunUserFile(item.userFile);
-                } else {
-                    loadAndRunGame(item);
+                    return;
                 }
+
+                if (item.frequentMistakesFile) {
+                    loadAndRunUserFile(item.frequentMistakesFile);
+                    return;
+                }
+
+                loadAndRunGame(item);
             };
 
             wrapper.appendChild(btn);
 
-            // 🗑️ только для пользовательских файлов
-            if (item.userFile) {
+            // 🗑️ для пользовательских файлов и Frequent Mistakes
+            if (item.userFile || item.frequentMistakesFile) {
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = '🗑️';
                 deleteBtn.title = uiTexts.delete_confirm;
 
                 deleteBtn.onclick = (e) => {
-                    e.stopPropagation(); // ⛔ чтобы не запускалась игра
-                    deleteUserFile(item.userFile);
-                    // После удаления рендерим текущую папку заново
-                    renderLevel(myWordsFolder.children);
+                    e.stopPropagation(); // ⛔ не запускать игру
+
+                    if (item.userFile) {
+                        deleteUserFile(item.userFile);
+                    } else if (item.frequentMistakesFile) {
+                        deleteFrequentMistakesFile(item.frequentMistakesFile);
+                    }
                 };
 
                 wrapper.appendChild(deleteBtn);
             }
+
 
             container.appendChild(wrapper);
             return;
@@ -418,12 +522,10 @@ function deleteUserFile(userFileObj) {
     syncMyWordsFolder();
 
     closeGame();
+    renderLevel(currentFolder || rootData);
 
-    // 🔹 Рендерим текущую папку (последний элемент стека, если есть) после удаления, чтобы не выкидывало в Home при пустой папке
-    const currentLevel = navigationStack.length ? navigationStack[navigationStack.length - 1] : rootData;
-    renderLevel(currentLevel);
 
-    // // если надо чтобы выкидывало в home надо вместо верхней строки то что ниже
+    // // если надо чтобы выкидывало в home если папка пуста надо вместо верхней строки то что ниже
     // if (userFiles.length === 0) {
     //     navigationStack = [];
     //     renderLevel(rootData);
@@ -431,6 +533,23 @@ function deleteUserFile(userFileObj) {
     //     renderLevel(myWordsFolder.children);
     // }
     
+}
+
+function deleteFrequentMistakesFile(fileObj) {
+    const confirmText = uiTexts.delete_confirm;
+
+    if (!confirm(confirmText)) return;
+
+    // удаляем файл из frequent mistakes
+    let files = loadFrequentMistakesFiles();
+    files = files.filter(f => f.name !== fileObj.name);
+    saveFrequentMistakesFiles(files);
+
+    syncFrequentMistakesFolder();
+
+    closeGame();
+    renderLevel(currentFolder || rootData);
+
 }
 
 
@@ -461,7 +580,6 @@ function isValidUserFile(file) {
     const ext = file.name.split('.').pop().toLowerCase();
 
     if (!allowed.includes(ext)) return false;
-    if (file.size > 5 * 1024 * 1024) return false;
 
     return true;
 }
@@ -674,11 +792,6 @@ function parsePairsFromXLSX(buffer) {
 function handleUserFiles(files) {
     files.forEach(file => {
 
-        if (file.size > 5 * 1024 * 1024) { // 5 мб
-            alert(uiTexts.file_too_large);
-            return;
-        }
-
         const existingNames = userFiles.map(f => f.name);
         const uniqueName = getUniqueFileName(file.name, existingNames);
 
@@ -707,9 +820,8 @@ function handleUserFiles(files) {
                 };
 
                 const temp = [...userFiles, newUserFile];
-                const totalSize = new Blob([JSON.stringify(temp)]).size;
 
-                if (totalSize > 5 * 1024 * 1024) {
+                if (getTotalStorageSize() > 5 * 1024 * 1024) {
                     alert(uiTexts.storage_full);
                     return;
                 }

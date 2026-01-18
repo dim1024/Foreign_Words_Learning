@@ -44,7 +44,14 @@
   "restore_word": "Restore word",
   "no_selected_words": "No selected words",
   "word_repetitions": "Word repetitions",
-  "frequent_mistakes": "Frequent Mistakes"
+
+
+  "frequent_mistakes": "Frequent Mistakes",
+  "repeat_mistakes": "Повторить только с ошибками",
+  "save_to_frequent_mistakes": "Отправить в Frequent Mistakes",
+  "no_mistakes": "Ошибок нет"
+
+
 
 
 
