@@ -280,21 +280,22 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
     gameContainer.className = 'memorize-game';
 
     const windowBox = document.createElement('div');
-    windowBox.className = 'memorize-window';
-    windowBox.style.width = '400px';
+    windowBox.className = 'game-window';
     windowBox.style.padding = '20px';
     windowBox.style.borderRadius = '10px';
     windowBox.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
     windowBox.style.backgroundColor = '#fff';
     windowBox.style.display = 'flex';
     windowBox.style.flexDirection = 'column';
-    windowBox.style.alignItems = 'center';
+    windowBox.style.position = 'relative';
 
     // Красный крестик
     const closeBtn = document.createElement('button');
     closeBtn.className = 'memorize-close-btn';
     closeBtn.textContent = '✖';
-    closeBtn.style.alignSelf = 'flex-end';
+    closeBtn.style.position = 'absolute';
+    closeBtn.style.top = '10px';
+    closeBtn.style.right = '10px';
     closeBtn.style.backgroundColor = 'transparent';
     closeBtn.style.border = 'none';
     closeBtn.style.color = 'red';
@@ -627,6 +628,10 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
     }
 
     function showFinished() {
+        // убираем настройки в финальном окне
+        settingsBtn.style.display = 'none';
+        settingsPanel.style.display = 'none';
+
 
         // Убираем прогресс бар из последнего окна MEMORIZE
         progressText.style.display = 'none';
@@ -639,7 +644,8 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             const wKey = `${p.term}|word`;
             const tKey = `${p.translation}|translation`;
 
-            if ((mistakesCount[wKey] || 0) + (mistakesCount[tKey] || 0) >= 2) {
+            // if ((mistakesCount[wKey] || 0) + (mistakesCount[tKey] || 0) >= 2) {
+            if (true) {// удалить А
                 mistakesPairs.push({
                     term: p.term,
                     translation: p.translation,
@@ -662,21 +668,40 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
         answersEl.innerHTML = '';
         questionEl.textContent = uiTexts.memorize_finished;
 
-        // Показываем список ошибок (для дебага)
-        const mistakesList = document.createElement('div');
-        mistakesList.style.marginTop = '10px';
-        mistakesList.style.fontSize = '14px';
-        mistakesList.style.textAlign = 'left';
+        // ===== Список частых ошибок (как в превью файла) =====
+        let mistakesBlock = null;
 
-        if (mistakesPairs.length === 0) {
-            mistakesList.textContent = uiTexts.no_mistakes;
-        } else {
-            mistakesList.innerHTML = mistakesPairs.map(mp => {
-                return `${mp.term} — ${mp.translation} (слово: ${mp.errors.word}, перевод: ${mp.errors.translation})`;
-            }).join('<br>');
+        if (mistakesPairs.length > 0) {
+            mistakesBlock = document.createElement('div');
+            mistakesBlock.className = 'words-list';
+            mistakesBlock.style.paddingLeft = '40px';
+
+            // чтобы окно с частыми ошибками не растягивалось и появился вертикальный скрол
+            mistakesBlock.style.maxHeight = '200px';
+            mistakesBlock.style.overflowY = 'auto';
+
+            mistakesPairs.forEach(mp => {
+                const row = document.createElement('div');
+                row.className = 'word-row';
+
+                const term = document.createElement('div');
+                term.className = 'word-cell';
+                term.textContent = mp.term;
+
+                const translation = document.createElement('div');
+                translation.className = 'word-cell';
+                translation.textContent =
+                    mp.translation +
+                    ` (${mp.errors.word + mp.errors.translation})`; // 🔧 дебаг: число ошибок
+
+                row.appendChild(term);
+                row.appendChild(translation);
+
+                mistakesBlock.appendChild(row);
+            });
+
+            windowBox.appendChild(mistakesBlock);
         }
-
-        windowBox.appendChild(mistakesList);
 
         // Кнопки
         const closeBtnFinish = document.createElement('button');
@@ -697,9 +722,22 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
         };
 
         const repeatMistakesBtn = document.createElement('button');
-        repeatMistakesBtn.textContent = uiTexts.repeat_mistakes;
+        repeatMistakesBtn.innerHTML = `
+            <div>
+                ${uiTexts.repeat}
+            </div>
+            <div style="font-size: 11px; opacity: 0.7;">
+                ${uiTexts.only_mistakes || 'только с ошибками'}
+            </div>
+        `;
         repeatMistakesBtn.style.padding = '10px';
         repeatMistakesBtn.style.borderRadius = '6px';
+        repeatMistakesBtn.style.maxWidth = '140px';
+        repeatMistakesBtn.style.whiteSpace = 'normal';
+        repeatMistakesBtn.style.lineHeight = '1.2';
+        repeatMistakesBtn.style.textAlign = 'center';
+
+
         repeatMistakesBtn.onclick = () => {
             if (mistakesPairs.length === 0) {
                 alert(uiTexts.no_mistakes);
@@ -708,10 +746,20 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             startMemorizingGame(mistakesPairs.map(x => ({ term: x.term, translation: x.translation })), uiTexts, fileData);
         };
 
+        // кнопка под списком ошибок "отправить в частые ошибки"
         const saveMistakesBtn = document.createElement('button');
+        if (mistakesBlock) {
+            saveMistakesBtn.style.marginTop = '10px';
+            saveMistakesBtn.style.marginBottom = '40px'; 
+            windowBox.appendChild(saveMistakesBtn);
+        }
         saveMistakesBtn.textContent = uiTexts.save_to_frequent_mistakes;
+        saveMistakesBtn.style.alignSelf = 'center';
         saveMistakesBtn.style.padding = '10px';
         saveMistakesBtn.style.borderRadius = '6px';
+        saveMistakesBtn.style.maxWidth = '220px';
+        saveMistakesBtn.style.whiteSpace = 'normal';
+        saveMistakesBtn.style.lineHeight = '1.2';
         saveMistakesBtn.onclick = () => {
             if (mistakesPairs.length === 0) {
                 alert(uiTexts.no_mistakes);
@@ -723,14 +771,27 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             closeGame();
         };
 
-        answersEl.appendChild(repeatBtn);
-        answersEl.appendChild(repeatMistakesBtn);
-        answersEl.appendChild(saveMistakesBtn);
-        answersEl.appendChild(closeBtnFinish);
+
+
+        // ===== Нижние кнопки (в самом низу окна) =====
+        const finishActions = document.createElement('div');
+        finishActions.className = 'game-actions';
+        finishActions.style.marginTop = 'auto'; // 🔑 прижимает вниз
+
+        finishActions.appendChild(repeatBtn);
+        finishActions.appendChild(repeatMistakesBtn);
+        finishActions.appendChild(closeBtnFinish);
+
+        windowBox.appendChild(finishActions);
+
+
+
     }
 
 
-    nextQuestion();
+    // nextQuestion();
+    showFinished(); //удалить А
+
 }
 
 function launchConfetti() {
