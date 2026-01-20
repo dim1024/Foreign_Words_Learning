@@ -674,7 +674,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
         if (mistakesPairs.length > 0) {
             mistakesBlock = document.createElement('div');
             mistakesBlock.className = 'words-list';
-            mistakesBlock.style.paddingLeft = '40px';
+            mistakesBlock.style.paddingLeft = '60px';
 
             // чтобы окно с частыми ошибками не растягивалось и появился вертикальный скрол
             mistakesBlock.style.maxHeight = '200px';
@@ -690,10 +690,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
                 const translation = document.createElement('div');
                 translation.className = 'word-cell';
-                translation.textContent =
-                    mp.translation +
-                    ` (${mp.errors.word + mp.errors.translation})`; // 🔧 дебаг: число ошибок
-
+                translation.textContent = mp.translation;
                 row.appendChild(term);
                 row.appendChild(translation);
 
@@ -703,7 +700,10 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             windowBox.appendChild(mistakesBlock);
         }
 
-        // Кнопки
+        // =====================
+        // КНОПКИ (2 варианта)
+        // =====================
+
         const closeBtnFinish = document.createElement('button');
         closeBtnFinish.textContent = uiTexts.close;
         closeBtnFinish.style.padding = '10px';
@@ -721,73 +721,75 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             startMemorizingGame(pairs, uiTexts, fileData);
         };
 
-        const repeatMistakesBtn = document.createElement('button');
-        repeatMistakesBtn.innerHTML = `
-            <div>
-                ${uiTexts.repeat}
-            </div>
-            <div style="font-size: 11px; opacity: 0.7;">
-                ${uiTexts.only_mistakes || 'только с ошибками'}
-            </div>
-        `;
-        repeatMistakesBtn.style.padding = '10px';
-        repeatMistakesBtn.style.borderRadius = '6px';
-        repeatMistakesBtn.style.maxWidth = '140px';
-        repeatMistakesBtn.style.whiteSpace = 'normal';
-        repeatMistakesBtn.style.lineHeight = '1.2';
-        repeatMistakesBtn.style.textAlign = 'center';
+        if (mistakesPairs.length === 0) {
+            // =====================
+            // Вариант: ошибок нет
+            // =====================
 
+            const finishActions = document.createElement('div');
+            finishActions.className = 'game-actions';
+            finishActions.style.marginTop = 'auto';
+            finishActions.appendChild(repeatBtn);
+            finishActions.appendChild(closeBtnFinish);
 
-        repeatMistakesBtn.onclick = () => {
-            if (mistakesPairs.length === 0) {
-                alert(uiTexts.no_mistakes);
-                return;
-            }
-            startMemorizingGame(mistakesPairs.map(x => ({ term: x.term, translation: x.translation })), uiTexts, fileData);
-        };
+            windowBox.appendChild(finishActions);
 
-        // кнопка под списком ошибок "отправить в частые ошибки"
-        const saveMistakesBtn = document.createElement('button');
-        if (mistakesBlock) {
-            saveMistakesBtn.style.marginTop = '10px';
-            saveMistakesBtn.style.marginBottom = '40px'; 
+        } else {
+
+            // =====================
+            // Вариант: есть ошибки
+            // =====================
+
+            const repeatMistakesBtn = document.createElement('button');
+            repeatMistakesBtn.innerHTML = `
+                <div>${uiTexts.repeat}</div>
+                <div style="font-size: 11px; opacity: 0.7;">
+                    ${uiTexts.only_mistakes || 'только с ошибками'}
+                </div>
+            `;
+            repeatMistakesBtn.style.padding = '10px';
+            repeatMistakesBtn.style.borderRadius = '6px';
+            repeatMistakesBtn.style.maxWidth = '140px';
+            repeatMistakesBtn.style.whiteSpace = 'normal';
+            repeatMistakesBtn.style.lineHeight = '1.2';
+            repeatMistakesBtn.style.textAlign = 'center';
+
+            repeatMistakesBtn.onclick = () => {
+                startMemorizingGame(
+                    mistakesPairs.map(x => ({ term: x.term, translation: x.translation })),
+                    uiTexts,
+                    fileData
+                );
+            };
+
+            const saveMistakesBtn = document.createElement('button');
+            saveMistakesBtn.textContent = uiTexts.save_to_frequent_mistakes;
+            saveMistakesBtn.style.alignSelf = 'center';
+            // saveMistakesBtn.style.marginTop = '5px';
+            saveMistakesBtn.style.marginBottom = '30px'; 
+            saveMistakesBtn.style.padding = '10px';
+            saveMistakesBtn.style.borderRadius = '6px';
+            saveMistakesBtn.style.maxWidth = '220px';
+            saveMistakesBtn.style.whiteSpace = 'normal';
+            saveMistakesBtn.style.lineHeight = '1.2';
+            saveMistakesBtn.onclick = () => {
+                saveMistakesFile(mistakesPairs, fileData.name);
+                document.removeEventListener('click', handleOutsideClick);
+                closeGame();
+            };
+
             windowBox.appendChild(saveMistakesBtn);
+
+            const finishActions = document.createElement('div');
+            finishActions.className = 'game-actions';
+            finishActions.style.marginTop = 'auto';
+            finishActions.appendChild(repeatBtn);
+            finishActions.appendChild(repeatMistakesBtn);
+            finishActions.appendChild(closeBtnFinish);
+
+            windowBox.appendChild(finishActions);
         }
-        saveMistakesBtn.textContent = uiTexts.save_to_frequent_mistakes;
-        saveMistakesBtn.style.alignSelf = 'center';
-        saveMistakesBtn.style.padding = '10px';
-        saveMistakesBtn.style.borderRadius = '6px';
-        saveMistakesBtn.style.maxWidth = '220px';
-        saveMistakesBtn.style.whiteSpace = 'normal';
-        saveMistakesBtn.style.lineHeight = '1.2';
-        saveMistakesBtn.onclick = () => {
-            if (mistakesPairs.length === 0) {
-                alert(uiTexts.no_mistakes);
-                return;
-            }
-
-            saveMistakesFile(mistakesPairs, fileData.name);
-            document.removeEventListener('click', handleOutsideClick);
-            closeGame();
-        };
-
-
-
-        // ===== Нижние кнопки (в самом низу окна) =====
-        const finishActions = document.createElement('div');
-        finishActions.className = 'game-actions';
-        finishActions.style.marginTop = 'auto'; // 🔑 прижимает вниз
-
-        finishActions.appendChild(repeatBtn);
-        finishActions.appendChild(repeatMistakesBtn);
-        finishActions.appendChild(closeBtnFinish);
-
-        windowBox.appendChild(finishActions);
-
-
-
     }
-
 
     // nextQuestion();
     showFinished(); //удалить А
