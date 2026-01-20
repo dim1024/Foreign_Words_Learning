@@ -293,7 +293,7 @@ XLSX TABLE
   border-radius: 8px;
 
   width: fit-content;
-  min-width: 220px;           /* минимальная ширина для 2 колонок */
+  min-width: 280px;           /* минимальная ширина для 2 колонок */
   max-width: 500px;           /* ограничение на слишком широкое окно */
   max-height: 90vh;
 }
@@ -321,9 +321,10 @@ XLSX TABLE
     gap: 6px;
     width: 100%;
     overflow-y: auto;      /* скролл для длинного списка */
-    margin: 12px 0;
+    /* margin: 12px 0; */
     border: 1px solid #ddd;
     box-sizing: border-box;
+    padding: 8px;   
 }
 
 /* одна строка */
@@ -849,4 +850,35 @@ XLSX TABLE
 
 .hidden {
   display: none !important;
+}
+
+/* ======= ОТДЕЛЬНЫЙ СТИЛЬ ДЛЯ ОКНА "ЧАСТЫЕ ОШИБКИ" ======= */
+
+.mistakes-list {
+    width: 100%;
+    margin: 12px 0;
+    padding: 8px;
+    padding-left: 60px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.mistakes-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* без кнопки справа */
+    gap: 10px;
+    padding: 6px 8px;
+    align-items: center;
+
+    /* width: 100%; */
+}
+
+.mistakes-cell {
+    text-align: left;
+    padding: 4px 8px;
+    min-width: 0;                 /* очень важно */
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }

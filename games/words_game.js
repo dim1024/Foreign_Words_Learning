@@ -632,7 +632,6 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
         settingsBtn.style.display = 'none';
         settingsPanel.style.display = 'none';
 
-
         // Убираем прогресс бар из последнего окна MEMORIZE
         progressText.style.display = 'none';
         progressWrapper.style.display = 'none';
@@ -644,8 +643,9 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             const wKey = `${p.term}|word`;
             const tKey = `${p.translation}|translation`;
 
+            // Только частые ошибки: 2+ ошибки по пар
             // if ((mistakesCount[wKey] || 0) + (mistakesCount[tKey] || 0) >= 2) {
-            if (true) {// удалить А
+            if (true) {// уудалить А
                 mistakesPairs.push({
                     term: p.term,
                     translation: p.translation,
@@ -673,8 +673,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
         if (mistakesPairs.length > 0) {
             mistakesBlock = document.createElement('div');
-            mistakesBlock.className = 'words-list';
-            mistakesBlock.style.paddingLeft = '60px';
+            mistakesBlock.className = 'mistakes-list';
 
             // чтобы окно с частыми ошибками не растягивалось и появился вертикальный скрол
             mistakesBlock.style.maxHeight = '200px';
@@ -682,15 +681,16 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
             mistakesPairs.forEach(mp => {
                 const row = document.createElement('div');
-                row.className = 'word-row';
+                row.className = 'mistakes-row';
 
                 const term = document.createElement('div');
-                term.className = 'word-cell';
+                term.className = 'mistakes-cell';
                 term.textContent = mp.term;
 
                 const translation = document.createElement('div');
-                translation.className = 'word-cell';
+                translation.className = 'mistakes-cell';
                 translation.textContent = mp.translation;
+
                 row.appendChild(term);
                 row.appendChild(translation);
 
@@ -700,23 +700,23 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             windowBox.appendChild(mistakesBlock);
         }
 
-        // =====================
-        // КНОПКИ (2 варианта)
-        // =====================
+            // =====================
+            // КНОПКИ (2 варианта)
+            // =====================
 
-        const closeBtnFinish = document.createElement('button');
-        closeBtnFinish.textContent = uiTexts.close;
-        closeBtnFinish.style.padding = '10px';
-        closeBtnFinish.style.borderRadius = '6px';
-        closeBtnFinish.onclick = () => {
-            document.removeEventListener('click', handleOutsideClick);
-            closeGame();
-        };
+            const closeBtnFinish = document.createElement('button');
+            closeBtnFinish.textContent = uiTexts.close;
+            closeBtnFinish.style.padding = '10px';
+            closeBtnFinish.style.borderRadius = '6px';
+            closeBtnFinish.onclick = () => {
+                document.removeEventListener('click', handleOutsideClick);
+                closeGame();
+            };
 
-        const repeatBtn = document.createElement('button');
-        repeatBtn.textContent = uiTexts.repeat;
-        repeatBtn.style.padding = '10px';
-        repeatBtn.style.borderRadius = '6px';
+            const repeatBtn = document.createElement('button');
+            repeatBtn.textContent = uiTexts.repeat;
+            repeatBtn.style.padding = '10px';
+            repeatBtn.style.borderRadius = '6px';
         repeatBtn.onclick = () => {
             startMemorizingGame(pairs, uiTexts, fileData);
         };
@@ -792,7 +792,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
     }
 
     // nextQuestion();
-    showFinished(); //удалить А
+    showFinished(); //уудалить А
 
 }
 
