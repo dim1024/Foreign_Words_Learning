@@ -1,13 +1,6 @@
-/*********************************
- * GAME HUB (выбор режима)
- *********************************/
-
 let gameContainer = null;
 
-/**
- * Закрытие любого игрового окна
- */
-function closeGame() {
+function closeGame() { //Закрытие любого игрового окна
     if (window.__memorizeHandleOutsideClick) {
         document.removeEventListener('click', window.__memorizeHandleOutsideClick);
         window.__memorizeHandleOutsideClick = null;
@@ -20,11 +13,7 @@ function closeGame() {
 }
 
 
-/**
- * Точка входа (вызывается из script.js)
- * Теперь это НЕ игра, а окно выбора режима
- */
-function startGame(fileData, uiTexts, pairs) {
+function startGame(fileData, uiTexts, pairs) { //Точка входа (вызывается из script.js)
     // ⛔ создаём локальную копию пар, чтобы можно было отключать слова, не ломая оригинал
     const localPairs = pairs.map(p => ({
         ...p,
@@ -182,7 +171,6 @@ function startLearningGame(pairs, uiTexts, fileData) {
     // // клик по карточке — не закрывает окно
     // card.onclick = e => e.stopPropagation();
 
-
     const termEl = document.createElement('div');
     termEl.className = 'study-term';
 
@@ -272,6 +260,13 @@ function shuffleArray(arr) {
 
 function startMemorizingGame(pairs, uiTexts, fileData) {
     closeGame();
+
+    const DEBUG_MEMORIZE_FINISH = 1; // <-- включить дебаг
+    // const DEBUG_MODE = 'none'
+    // const DEBUG_MODE = 'mistakes'
+    const DEBUG_MODE = 'frequent' 
+
+
     let lastQuestionKey = null;
     let lastPairTerm = null;
     let REQUIRED_CORRECT_ANSWERS_PER_ITEM = Number(localStorage.getItem('memorizeRepeats')) || 2; // количество повторений слов или переводов в вопросах.
@@ -568,8 +563,6 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
         }
         questionEl.textContent = question;
 
-        
-
         // 3 варианта + "не знаю"
         let options = [correctAnswer];
 
@@ -637,49 +630,128 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
         progressWrapper.style.display = 'none';
 
         // Считаем ошибки
-        const mistakesPairs = [];
+        const frequentMistakesPairs = []; // частые ошибки (2+)
+        const rareMistakesPairs = []; // редкие ошибки (1)
+
+        // =========================
+        // DEBUG MODE: подменяем ошибки
+        // =========================
+        if (DEBUG_MEMORIZE_FINISH) {
+
+            // сначала обнуляем сбрасываем все ошибки
+            mistakesCount = {};
+
+            if (DEBUG_MODE === 'frequent') { // 2 частые, 1 редкая
+                pairs = [
+                    { term: 'cat', translation: 'кот' },
+                    { term: 'dog', translation: 'собака' },
+                    { term: 'fox', translation: 'лиса' }
+                ];
+
+                mistakesCount['cat|word'] = 2;
+                mistakesCount['кот|translation'] = 0;
+
+                mistakesCount['dog|word'] = 1;
+                mistakesCount['собака|translation'] = 1;
+
+                mistakesCount['fox|word'] = 0;
+                mistakesCount['лиса|translation'] = 1;
+
+            } else if (DEBUG_MODE === 'mistakes') { // 2 редкие
+                pairs = [
+                    { term: 'HOME', translation: 'ДОМ' },
+                    { term: 'SUN', translation: 'СОЛНЦЕ' }
+                ];
+
+                mistakesCount['HOME|word'] = 1;
+                mistakesCount['ДОМ|translation'] = 0;
+
+                mistakesCount['SUN|word'] = 0;
+                mistakesCount['СОЛНЦЕ|translation'] = 1;
+
+            } else if (DEBUG_MODE === 'none') {
+                pairs = [
+                    { term: 'sky', translation: 'небо' },
+                    { term: 'water', translation: 'вода' }
+                ];
+
+                mistakesCount['sky|word'] = 0;
+                mistakesCount['небо|translation'] = 0;
+
+                mistakesCount['water|word'] = 0;
+                mistakesCount['вода|translation'] = 0;
+            }
+
+
+        }
 
         pairs.forEach(p => {
             const wKey = `${p.term}|word`;
             const tKey = `${p.translation}|translation`;
 
-            // Только частые ошибки: 2+ ошибки по пар
-            // if ((mistakesCount[wKey] || 0) + (mistakesCount[tKey] || 0) >= 2) {
-            if (true) {// уудалить А
-                mistakesPairs.push({
+            const wordErrors = mistakesCount[wKey] || 0;
+            const translationErrors = mistakesCount[tKey] || 0;
+
+            const totalErrorsInPair = wordErrors + translationErrors;
+
+            if (totalErrorsInPair >= 2) { // Если есть частые ошибки
+                frequentMistakesPairs.push({
                     term: p.term,
                     translation: p.translation,
                     errors: {
-                        word: mistakesCount[wKey] || 0,
-                        translation: mistakesCount[tKey] || 0
+                        word: wordErrors,
+                        translation: translationErrors
+                    }
+                });
+            } else if (totalErrorsInPair === 1) { // Если есть редкие рошибки
+                rareMistakesPairs.push({
+                    term: p.term,
+                    translation: p.translation,
+                    errors: {
+                        word: wordErrors,
+                        translation: translationErrors
                     }
                 });
             }
-        });
-
-        // если ошибок нет — конфети
-        const totalMistakes = Object.values(mistakesCount)
-            .reduce((sum, v) => sum + v, 0);
-
-        if (totalMistakes === 0) {
-            launchConfetti();
-        }
+        });      
 
         answersEl.innerHTML = '';
         questionEl.textContent = uiTexts.memorize_finished;
 
-        // ===== Список частых ошибок (как в превью файла) =====
-        let mistakesBlock = null;
+        // =====================
+        // КНОПКИ (2 варианта)
+        // =====================
 
-        if (mistakesPairs.length > 0) {
-            mistakesBlock = document.createElement('div');
+        const closeBtnFinish = document.createElement('button');
+        closeBtnFinish.textContent = uiTexts.close;
+        closeBtnFinish.style.padding = '10px';
+        closeBtnFinish.style.borderRadius = '6px';
+        closeBtnFinish.onclick = () => {
+            document.removeEventListener('click', handleOutsideClick);
+            closeGame();
+        };
+
+        const repeatBtn = document.createElement('button');
+        repeatBtn.textContent = uiTexts.repeat;
+        repeatBtn.style.padding = '10px';
+        repeatBtn.style.borderRadius = '6px';
+        repeatBtn.onclick = () => {
+            startMemorizingGame(pairs, uiTexts, fileData);
+        };
+
+        // =======================
+        // 1) Если есть частые ошибки
+        // =======================
+        if (frequentMistakesPairs.length > 0) {
+
+            questionEl.textContent = 'Слова с частыми ошибками'; // <-- текст меняем здесь
+
+            const mistakesBlock = document.createElement('div');
             mistakesBlock.className = 'mistakes-list';
-
-            // чтобы окно с частыми ошибками не растягивалось и появился вертикальный скрол
             mistakesBlock.style.maxHeight = '200px';
             mistakesBlock.style.overflowY = 'auto';
 
-            mistakesPairs.forEach(mp => {
+            frequentMistakesPairs.forEach(mp => {
                 const row = document.createElement('div');
                 row.className = 'mistakes-row';
 
@@ -693,58 +765,17 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
                 row.appendChild(term);
                 row.appendChild(translation);
-
                 mistakesBlock.appendChild(row);
             });
 
             windowBox.appendChild(mistakesBlock);
-        }
 
-            // =====================
-            // КНОПКИ (2 варианта)
-            // =====================
-
-            const closeBtnFinish = document.createElement('button');
-            closeBtnFinish.textContent = uiTexts.close;
-            closeBtnFinish.style.padding = '10px';
-            closeBtnFinish.style.borderRadius = '6px';
-            closeBtnFinish.onclick = () => {
-                document.removeEventListener('click', handleOutsideClick);
-                closeGame();
-            };
-
-            const repeatBtn = document.createElement('button');
-            repeatBtn.textContent = uiTexts.repeat;
-            repeatBtn.style.padding = '10px';
-            repeatBtn.style.borderRadius = '6px';
-        repeatBtn.onclick = () => {
-            startMemorizingGame(pairs, uiTexts, fileData);
-        };
-
-        if (mistakesPairs.length === 0) {
-            // =====================
-            // Вариант: ошибок нет
-            // =====================
-
-            const finishActions = document.createElement('div');
-            finishActions.className = 'game-actions';
-            finishActions.style.marginTop = 'auto';
-            finishActions.appendChild(repeatBtn);
-            finishActions.appendChild(closeBtnFinish);
-
-            windowBox.appendChild(finishActions);
-
-        } else {
-
-            // =====================
-            // Вариант: есть ошибки
-            // =====================
-
+            // Кнопки
             const repeatMistakesBtn = document.createElement('button');
             repeatMistakesBtn.innerHTML = `
                 <div>${uiTexts.repeat}</div>
                 <div style="font-size: 11px; opacity: 0.7;">
-                    ${uiTexts.only_mistakes || 'только с ошибками'}
+                    ${uiTexts.only_mistakes || 'с частыми ошибками'}
                 </div>
             `;
             repeatMistakesBtn.style.padding = '10px';
@@ -756,7 +787,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
             repeatMistakesBtn.onclick = () => {
                 startMemorizingGame(
-                    mistakesPairs.map(x => ({ term: x.term, translation: x.translation })),
+                    frequentMistakesPairs.map(x => ({ term: x.term, translation: x.translation })),
                     uiTexts,
                     fileData
                 );
@@ -765,15 +796,14 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             const saveMistakesBtn = document.createElement('button');
             saveMistakesBtn.textContent = uiTexts.save_to_frequent_mistakes;
             saveMistakesBtn.style.alignSelf = 'center';
-            // saveMistakesBtn.style.marginTop = '5px';
-            saveMistakesBtn.style.marginBottom = '30px'; 
+            saveMistakesBtn.style.marginBottom = '30px';
             saveMistakesBtn.style.padding = '10px';
             saveMistakesBtn.style.borderRadius = '6px';
             saveMistakesBtn.style.maxWidth = '220px';
             saveMistakesBtn.style.whiteSpace = 'normal';
             saveMistakesBtn.style.lineHeight = '1.2';
             saveMistakesBtn.onclick = () => {
-                saveMistakesFile(mistakesPairs, fileData.name);
+                saveMistakesFile(frequentMistakesPairs, fileData.name);
                 document.removeEventListener('click', handleOutsideClick);
                 closeGame();
             };
@@ -788,11 +818,40 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             finishActions.appendChild(closeBtnFinish);
 
             windowBox.appendChild(finishActions);
-        }
-    }
 
-    // nextQuestion();
-    showFinished(); //уудалить А
+            return; // важно! чтобы дальше не выполнялось
+        }
+
+        // =======================
+        // 2) Если частых ошибок нет
+        // =======================
+
+        // общий подсчёт ошибок
+        const totalMistakes = Object.values(mistakesCount)
+            .reduce((sum, v) => sum + v, 0);
+
+        if (totalMistakes === 0) {
+            questionEl.textContent = 'Ошибок нет 🎉';
+            launchConfetti();
+        } else {
+            questionEl.textContent = `Редких ошибок: ${rareMistakesPairs.length}`;
+        }
+
+        const finishActions = document.createElement('div');
+        finishActions.className = 'game-actions';
+        finishActions.style.marginTop = 'auto';
+        finishActions.appendChild(repeatBtn);
+        finishActions.appendChild(closeBtnFinish);
+
+        windowBox.appendChild(finishActions);
+
+    }
+ 
+    if (DEBUG_MEMORIZE_FINISH) { 
+        showFinished(); //уудалить А ee
+    } else {
+        nextQuestion(); // эта строчка это нормальное поведение без дебага
+    }
 
 }
 
@@ -807,14 +866,13 @@ function launchConfetti() {
     canvas.style.zIndex = 9999;
 
     document.body.appendChild(canvas);
-
     const ctx = canvas.getContext('2d');
     const W = canvas.width = window.innerWidth;
     const H = canvas.height = window.innerHeight;
 
     const CONFETTI_COUNT = 360; // <- здесь можно менять количество частиц
     const pieces = [];
-    const colors = ['#FFC107', '#4CAF50', '#2196F3', '#E91E63'];
+    const colors = ['#ffde07', '#3ae340', '#2196F3', '#E91E63'];
 
     for (let i = 0; i < CONFETTI_COUNT; i++) {
         pieces.push({
@@ -844,7 +902,7 @@ function launchConfetti() {
 
         // время проигрывания анимации + плавное затухание в последние мс
         let fadeDuration = 350; // длительность плавного затухания в мс
-        let confettiDuration = 2000;
+        let confettiDuration = 20000;
 
         if (elapsed < confettiDuration - fadeDuration) {
             canvas.style.opacity = '1';
