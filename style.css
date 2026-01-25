@@ -882,3 +882,14 @@ XLSX TABLE
     word-break: break-word;
     overflow-wrap: anywhere;
 }
+
+/* анимация для кнопки "сохранено" */
+.save-animate {
+  transition: background-color 0.9s ease, transform 0.1s ease;
+}
+
+.save-animate.success {
+  background-color: #47c04b !important;
+  color: #fff !important;
+  transform: scale(1.02);
+}

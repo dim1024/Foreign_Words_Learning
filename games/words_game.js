@@ -793,6 +793,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
                 );
             };
 
+            // кнопка сохранить ошибки в папку frequent Mistakes. С анимацией
             const saveMistakesBtn = document.createElement('button');
             saveMistakesBtn.textContent = uiTexts.save_to_frequent_mistakes;
             saveMistakesBtn.style.alignSelf = 'center';
@@ -802,11 +803,48 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             saveMistakesBtn.style.maxWidth = '220px';
             saveMistakesBtn.style.whiteSpace = 'normal';
             saveMistakesBtn.style.lineHeight = '1.2';
-            saveMistakesBtn.onclick = () => {
+
+            // ВАЖНО: кнопка будет "живой" и менять текст/функцию
+            saveMistakesBtn.onclick = async () => {
+
+                // 1) Включаем анимацию
+                saveMistakesBtn.disabled = true;
+                saveMistakesBtn.classList.add('save-animate', 'success');
+                saveMistakesBtn.textContent = uiTexts.saved || '✔ Сохранено';
+
+                // 2) сохраняем файл
                 saveMistakesFile(frequentMistakesPairs, fileData.name);
-                document.removeEventListener('click', handleOutsideClick);
-                closeGame();
+
+                // 3) через 0.8 секунды меняем кнопку на "Открыть папку"
+                setTimeout(() => {
+
+                    saveMistakesBtn.classList.remove('success');
+                    saveMistakesBtn.textContent = uiTexts.open_frequent_mistakes || 'Открыть Frequent Mistakes';
+                    saveMistakesBtn.disabled = false;
+
+                    // меняем действие кнопки
+                    saveMistakesBtn.onclick = () => {
+                        // закрываем игру
+                        document.removeEventListener('click', handleOutsideClick);
+                        closeGame();
+
+                        // открываем папку Frequent Mistakes
+                        navigationStack = [];
+                        currentFolder = rootData;
+                        renderLevel(rootData);
+
+                        // переходим в папку Frequent Mistakes
+                        const frequentFolder = frequentMistakesFolder.children;
+                        navigationStack.push(rootData);
+                        currentFolder = frequentFolder;
+                        renderLevel(frequentFolder);
+                    };
+
+                }, 1600);
             };
+
+
+
 
             windowBox.appendChild(saveMistakesBtn);
 
