@@ -47,9 +47,17 @@
 
 
   "frequent_mistakes": "Frequent Mistakes",
-  "repeat_mistakes": "Повторить только с ошибками",
-  "save_to_frequent_mistakes": "Отправить во Frequent Mistakes",
-  "no_mistakes": "Ошибок нет"
+  "repeat_mistakes": "Review only mistakes",
+  "save_to_frequent_mistakes": "Save to Frequent Mistakes",
+  "no_mistakes": "No mistakes 🎉",
+  "words_with_frequent_mistakes": "Words with frequent mistakes",
+  "only_mistakes": "with frequent mistakes",
+  "rare_mistakes_count": "Rare mistakes: {count}",
+  "saved_success": "✔ Saved",
+  "open_frequent_mistakes": "Open Frequent Mistakes folder"
+
+
+
 
 
 

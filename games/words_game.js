@@ -263,9 +263,8 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
     const DEBUG_MEMORIZE_FINISH = 1; // <-- включить дебаг
     // const DEBUG_MODE = 'none'
-    // const DEBUG_MODE = 'mistakes'
-    const DEBUG_MODE = 'frequent' 
-
+    const DEBUG_MODE = 'mistakes'
+    // const DEBUG_MODE = 'frequent' 
 
     let lastQuestionKey = null;
     let lastPairTerm = null;
@@ -744,7 +743,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
         // =======================
         if (frequentMistakesPairs.length > 0) {
 
-            questionEl.textContent = 'Слова с частыми ошибками'; // <-- текст меняем здесь
+            questionEl.textContent = uiTexts.words_with_frequent_mistakes; 
 
             const mistakesBlock = document.createElement('div');
             mistakesBlock.className = 'mistakes-list';
@@ -775,7 +774,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             repeatMistakesBtn.innerHTML = `
                 <div>${uiTexts.repeat}</div>
                 <div style="font-size: 11px; opacity: 0.7;">
-                    ${uiTexts.only_mistakes || 'с частыми ошибками'}
+                    ${uiTexts.only_mistakes}
                 </div>
             `;
             repeatMistakesBtn.style.padding = '10px';
@@ -821,7 +820,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
                 // 1) Включаем анимацию
                 saveMistakesBtn.disabled = true;
                 saveMistakesBtn.classList.add('save-animate', 'success');
-                saveMistakesBtn.textContent = uiTexts.saved || '✔ Сохранено';
+                saveMistakesBtn.textContent = uiTexts.saved_success;
 
                 // 2) сохраняем файл
                 saveMistakesFile(frequentMistakesPairs, fileData.name);
@@ -830,7 +829,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
                 setTimeout(() => {
 
                     saveMistakesBtn.classList.remove('success');
-                    saveMistakesBtn.textContent = uiTexts.open_frequent_mistakes || 'Открыть папку Frequent Mistakes';
+                    saveMistakesBtn.textContent = uiTexts.open_frequent_mistakes;
                     saveMistakesBtn.disabled = false;
 
                     // меняем действие кнопки
@@ -880,10 +879,11 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             .reduce((sum, v) => sum + v, 0);
 
         if (totalMistakes === 0) {
-            questionEl.textContent = 'Ошибок нет 🎉';
+            questionEl.textContent = uiTexts.no_mistakes;;
             launchConfetti();
         } else {
-            questionEl.textContent = `Редких ошибок: ${rareMistakesPairs.length}`;
+            questionEl.textContent = uiTexts.rare_mistakes_count
+                .replace('{count}', rareMistakesPairs.length);
         }
 
         const finishActions = document.createElement('div');
@@ -951,7 +951,7 @@ function launchConfetti() {
 
         // время проигрывания анимации + плавное затухание в последние мс
         let fadeDuration = 350; // длительность плавного затухания в мс
-        let confettiDuration = 20000;
+        let confettiDuration = 2000;
 
         if (elapsed < confettiDuration - fadeDuration) {
             canvas.style.opacity = '1';

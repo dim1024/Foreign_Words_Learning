@@ -43,8 +43,15 @@
   "restore_word": "Вернуть слово",
   "no_selected_words": "Нет выбранных слов",
   "word_repetitions": "Повторение слов",
-  "frequent_mistakes": "Частые ошибки"
-
+  "frequent_mistakes": "Частые ошибки",
+  "repeat_mistakes": "Повторить только с ошибками",
+  "save_to_frequent_mistakes": "Сохранить во Frequent Mistakes",
+  "no_mistakes": "Ошибок нет 🎉",
+  "words_with_frequent_mistakes": "Слова с частыми ошибками",
+  "only_mistakes": "с частыми ошибками",
+  "rare_mistakes_count": "Редких ошибок: {count}",
+  "saved_success": "✔ Сохранено",
+  "open_frequent_mistakes": "Открыть папку Frequent Mistakes"
 
 
 
