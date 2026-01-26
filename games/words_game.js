@@ -800,9 +800,20 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             saveMistakesBtn.style.marginBottom = '30px';
             saveMistakesBtn.style.padding = '10px';
             saveMistakesBtn.style.borderRadius = '6px';
-            saveMistakesBtn.style.maxWidth = '220px';
-            saveMistakesBtn.style.whiteSpace = 'normal';
-            saveMistakesBtn.style.lineHeight = '1.2';
+            // saveMistakesBtn.style.maxWidth = '220px';
+            // saveMistakesBtn.style.whiteSpace = 'normal';
+            // saveMistakesBtn.style.lineHeight = '1.2';
+            saveMistakesBtn.style.whiteSpace = 'nowrap';   // ❗ запрет переноса
+            saveMistakesBtn.style.width = 'fit-content';  // ширина по тексту
+            saveMistakesBtn.style.maxWidth = '100%';       // защита от переполнения
+            saveMistakesBtn.style.width = '260px';     // 🔒 фиксируем ширину
+            saveMistakesBtn.style.height = '42px';     // 🔒 фиксируем высоту
+            saveMistakesBtn.style.display = 'flex';
+            saveMistakesBtn.style.alignItems = 'center';
+            saveMistakesBtn.style.justifyContent = 'center';
+            saveMistakesBtn.style.whiteSpace = 'nowrap';
+
+
 
             // ВАЖНО: кнопка будет "живой" и менять текст/функцию
             saveMistakesBtn.onclick = async () => {
@@ -819,7 +830,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
                 setTimeout(() => {
 
                     saveMistakesBtn.classList.remove('success');
-                    saveMistakesBtn.textContent = uiTexts.open_frequent_mistakes || 'Открыть Frequent Mistakes';
+                    saveMistakesBtn.textContent = uiTexts.open_frequent_mistakes || 'Открыть папку Frequent Mistakes';
                     saveMistakesBtn.disabled = false;
 
                     // меняем действие кнопки
