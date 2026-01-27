@@ -33,6 +33,8 @@
 
   "study": "Study",
   "memorize": "Memorize",
+  "quick_check": "Quick check",
+
   "close_game": "Close",
 
   
@@ -54,7 +56,10 @@
   "only_mistakes": "with frequent mistakes",
   "rare_mistakes_count": "Rare mistakes: {count}",
   "saved_success": "✔ Saved",
-  "open_frequent_mistakes": "Open Frequent Mistakes folder"
+  "open_frequent_mistakes": "Open Frequent Mistakes folder",
+  "ok": "Ok",
+  "quick_check_mistakes": "Mistakes"
+
 
 
 
