@@ -33,6 +33,8 @@
 
   "study": "Изучение",
   "memorize": "Заучивание",
+  "quick_check": "Быстрая проверка",
+
   "close_game": "Закрыть",
 
   "dont_know": "Я не знаю",
@@ -51,7 +53,9 @@
   "only_mistakes": "с частыми ошибками",
   "rare_mistakes_count": "Редких ошибок: {count}",
   "saved_success": "✔ Сохранено",
-  "open_frequent_mistakes": "Открыть папку Frequent Mistakes"
+  "open_frequent_mistakes": "Открыть папку Частые ошибки",
+  "ok": "Ok",
+  "quick_check_mistakes": "Ошибки"
 
 
 

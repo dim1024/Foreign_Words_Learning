@@ -606,7 +606,18 @@ XLSX TABLE
 /* нижняя кнопка */
 .study-bottom {
   margin-top: 16px;
+  display: flex;
+  gap: 10px;              /* ⬅️ отступ между кнопками */
+  justify-content: center;
 }
+
+.study-bottom button {
+  padding: 10px 16px;     /* ⬅️ крупнее */
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 
 /* крестик */
 .study-close-btn {
@@ -858,11 +869,24 @@ XLSX TABLE
     width: 100%;
     margin: 12px 0;
     padding: 8px;
-    padding-left: 60px;
+    /* padding-left: 60px; */
     box-sizing: border-box;
     border: 1px solid #ddd;
     max-height: 200px;
     overflow-y: auto;
+}
+
+.memorize-game:not(.quick-check) .mistakes-list {
+    padding-left: 60px;
+}
+
+.memorize-game.quick-check .mistakes-list {
+    padding-left: 30px;
+}
+
+/* Расстояние кнопок от списка с ошибками только в QUICK CHECK */
+.memorize-game.quick-check .game-actions {
+    margin-top: 28px;
 }
 
 .mistakes-row {
@@ -882,6 +906,32 @@ XLSX TABLE
     word-break: break-word;
     overflow-wrap: anywhere;
 }
+
+/* ===== ПОДСВЕТКА КОНКРЕТНОЙ ЯЧЕЙКИ С ОШИБКОЙ ===== */
+
+.mistakes-cell.has-mistake {
+    background: #ffd6d6;      /* ярче, чем было */
+    color: #8b0000;           /* насыщенный тёмно-красный */
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-weight: 600;
+
+    animation: mistakeFadeIn 1s ease-out both;
+}
+
+@keyframes mistakeFadeIn {
+    from {
+        background-color: transparent;
+        color: inherit;
+        transform: scale(0.96);
+    }
+    to {
+        background-color: #ffd6d6;
+        color: #8b0000;
+        transform: scale(1);
+    }
+}
+
 
 /* анимация для кнопки "сохранено" */
 .save-animate {
