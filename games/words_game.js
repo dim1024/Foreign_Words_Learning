@@ -937,7 +937,6 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
     gameContainer = document.createElement('div');
     gameContainer.className = 'memorize-game quick-check';
 
-
     const windowBox = document.createElement('div');
     windowBox.className = 'game-window';
     windowBox.style.padding = '20px';
