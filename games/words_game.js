@@ -1,3 +1,5 @@
+console.log('MEMORIZE.JS LOADED');
+
 let gameContainer = null;
 
 function closeGame() { //Закрытие любого игрового окна
@@ -1402,5 +1404,3 @@ function launchConfetti() {
 
     requestAnimationFrame(draw);
 }
-
-

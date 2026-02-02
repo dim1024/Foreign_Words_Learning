@@ -26,6 +26,10 @@ git reset HEAD~1 -->
         </div>
 
         <div class="top-panel__right">
+
+            <!-- Режим экзамена кнопка "Проверить себя" -->
+            <button id="selfCheckBtn" data-i18n="self_check"></button>
+
             <!-- Добавить свои слова -->
             <button id="addWordsBtn" data-i18n="add_own_words"></button>
 
@@ -51,6 +55,27 @@ git reset HEAD~1 -->
         <div id="fileContainer"></div>
     </main>
 
+    <!-- SELF CHECK MODAL -->
+    <div id="selfCheckModal" style="display:none;">
+        <div class="self-check-box">
+
+            <h2 data-i18n="self_check_title"></h2>
+
+            <div id="selfCheckStats">
+                <!-- здесь будет "Выбрано: X файлов / Y слов" -->
+            </div>
+
+            <div id="selfCheckTree">
+                <!-- сюда позже отрендерим дерево -->
+            </div>
+
+            <div class="self-check-actions">
+                <button id="cancelSelfCheck" data-i18n="cancel"></button>
+                <button id="startSelfCheck" disabled data-i18n="start"></button>
+            </div>
+
+        </div>
+    </div>
 
     <!-- МОДАЛКА ПРЕДПРОСМОТРА загруженных слов-->
     <div id="previewModal" style="display:none;">
@@ -277,10 +302,12 @@ git reset HEAD~1 -->
 
     <!-- Подключаем SheetJS для xlsx -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-    <!-- Заглушка игры -->
     <script src="games/words_game.js"></script>
+    <script src="games/self_check.js"></script>
+    
     <!-- Основная логика -->
     <script src="script.js"></script>
+    
 </body>
 
 

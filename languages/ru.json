@@ -55,7 +55,21 @@
   "saved_success": "✔ Сохранено",
   "open_frequent_mistakes": "Открыть папку Частые ошибки",
   "ok": "Ok",
-  "quick_check_mistakes": "Ошибки"
+  "quick_check_mistakes": "Ошибки",
+
+
+  "self_check": "Проверка себя",
+  "start": "Старт",
+  "self_check_selected": "Выбрано файлов: {files}, всего слов: {words}",
+
+  
+
+
+
+
+
+
+  "удалить это": "поставил чтобы не писать каждый раз запятую"
 
 
 

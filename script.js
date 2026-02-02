@@ -14,10 +14,17 @@ let navigationStack = [];
 // Текущий уровень/папка (для корректной навигации при смене языка)
 let currentFolder = null;
 
+/***********************
+ * SELF CHECK STATE
+ ***********************/
+let selfCheckSelectedFiles = new Set();
+let selfCheckSelectedPairs = [];
+
 // DOM-элементы
 const container = document.getElementById('fileContainer');
 const homeBtn = document.getElementById('homeBtn');
 const backBtn = document.getElementById('backBtn');
+const selfCheckBtn = document.getElementById('selfCheckBtn');
 
 const myWordsFolder = {
     name: '',
@@ -67,8 +74,6 @@ function syncFrequentMistakesFolder() {
             });
         });
 }
-
-
 
 function saveMistakesFile(mistakesPairs, sourceFileName) {
     const mistakesFiles = loadFrequentMistakesFiles();
@@ -249,6 +254,24 @@ async function loadFileTree() {
         return null;
     }
 }
+
+// собирает рекурсивно файлы из папки для режима-экзамена "Проверка себя"
+function collectFilesRecursively(node, result = []) {
+    if (!node) return result;
+
+    if (node.type === 'file') {
+        result.push(node);
+    }
+
+    if (node.type === 'folder' && Array.isArray(node.children)) {
+        node.children.forEach(child => {
+            collectFilesRecursively(child, result);
+        });
+    }
+
+    return result;
+}
+
 
 /***********************
  * ЗАГРУЗКА КОНКРЕТНОГО ФАЙЛА
@@ -463,6 +486,163 @@ addWordsBtn.onclick = () => {
     openUploadModal();
 };
 
+function getRootWithVirtualFolders() {
+    syncMyWordsFolder();
+    syncFrequentMistakesFolder();
+    return [
+        myWordsFolder,
+        frequentMistakesFolder,
+        ...rootData
+    ];
+}
+
+// рендер дерева с чекбоксами
+function renderSelfCheckTree(container, level) {
+    level.forEach(item => {
+        if (item.type === 'folder') {
+            container.appendChild(createSelfCheckFolder(item));
+        } else {
+            container.appendChild(createSelfCheckFile(item));
+        }
+    });
+}
+
+// для рисования дерева папок
+function createSelfCheckFolder(folder) {
+    const wrapper = document.createElement('div');
+
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.alignItems = 'center';
+    header.style.gap = '6px';
+
+    const toggle = document.createElement('span');
+    toggle.textContent = '▶';
+    toggle.style.cursor = 'pointer';
+    toggle.style.width = '14px';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+
+    const label = document.createElement('span');
+    label.textContent = '📁 ' + folder.name;
+
+    header.append(toggle, checkbox, label);
+
+    const childrenBox = document.createElement('div');
+    childrenBox.style.marginLeft = '20px';
+    childrenBox.style.display = 'none';
+
+    toggle.onclick = () => {
+        const open = childrenBox.style.display === 'none';
+        childrenBox.style.display = open ? 'block' : 'none';
+        toggle.textContent = open ? '▼' : '▶';
+    };
+
+    checkbox.onchange = async () => {
+        const checked = checkbox.checked;
+
+        // логика
+        if (checked) {
+            collectFilesRecursively(folder).forEach(f => selfCheckSelectedFiles.add(f));
+        } else {
+            collectFilesRecursively(folder).forEach(f => selfCheckSelectedFiles.delete(f));
+        }
+
+        // визуально отметить / снять все дочерние чекбоксы
+        childrenBox.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.checked = checked;
+        });
+
+        await updateSelfCheckStats();
+    };
+
+    folder.children?.forEach(child => {
+        if (child.type === 'folder') {
+            childrenBox.appendChild(createSelfCheckFolder(child));
+        } else {
+            childrenBox.appendChild(createSelfCheckFile(child));
+        }
+    });
+
+    wrapper.append(header, childrenBox);
+    return wrapper;
+}
+
+// Для рисования дерева файлов
+function createSelfCheckFile(file) {
+    const row = document.createElement('div');
+    row.style.marginLeft = '20px';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+
+    const label = document.createElement('span');
+    label.textContent = ' 📄 ' + file.name;
+
+    checkbox.onchange = async () => {
+        if (checkbox.checked) {
+            selfCheckSelectedFiles.add(file);
+        } else {
+            selfCheckSelectedFiles.delete(file);
+        }
+        await updateSelfCheckStats();
+    };
+
+    row.append(checkbox, label);
+    return row;
+}
+
+
+// Статистика + Активация кнопки старт
+async function updateSelfCheckStats() {
+    const stats = document.getElementById('selfCheckStats');
+    const startBtn = document.getElementById('startSelfCheck');
+
+    let totalPairs = [];
+
+    for (const file of selfCheckSelectedFiles) {
+        try {
+            let pairs;
+
+            if (file.userFile) {
+                pairs = file.userFile.pairs;
+            } else if (file.frequentMistakesFile) {
+                pairs = file.frequentMistakesFile.pairs;
+            } else {
+                pairs = await loadFile(file);
+            }
+
+            totalPairs.push(...pairs);
+        } catch {
+            // просто пропускаем файл
+        }
+    }
+
+    selfCheckSelectedPairs = totalPairs;
+
+    stats.textContent = uiTexts.self_check_selected
+        .replace('{files}', selfCheckSelectedFiles.size)
+        .replace('{words}', totalPairs.length);
+
+    startBtn.disabled = selfCheckSelectedFiles.size === 0;
+}
+
+
+selfCheckBtn.onclick = () => {
+    const modal = document.getElementById('selfCheckModal');
+    const tree = document.getElementById('selfCheckTree');
+
+    selfCheckSelectedFiles.clear();
+    selfCheckSelectedPairs = [];
+
+    tree.innerHTML = '';
+    updateSelfCheckStats();
+
+    renderSelfCheckTree(tree, getRootWithVirtualFolders());
+
+    modal.style.display = 'flex';
+};
 
 /***********************
  * ЗАГЛУШКА ИГРЫ
@@ -949,3 +1129,33 @@ function applyTranslations() {
         if (uiTexts[key]) el.title = uiTexts[key];
     });
 }
+
+//кнопка Cancel / Отмена для режима экзамен "Проверка себя"
+document.getElementById('cancelSelfCheck').onclick = () => {
+    document.getElementById('selfCheckModal').style.display = 'none';
+};
+
+document.getElementById('startSelfCheck').onclick = () => {
+
+    // 🛑 защита: если вдруг кнопка нажалась без слов
+    if (!selfCheckSelectedPairs.length) {
+        alert(uiTexts.no_selected_words || 'No words selected');
+        return;
+    }
+
+    // 1️⃣ закрываем модалку выбора
+    document.getElementById('selfCheckModal').style.display = 'none';
+
+    // 2️⃣ запускаем проверку себя
+    // closeSelfCheckModal(); // если есть, чтобы закрыть окно выбора
+
+    window.startSelfCheckExam(
+        selfCheckSelectedPairs,
+        uiTexts,
+        { name: uiTexts.self_check_title } // фиктивное имя
+    );
+
+};
+
+
+

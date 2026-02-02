@@ -58,7 +58,13 @@
   "saved_success": "✔ Saved",
   "open_frequent_mistakes": "Open Frequent Mistakes folder",
   "ok": "Ok",
-  "quick_check_mistakes": "Mistakes"
+  "quick_check_mistakes": "Mistakes",
+
+
+  "self_check": "Self check",
+  "start": "Start",
+  "self_check_selected": "Selected files: {files}, total words: {words}",
+  "self_check_title": "Выбор слов для проверки",
 
 
 
@@ -68,6 +74,8 @@
 
 
 
+
+  "удалить это": "поставил чтобы не писать каждый раз запятую"
 
 
 
