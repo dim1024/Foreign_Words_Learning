@@ -33,7 +33,7 @@ function shuffleArray(arr) {
 window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     closeGame();
 
-    const DEBUG_QUICK_CHECK_FINISH = false; // <-- включить дебаг
+    const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
     // const DEBUG_MODE = 'none'
     const DEBUG_MODE = 'mistakes' 
     // const DEBUG_MODE = 'all_mistakes';
@@ -362,8 +362,30 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         // =========================
         // 🔴 ЕСТЬ ОШИБКИ
         // =========================
-        questionEl.textContent = uiTexts.quick_check_mistakes;
-        questionEl.style.marginTop = '10px';
+        
+        //считаем ошибки (1 пара может дать только 1 ошибку)
+        const totalPairs = pairs.length;
+
+        let wrongPairs = 0;
+
+        pairs.forEach(p => {
+            const wordErrors = mistakesCount[`${p.term}|word`] || 0;
+            const translationErrors = mistakesCount[`${p.translation}|translation`] || 0;
+
+            if (wordErrors > 0 || translationErrors > 0) {
+                wrongPairs++;
+            }
+        });
+
+        const correctPairs = totalPairs - wrongPairs;
+        const percent = Math.round((correctPairs / totalPairs) * 100);
+
+        questionEl.textContent = uiTexts.self_check_result
+            .replace('{correct}', correctPairs)
+            .replace('{total}', totalPairs)
+            .replace('{percent}', percent);
+
+        questionEl.style.marginTop = '25px';
         questionEl.style.marginBottom = '5px';
 
 
@@ -385,6 +407,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         mistakesBlock.className = 'mistakes-list';
         mistakesBlock.style.maxHeight = '200px';
         mistakesBlock.style.overflowY = 'auto';
+        mistakesBlock.style.marginBottom = '8px';
 
         mistakesPairs.forEach(mp => {
             const row = document.createElement('div');
@@ -416,6 +439,68 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         });
 
         windowBox.appendChild(mistakesBlock);
+
+        // =========================
+        // КНОПКА: СОХРАНИТЬ В ЧАСТЫЕ ОШИБКИ (SELF CHECK)
+        // =========================
+        const saveMistakesBtn = document.createElement('button');
+        saveMistakesBtn.textContent = uiTexts.save_to_frequent_mistakes;
+
+        // стили — 1 в 1 из MEMORIZE
+        saveMistakesBtn.style.alignSelf = 'center';
+        saveMistakesBtn.style.margin = '6px 0 10px';
+        saveMistakesBtn.style.padding = '10px';
+        saveMistakesBtn.style.borderRadius = '6px';
+        saveMistakesBtn.style.width = '260px';
+        saveMistakesBtn.style.height = '42px';
+        saveMistakesBtn.style.display = 'flex';
+        saveMistakesBtn.style.alignItems = 'center';
+        saveMistakesBtn.style.justifyContent = 'center';
+        saveMistakesBtn.style.whiteSpace = 'nowrap';
+
+        // 👇 ВАЖНО: сохраняем ВСЕ слова из таблицы ошибок
+        saveMistakesBtn.onclick = () => {
+
+            // 1️⃣ анимация
+            saveMistakesBtn.disabled = true;
+            saveMistakesBtn.classList.add('save-animate', 'success');
+            saveMistakesBtn.textContent = uiTexts.saved_success;
+
+            // 2️⃣ СОХРАНЯЕМ (ВСЕ mistakesPairs)
+            saveMistakesFile(
+                mistakesPairs,
+                fileData?.name || 'Self Check',
+                'self_check'
+            );
+
+            // 3️⃣ меняем кнопку на "Открыть папку"
+            setTimeout(() => {
+
+                saveMistakesBtn.classList.remove('success');
+                saveMistakesBtn.textContent = uiTexts.open_frequent_mistakes;
+                saveMistakesBtn.disabled = false;
+
+                saveMistakesBtn.onclick = () => {
+                    closeGame();
+
+                    navigationStack = [];
+                    currentFolder = rootData;
+                    renderLevel(rootData);
+
+                    const frequentFolder = frequentMistakesFolder.children;
+                    navigationStack.push(rootData);
+                    currentFolder = frequentFolder;
+                    renderLevel(frequentFolder);
+                };
+
+            }, 1600);
+        };
+
+        windowBox.appendChild(saveMistakesBtn);
+
+
+
+
 
         // кнопки
         const actions = document.createElement('div');

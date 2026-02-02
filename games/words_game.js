@@ -847,7 +847,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
                 saveMistakesBtn.textContent = uiTexts.saved_success;
 
                 // 2) сохраняем файл
-                saveMistakesFile(frequentMistakesPairs, fileData.name);
+                saveMistakesFile(frequentMistakesPairs, fileData.name, 'mistakes');
 
                 // 3) через 0.8 секунды меняем кнопку на "Открыть папку"
                 setTimeout(() => {

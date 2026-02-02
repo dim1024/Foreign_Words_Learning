@@ -65,6 +65,8 @@
   "start": "Start",
   "self_check_selected": "Selected files: {files}, total words: {words}",
   "self_check_title": "Выбор слов для проверки",
+  "self_check_result": "Correct answers: {correct} out of {total} ({percent}%)",
+
 
 
 

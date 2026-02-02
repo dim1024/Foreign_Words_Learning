@@ -61,6 +61,9 @@
   "self_check": "Проверка себя",
   "start": "Старт",
   "self_check_selected": "Выбрано файлов: {files}, всего слов: {words}",
+  "self_check_result2": "Результат: {correct} из {total} правильных ({percent}%)",
+  "self_check_result": "Верных ответов: {correct} из {total} ({percent}%)",
+ 
 
   
 

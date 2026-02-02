@@ -75,14 +75,30 @@ function syncFrequentMistakesFolder() {
         });
 }
 
-function saveMistakesFile(mistakesPairs, sourceFileName) {
+function saveMistakesFile(mistakesPairs, sourceFileName, mode = 'mistakes') {
     const mistakesFiles = loadFrequentMistakesFiles();
 
     const date = new Date();
     const dateStr = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}_${date.getHours().toString().padStart(2,'0')}-${date.getMinutes().toString().padStart(2,'0')}`;
 
-    let baseName = `mistakes_${sourceFileName}_${dateStr}`;
-    baseName = baseName.replace(/[^\w\s-]/g, '');
+    // 🧠 префикс по режиму
+    const prefix = mode === 'self_check' ? 'self_check' : 'mistakes';
+
+    // ✅ 1. сначала чистим имя источника
+    let cleanSourceName =
+        typeof sourceFileName === 'string'
+            ? sourceFileName.replace(/[^\w\s-]/g, '').trim()
+            : '';
+
+    // ✅ 2. если после очистки пусто — считаем, что имени нет
+    if (!cleanSourceName) {
+        cleanSourceName = null;
+    }
+
+    // ✅ 3. собираем имя БЕЗ __ при любых условиях
+    const baseName = cleanSourceName
+        ? `${prefix}_${cleanSourceName}_${dateStr}`
+        : `${prefix}_${dateStr}`;
 
     let name = baseName;
     let i = 1;
@@ -95,16 +111,14 @@ function saveMistakesFile(mistakesPairs, sourceFileName) {
         name,
         date: date.toISOString(),
         pairs: mistakesPairs.map(x => ({ term: x.term, translation: x.translation })),
-        source: sourceFileName
+        source: sourceFileName,
+        mode
     });
 
     saveFrequentMistakesFiles(mistakesFiles);
     syncFrequentMistakesFolder();
 
-    // если пользователь сейчас на главном экране — сразу обновляем
-    if (currentFolder === rootData) {
-        renderLevel(rootData);
-    }
+    renderLevel(currentFolder);
 }
 
 const USER_WORDS_KEY = 'user_words';
