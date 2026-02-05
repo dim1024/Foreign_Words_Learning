@@ -1,26 +1,3 @@
-console.log('SELF_CHECK.JS LOADED');
-
-// // ⬇⬇⬇ ВСТАВИТЬ СРАЗУ ПОСЛЕ ЭТОГО ⬇⬇⬇
-// window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
-//     console.log('✅ startSelfCheckExam CALLED');
-//     console.log('pairs:', pairs);
-//     console.log('uiTexts:', uiTexts);
-//     console.log('fileData:', fileData);
-// };
-
-
-// let gameContainer = null;
-
-// function closeGame() { //Закрытие любого игрового окна
-//     if (gameContainer) {
-//         gameContainer.remove();
-//         gameContainer = null;
-
-//     }
-// }
-
-
-
 function shuffleArray(arr) {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -33,7 +10,7 @@ function shuffleArray(arr) {
 window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     closeGame();
 
-    const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
+    const DEBUG_QUICK_CHECK_FINISH = 0; // <-- включить дебаг
     const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes' 
     // const DEBUG_MODE = 'all_mistakes';
@@ -235,22 +212,15 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         answersEl.appendChild(dontKnowBtn);
     }
 
-
     function handleAnswer(button, correct, key, correctAnswer, isDontKnow) {
-        if (correct) {
-            button.style.backgroundColor = '#8BC34A';
-        } else if (!isDontKnow) {
-            button.style.backgroundColor = '#F44336';
-        }
-
+        // Считаем ошибки
         if (!correct) {
             mistakesCount[key] = (mistakesCount[key] || 0) + 1;
         }
 
-
+        // Блокировка кнопок, чтобы заблокировать выбор другого ответа и перейти к след вопросы
         Array.from(answersEl.children).forEach(btn => {
             btn.disabled = true;
-            if (btn.textContent === correctAnswer) btn.style.backgroundColor = '#8BC34A';
         });
 
         // ✅ ВАЖНО: увеличиваем индекс СРАЗУ
@@ -265,7 +235,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
             } else {
                 nextQuestion();
             }
-        }, 800);
+        }, 500); // сокращен таймаут для экзамена
     }
 
     function showFinishedQuickCheck() {
@@ -347,7 +317,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         // =========================
         if (totalMistakes === 0) {
             questionEl.textContent = uiTexts.no_mistakes;
-            launchFireworks();
+            // launchFireworks();
 
             // кнопки
             const actions = document.createElement('div');
