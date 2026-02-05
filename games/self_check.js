@@ -34,8 +34,8 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     closeGame();
 
     const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
-    // const DEBUG_MODE = 'none'
-    const DEBUG_MODE = 'mistakes' 
+    const DEBUG_MODE = 'none'
+    // const DEBUG_MODE = 'mistakes' 
     // const DEBUG_MODE = 'all_mistakes';
 
     gameContainer = document.createElement('div');
@@ -347,7 +347,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         // =========================
         if (totalMistakes === 0) {
             questionEl.textContent = uiTexts.no_mistakes;
-            launchConfetti();
+            launchFireworks();
 
             // кнопки
             const actions = document.createElement('div');
@@ -518,67 +518,169 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     nextQuestion();
 }
 
-// function launchConfetti() {
-//     const canvas = document.createElement('canvas');
-//     canvas.style.position = 'fixed';
-//     canvas.style.top = 0;
-//     canvas.style.left = 0;
-//     canvas.style.width = '100%';
-//     canvas.style.height = '100%';
-//     canvas.style.pointerEvents = 'none';
-//     canvas.style.zIndex = 9999;
 
-//     document.body.appendChild(canvas);
-//     const ctx = canvas.getContext('2d');
-//     const W = canvas.width = window.innerWidth;
-//     const H = canvas.height = window.innerHeight;
+function launchFireworks() {
+    // === НАСТРОЙКИ ===
+    const ROCKET_COUNT = 5;
+    const ROCKET_INTERVAL = 450;
+    const ROCKET_SPEED = -14;
+    const EXPLOSION_PARTS = 170;
+    const EXPLOSION_LIFE = 120;
+    // const COLORS = ['#FF0000','#FF8C00','#FFD700','#00FF00','#00BFFF','#1E90FF','#FF69B4','#9400D3'];
+    // const COLORS = ['#fe3b3b','#f4a340','#f2dc5c','#6afa6a','#60d5fc','#2b94fc','#f684bd','#c659f4'];
+    const COLORS = ['#fe3b3b','#f89b29','#fcde38','#3ffc3f','#41cfff','#2b94fc','#fa5baa','#c643ff'];
+    const backgroundOpacity = 0.6;
+    const fadeDuration = 900; // скорость появления затемнения
 
-//     const CONFETTI_COUNT = 360; // <- здесь можно менять количество частиц
-//     const pieces = [];
-//     const colors = ['#ffde07', '#3ae340', '#2196F3', '#E91E63'];
+    // === Создаем затемняющий слой ===
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0,0,0,0);
+        pointer-events: none;
+        z-index: 9998;
+        transition: background-color ${fadeDuration}ms linear;
+    `;
+    document.body.appendChild(overlay);
 
-//     for (let i = 0; i < CONFETTI_COUNT; i++) {
-//         pieces.push({
-//             x: Math.random() * W,
-//             y: Math.random() * -H,
-//             size: 6 + Math.random() * 4,
-//             speed: 2 + Math.random() * 4,
-//             color: colors[Math.floor(Math.random() * colors.length)],
-//             tilt: Math.random() * 10
-//         });
-//     }
+    // === Канвас для салюта ===
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = `
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 9999;
+    `;
+    document.body.appendChild(canvas);
 
-//     let start = null;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width = window.innerWidth;
+    const H = canvas.height = window.innerHeight;
 
-//     function draw(timestamp) {
-//         if (!start) start = timestamp;
-//         const elapsed = timestamp - start;
+    const rockets = [];
+    const particles = [];
+    let rocketsLaunched = 0;
+    let lastLaunchTime = performance.now();
 
-//         ctx.clearRect(0, 0, W, H);
+    // === Начинаем плавное затемнение ===
+    requestAnimationFrame(() => {
+        overlay.style.backgroundColor = `rgba(0,0,0,${backgroundOpacity})`;
+    });
 
-//         pieces.forEach(p => {
-//             p.y += p.speed;
-//             p.x += Math.sin(p.y * 0.05);
-//             ctx.fillStyle = p.color;
-//             ctx.fillRect(p.x, p.y, p.size, p.size);
-//         });
+    function Particle(x, y, vx, vy, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.life = EXPLOSION_LIFE;
+        this.size = Math.random() * 3 + 2;
+        this.color = color;
+        this.alpha = 1; // прозрачность
+    }
 
-//         // время проигрывания анимации + плавное затухание в последние мс
-//         let fadeDuration = 350; // длительность плавного затухания в мс
-//         let confettiDuration = 2000;
+    Particle.prototype.update = function () {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.05;
 
-//         if (elapsed < confettiDuration - fadeDuration) {
-//             canvas.style.opacity = '1';
-//             requestAnimationFrame(draw);
-//         } else if (elapsed < confettiDuration) {
-//             canvas.style.opacity = `${1 - (elapsed - confettiDuration + fadeDuration) / fadeDuration}`;
-//             requestAnimationFrame(draw);
-//         } else {
-//             canvas.remove();
-//         }
+        if (this.life <= FADE_TIME) {
+            this.alpha = this.life / FADE_TIME; // плавное уменьшение прозрачности
+        }
 
-//     }
+        this.life--;
+    };
 
-//     requestAnimationFrame(draw);
-// }
+    Particle.prototype.draw = function () {
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.alpha; // применяем прозрачность
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1; // сброс прозрачности
+    };
+
+    function explode(x, y) {
+        for (let i = 0; i < EXPLOSION_PARTS; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 6 + 2;
+            const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+            particles.push(
+                new Particle(
+                    x,
+                    y,
+                    Math.cos(angle) * speed,
+                    Math.sin(angle) * speed,
+                    color
+                )
+            );
+        }
+    }
+
+    function Rocket(x) {
+        this.x = x;
+        this.y = H;
+        this.vy = ROCKET_SPEED;
+        this.exploded = false;
+    }
+
+    Rocket.prototype.update = function () {
+        this.y += this.vy;
+        this.vy += 0.2;
+
+        ctx.fillStyle = '#b1eaf7';
+        ctx.fillRect(this.x - 1, this.y, 2, 10);
+
+        if (this.vy >= 0 && !this.exploded) {
+            this.exploded = true;
+            explode(this.x, this.y);
+        }
+    };
+
+    function launchRocket() {
+        const x = Math.random() * W * 0.6 + W * 0.2;
+        rockets.push(new Rocket(x));
+        rocketsLaunched++;
+    }
+
+    function animate(now) {
+        ctx.clearRect(0, 0, W, H);
+
+        if (rocketsLaunched < ROCKET_COUNT && now - lastLaunchTime > ROCKET_INTERVAL) {
+            launchRocket();
+            lastLaunchTime = now;
+        }
+
+        rockets.forEach((r, i) => {
+            r.update();
+            if (r.exploded) rockets.splice(i, 1);
+        });
+
+        particles.forEach((p, i) => {
+            p.update();
+            p.draw();
+            if (p.life <= 0) particles.splice(i, 1);
+        });
+
+        if (rockets.length || particles.length || rocketsLaunched < ROCKET_COUNT) {
+            requestAnimationFrame(animate);
+        } else {
+            // === Плавное исчезновение затемнения ===
+            overlay.style.backgroundColor = 'rgba(0,0,0,0)';
+            setTimeout(() => {
+                canvas.remove();
+                overlay.remove();
+            }, fadeDuration);
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+
+
+
+
+
+
+
 
