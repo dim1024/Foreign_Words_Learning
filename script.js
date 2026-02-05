@@ -163,19 +163,30 @@ function saveFrequentMistakesFiles(files) {
  * ПРОВЕРКА ИМЕН ПОЛЬЗОВАТЕЛЬСКИХ ФАЙЛОВ НА ДУБЛИКАТЫ
  ***********************/
 function getUniqueFileName(originalName, existingNames) {
-    const dotIndex = originalName.lastIndexOf('.');
-    const base = dotIndex !== -1 ? originalName.slice(0, dotIndex) : originalName;
-    const ext = dotIndex !== -1 ? originalName.slice(dotIndex) : '';
+    if (typeof originalName !== 'string') originalName = 'file'; // на всякий случай, чтоы функция не ломалась если че вдруг
 
-    let name = originalName;
+    // 1. Отрезаем расширение
+    const dotIndex = originalName.lastIndexOf('.');
+    let baseName = dotIndex > 0 ? originalName.slice(0, dotIndex) : originalName;
+
+    // 2. Очищаем лишние символы, оставляем буквы (любой язык), цифры, пробелы и дефис
+    baseName = baseName.replace(/[^\p{L}\d\s-]/gu, '');
+
+    // Убираем двойные и более пробелы
+    baseName = baseName.replace(/\s+/g, ' ').trim();
+
+    if (!baseName) baseName = 'file';
+
+    // 3. Генерируем уникальное имя
+    let uniqueName = baseName;
     let counter = 2;
 
-    while (existingNames.includes(name)) {
-        name = `${base} (${counter})${ext}`;
+    while (existingNames.includes(uniqueName)) {
+        uniqueName = `${baseName} (${counter})`;
         counter++;
     }
 
-    return name;
+    return uniqueName;
 }
 
 
