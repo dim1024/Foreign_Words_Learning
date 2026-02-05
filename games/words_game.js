@@ -285,9 +285,9 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
     closeGame();
 
     const DEBUG_MEMORIZE_FINISH = 1; // <-- включить дебаг
-    // const DEBUG_MODE = 'none'
+    const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes'
-    const DEBUG_MODE = 'frequent' 
+    // const DEBUG_MODE = 'frequent' 
 
     let lastQuestionKey = null;
     let lastPairTerm = null;
@@ -1350,8 +1350,8 @@ function launchConfetti() {
     canvas.style.height = '100%';
     canvas.style.pointerEvents = 'none';
     canvas.style.zIndex = 9999;
-
     document.body.appendChild(canvas);
+
     const ctx = canvas.getContext('2d');
     const W = canvas.width = window.innerWidth;
     const H = canvas.height = window.innerHeight;
@@ -1360,36 +1360,56 @@ function launchConfetti() {
     const pieces = [];
     const colors = ['#ffde07', '#3ae340', '#2196F3', '#E91E63'];
 
-    for (let i = 0; i < CONFETTI_COUNT; i++) {
-        pieces.push({
+    // Используем пул объектов для частиц
+    function createParticle() {
+        return {
             x: Math.random() * W,
             y: Math.random() * -H,
             size: 6 + Math.random() * 4,
             speed: 2 + Math.random() * 4,
             color: colors[Math.floor(Math.random() * colors.length)],
             tilt: Math.random() * 10
-        });
+        };
+    }
+
+    // Инициализация частиц
+    for (let i = 0; i < CONFETTI_COUNT; i++) {
+        pieces.push(createParticle());
     }
 
     let start = null;
 
+    // Функция рисования
     function draw(timestamp) {
         if (!start) start = timestamp;
         const elapsed = timestamp - start;
 
+        // Очищаем канвас
         ctx.clearRect(0, 0, W, H);
 
-        pieces.forEach(p => {
+        // Обновляем и рисуем частицы
+        for (let i = 0; i < pieces.length; i++) {
+            const p = pieces[i];
+
+            // Двигаем частицу
             p.y += p.speed;
             p.x += Math.sin(p.y * 0.05);
-            ctx.fillStyle = p.color;
-            ctx.fillRect(p.x, p.y, p.size, p.size);
-        });
 
-        // время проигрывания анимации + плавное затухание в последние мс
+            // Если частица ушла за пределы экрана, переназначаем её позицию
+            if (p.y > H) {
+                pieces[i] = createParticle();
+            } else {
+                // Рисуем частицу
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
+            }
+        }
+
+        // Длительность анимации + плавное затухание в последние мс
         let fadeDuration = 350; // длительность плавного затухания в мс
         let confettiDuration = 2000;
 
+        // Анимация с плавным затуханием
         if (elapsed < confettiDuration - fadeDuration) {
             canvas.style.opacity = '1';
             requestAnimationFrame(draw);
@@ -1399,8 +1419,8 @@ function launchConfetti() {
         } else {
             canvas.remove();
         }
-
     }
 
+    // Запуск анимации
     requestAnimationFrame(draw);
 }

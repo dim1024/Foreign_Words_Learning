@@ -43,11 +43,7 @@
   overflow-wrap: anywhere;
 }
 
-
-
-/* =========================
-   UPLOAD MODAL (MINIMAL)
-   ========================= */
+/* ==== UPLOAD MODAL (MINIMAL) ============================ */
 
 #uploadModal {
   position: fixed;
@@ -80,9 +76,7 @@
 }
 
 
-/* =========================
-   EXAMPLES
-   ========================= */
+/* ========================= EXAMPLES ========================= */
 
 #formatExamples {
   display: flex;
@@ -124,9 +118,7 @@
   margin-left: auto;
 }
 
-/* ========================= 
-XLSX TABLE 
-========================= */
+/* ==================== XLSX TABLE ========================= */
 
 .xlsx-wrapper {
   display: flex;
@@ -158,7 +150,6 @@ XLSX TABLE
   overflow-wrap: anywhere;      /* современный вариант */
 }
 
-
 /* ИКОНКИ */
 .xlsx-icons {
   display: flex;
@@ -181,9 +172,7 @@ XLSX TABLE
   color: #c62828;
 }
 
-/* =========================
-   DOWNLOAD EXAMPLES
-   ========================= */
+/* =========== DOWNLOAD EXAMPLES ========================= */
 
 #downloadExamples {
   grid-column: 1 / -1;
@@ -196,9 +185,7 @@ XLSX TABLE
   cursor: pointer;
 }
 
-/* =========================
-   DROP ZONE
-   ========================= */
+/* ================ DROP ZONE  ========================= */
 
 #dropZone {
   grid-column: 1 / -1;
@@ -225,9 +212,7 @@ XLSX TABLE
   color: #c62828;
 }
 
-/* =========================
-   ACTION BUTTONS
-   ========================= */
+/* =============== ACTION BUTTONS  ========================= */
 
 .upload-actions {
   grid-column: 1 / -1;
@@ -247,9 +232,7 @@ XLSX TABLE
   color: #4da3ff;
 }
 
-/* =========================
-   LANGUAGE SWITCHER
-   ========================= */
+/* =================== LANGUAGE SWITCHER  ========================= */
 
 #langSwitcher {
   display: flex;
@@ -266,9 +249,7 @@ XLSX TABLE
   padding: 4px 6px;
 }
 
-/* =========================
-   GAME MODAL (mode chooser)
-   ========================= */
+/* ========================= GAME MODAL (mode chooser) ========================= */
 
 .game-modal {
   position: fixed;
@@ -311,9 +292,7 @@ XLSX TABLE
   cursor: pointer;
 }
 
-/* =========================
-   WORDS LIST (GRID VERSION)
-   ========================= */
+/* ========================= WORDS LIST (GRID VERSION) ========================= */
 
 .words-list {
     display: flex;
@@ -357,7 +336,6 @@ XLSX TABLE
     border-bottom: none;
 }
 
-
 .words-table-wrapper {
   flex: 1;
   overflow-y: auto;
@@ -367,7 +345,6 @@ XLSX TABLE
   display: flex;                /* центрируем таблицу в контейнере */
   justify-content: center;      /* таблица в середине */
 }
-
 
 @media (max-width: 768px) {
   .words-table td {
@@ -389,9 +366,7 @@ XLSX TABLE
   font-size: 16px;
 }
 
-/* =========================
-   GAME STUB
-   ========================= */
+/* ========================= GAME STUB ========================= */
 
 .game-stub {
   position: fixed;
@@ -445,8 +420,6 @@ XLSX TABLE
   align-items: center;
   gap: 10px;
 }
-
-
 
 .site-title {
   cursor: pointer;
@@ -505,10 +478,7 @@ XLSX TABLE
   content: "➕ ";
 }
 
-
-/* =========================
-   СТИЛЬ ФАЙЛОВ И ПАПОК
-   ========================= */
+/* ===================== СТИЛЬ ФАЙЛОВ И ПАПОК ========================= */
 
 /* Общий стиль кнопок */
 .main-content button {
@@ -540,9 +510,7 @@ XLSX TABLE
   margin-right: 6px;
 }
 
-/* =========================
-   STUDY MODE (MODAL)
-   ========================= */
+/* ========================= STUDY MODE (MODAL) ========================= */
 
 .study-game {
   position: fixed;
@@ -618,7 +586,6 @@ XLSX TABLE
   cursor: pointer;
 }
 
-
 /* крестик */
 .study-close-btn {
   position: absolute;
@@ -666,8 +633,6 @@ XLSX TABLE
   font-size: 18px;
   cursor: pointer;
 }
-
-
 
 .memorize-options button {
   font-size: 16px;
@@ -717,15 +682,12 @@ XLSX TABLE
     vertical-align: middle;
 }
 
-/* =========================
-   КНОПКА УДАЛИТЬ/ВЕРНУТЬ СЛОВО
-   ========================= */
+/* =================== КНОПКА УДАЛИТЬ/ВЕРНУТЬ СЛОВО ========================= */
 
 .word-disabled {
     color: #999;
     position: relative;
 }
-
 
 /* кнопка действия */
 .word-toggle-btn {
@@ -746,7 +708,6 @@ XLSX TABLE
     background: transparent;
     transition: background 0.2s, transform 0.1s;
 }
-
 
 .word-toggle-btn:hover {
     transform: scale(1.1);
@@ -777,9 +738,7 @@ XLSX TABLE
     white-space: nowrap;
 }
 
-/* =========================
-   STRIKETHROUGH (GRID)
-   ========================= */
+/* ================== STRIKETHROUGH (GRID) ========================= */
 
 /* линия */
 .word-row::after {
@@ -815,7 +774,6 @@ XLSX TABLE
 }
 
 /* ⚙️ настройки MEMORIZE */
-
 .memorize-settings-btn {
   position: absolute;
   top: 10px;
@@ -847,7 +805,6 @@ XLSX TABLE
   gap: 6px;
 }
 
-
 .memorize-settings-panel button {
   padding: 4px 8px;
   border-radius: 4px;
@@ -864,7 +821,6 @@ XLSX TABLE
 }
 
 /* ======= ОТДЕЛЬНЫЙ СТИЛЬ ДЛЯ ОКНА "ЧАСТЫЕ ОШИБКИ" ======= */
-
 .mistakes-list {
     width: 100%;
     margin: 12px 0;
@@ -908,7 +864,6 @@ XLSX TABLE
 }
 
 /* ===== ПОДСВЕТКА КОНКРЕТНОЙ ЯЧЕЙКИ С ОШИБКОЙ ===== */
-
 .mistakes-cell.has-mistake {
     background: #ffd6d6;      /* ярче, чем было */
     color: #8b0000;           /* насыщенный тёмно-красный */
@@ -944,11 +899,7 @@ XLSX TABLE
   transform: scale(1.02);
 }
 
-
-/* =========================
-   SELF CHECK MODAL
-   ========================= */
-
+/* ========================= SELF CHECK MODAL ========================= */
 #selfCheckBtn {
   padding: 6px 10px;
   background: #2b2b2b;
@@ -962,7 +913,6 @@ XLSX TABLE
 #selfCheckBtn::before {
   content: "✅ ";
 }
-
 
 #selfCheckModal {
   position: fixed;
@@ -994,10 +944,7 @@ XLSX TABLE
   padding: 8px;
 }
 
-/* =========================
-   SELF CHECK FILE SELECTION
-   ========================= */
-
+/* ========================= SELF CHECK FILE SELECTION ========================= */
 .self-check-actions {
   display: flex;
   justify-content: flex-end;

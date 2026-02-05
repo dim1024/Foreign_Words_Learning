@@ -10,7 +10,7 @@ function shuffleArray(arr) {
 window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     closeGame();
 
-    const DEBUG_QUICK_CHECK_FINISH = 0; // <-- включить дебаг
+    const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
     const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes' 
     // const DEBUG_MODE = 'all_mistakes';
@@ -317,7 +317,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         // =========================
         if (totalMistakes === 0) {
             questionEl.textContent = uiTexts.no_mistakes;
-            // launchFireworks();
+            launchFireworks();
 
             // кнопки
             const actions = document.createElement('div');
@@ -488,19 +488,22 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     nextQuestion();
 }
 
-
 function launchFireworks() {
     // === НАСТРОЙКИ ===
     const ROCKET_COUNT = 5;
     const ROCKET_INTERVAL = 450;
-    const ROCKET_SPEED = -14;
-    const EXPLOSION_PARTS = 170;
+    const ROCKET_SPEED = -18;
+
+    const EXPLOSION_PARTS = 130;
     const EXPLOSION_LIFE = 120;
+    const FADE_TIME = 45;
+
+    const COLORS = ['#fe3b3b','#f89b29','#fcde38','#3ffc3f','#41cfff','#2b94fc','#fa5baa','#c643ff'];
     // const COLORS = ['#FF0000','#FF8C00','#FFD700','#00FF00','#00BFFF','#1E90FF','#FF69B4','#9400D3'];
     // const COLORS = ['#fe3b3b','#f4a340','#f2dc5c','#6afa6a','#60d5fc','#2b94fc','#f684bd','#c659f4'];
-    const COLORS = ['#fe3b3b','#f89b29','#fcde38','#3ffc3f','#41cfff','#2b94fc','#fa5baa','#c643ff'];
+
     const backgroundOpacity = 0.6;
-    const fadeDuration = 900; // скорость появления затемнения
+    const fadeDuration = 900;
 
     // === Создаем затемняющий слой ===
     const overlay = document.createElement('div');
@@ -525,11 +528,19 @@ function launchFireworks() {
     document.body.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
-    const W = canvas.width = window.innerWidth;
-    const H = canvas.height = window.innerHeight;
 
+    const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+    const W = canvas.width = window.innerWidth * DPR;
+    const H = canvas.height = window.innerHeight * DPR;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.scale(DPR, DPR);
+
+    // === Pools ===
     const rockets = [];
     const particles = [];
+    const particlePool = [];
+
     let rocketsLaunched = 0;
     let lastLaunchTime = performance.now();
 
@@ -538,16 +549,19 @@ function launchFireworks() {
         overlay.style.backgroundColor = `rgba(0,0,0,${backgroundOpacity})`;
     });
 
-    function Particle(x, y, vx, vy, color) {
+    // === Particle ===
+    function Particle() {}
+
+    Particle.prototype.reset = function (x, y, vx, vy, color) {
         this.x = x;
         this.y = y;
         this.vx = vx;
         this.vy = vy;
         this.life = EXPLOSION_LIFE;
-        this.size = Math.random() * 3 + 2;
+        this.alpha = 1;
+        this.size = Math.random() * 2.5 + 2;
         this.color = color;
-        this.alpha = 1; // прозрачность
-    }
+    };
 
     Particle.prototype.update = function () {
         this.x += this.vx;
@@ -562,36 +576,44 @@ function launchFireworks() {
     };
 
     Particle.prototype.draw = function () {
+        ctx.globalAlpha = this.alpha;
         ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.alpha; // применяем прозрачность
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
-        ctx.globalAlpha = 1; // сброс прозрачности
     };
+
+    function getParticle() {
+        return particlePool.pop() || new Particle();
+    }
 
     function explode(x, y) {
         for (let i = 0; i < EXPLOSION_PARTS; i++) {
+            const p = getParticle();
             const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 6 + 2;
-            const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-            particles.push(
-                new Particle(
-                    x,
-                    y,
-                    Math.cos(angle) * speed,
-                    Math.sin(angle) * speed,
-                    color
-                )
+            const speed = Math.random() * 5 + 2;
+
+            p.reset(
+                x,
+                y,
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed,
+                COLORS[Math.random() * COLORS.length | 0]
             );
+
+            particles.push(p);
         }
     }
 
+    // === Rocket ===
     function Rocket(x) {
         this.x = x;
         this.y = H;
         this.vy = ROCKET_SPEED;
         this.exploded = false;
+
+        // 🎯 цель взрыва: 20% – 40% высоты экрана
+        this.targetY = H * (0.20 + Math.random() * 0.20);
     }
 
     Rocket.prototype.update = function () {
@@ -601,15 +623,14 @@ function launchFireworks() {
         ctx.fillStyle = '#b1eaf7';
         ctx.fillRect(this.x - 1, this.y, 2, 10);
 
-        if (this.vy >= 0 && !this.exploded) {
+        if (this.y <= this.targetY && !this.exploded) {
             this.exploded = true;
             explode(this.x, this.y);
         }
     };
 
     function launchRocket() {
-        const x = Math.random() * W * 0.6 + W * 0.2;
-        rockets.push(new Rocket(x));
+        rockets.push(new Rocket(Math.random() * (W * 0.45) + W * 0.2));
         rocketsLaunched++;
     }
 
@@ -621,16 +642,26 @@ function launchFireworks() {
             lastLaunchTime = now;
         }
 
-        rockets.forEach((r, i) => {
-            r.update();
-            if (r.exploded) rockets.splice(i, 1);
-        });
+        for (let i = rockets.length - 1; i >= 0; i--) {
+            rockets[i].update();
+            if (rockets[i].exploded) {
+                rockets.splice(i, 1);
+            }
+        }
 
-        particles.forEach((p, i) => {
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
             p.update();
             p.draw();
-            if (p.life <= 0) particles.splice(i, 1);
-        });
+
+            if (p.life <= 0) {
+                particlePool.push(p);
+                particles.splice(i, 1);
+            }
+        }
+
+        ctx.globalAlpha = 1;
 
         if (rockets.length || particles.length || rocketsLaunched < ROCKET_COUNT) {
             requestAnimationFrame(animate);
@@ -646,11 +677,5 @@ function launchFireworks() {
 
     requestAnimationFrame(animate);
 }
-
-
-
-
-
-
 
 
