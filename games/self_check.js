@@ -1,3 +1,5 @@
+let counter = 0;
+
 function shuffleArray(arr) {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -11,9 +13,9 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     closeGame();
 
     const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
-    // const DEBUG_MODE = 'none'
+    const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes' 
-    const DEBUG_MODE = 'all_mistakes';
+    // const DEBUG_MODE = 'all_mistakes';
 
     gameContainer = document.createElement('div');
     gameContainer.className = 'memorize-game quick-check';
@@ -268,6 +270,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         const repeatBtn = document.createElement('button');
         repeatBtn.textContent = uiTexts.repeat;
         repeatBtn.onclick = () => {
+            counter++;
             startSelfCheckExam(pairs, uiTexts, fileData);
         };
 
@@ -278,9 +281,15 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         // =========================
         // 🟢 НЕТ ОШИБОК
         // =========================
+        
         if (totalMistakes === 0) {
             questionEl.textContent = uiTexts.no_mistakes;
-            launchFireworks();
+            if (counter % 2 == 1) {
+                launchFireworks();
+            } else {
+                launchFireworks2();
+            }
+            
 
             // кнопки
             const actions = document.createElement('div');
@@ -446,8 +455,11 @@ function launchFireworks() {
     // const COLORS = ['#FF0000','#FF8C00','#FFD700','#00FF00','#00BFFF','#1E90FF','#FF69B4','#9400D3'];
     // const COLORS = ['#fe3b3b','#f4a340','#f2dc5c','#6afa6a','#60d5fc','#2b94fc','#f684bd','#c659f4'];
 
-    const backgroundOpacity = 0.6;
+    const backgroundOpacity = 0.7;
     const fadeDuration = 900;
+
+    const FLASH_MAX_OPACITY = 0.35;   // яркость вспышки
+    const FLASH_LIFE = 30;           // длительность жизни (кадры)
 
     // === Создаем затемняющий слой ===
     const overlay = document.createElement('div');
@@ -456,10 +468,22 @@ function launchFireworks() {
         inset: 0;
         background-color: rgba(0,0,0,0);
         pointer-events: none;
-        z-index: 9998;
+        z-index: 9997;
         transition: background-color ${fadeDuration}ms linear;
     `;
     document.body.appendChild(overlay);
+
+    // Вспышка от взрыва ракеты
+    const flash = document.createElement('div');
+    flash.style.cssText = `
+        position: fixed;
+        inset: 0;
+        background-color: white;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 9998;
+    `;
+    document.body.appendChild(flash);
 
     // === Канвас для салюта ===
     const canvas = document.createElement('canvas');
@@ -487,6 +511,9 @@ function launchFireworks() {
 
     let rocketsLaunched = 0;
     let lastLaunchTime = performance.now();
+
+    // === ⚡ СОСТОЯНИЕ ВСПЫШКИ ===
+    let flashLife = 0; // 🔄 счетчик жизни вспышки
 
     // === Начинаем плавное затемнение ===
     requestAnimationFrame(() => {
@@ -532,6 +559,11 @@ function launchFireworks() {
     }
 
     function explode(x, y) {
+
+        // === ⚡ АКТИВАЦИЯ ВСПЫШКИ В МОМЕНТ ВЗРЫВА ===
+        flashLife = FLASH_LIFE;
+        flash.style.opacity = FLASH_MAX_OPACITY;
+
         for (let i = 0; i < EXPLOSION_PARTS; i++) {
             const p = getParticle();
             const angle = Math.random() * Math.PI * 2;
@@ -580,6 +612,282 @@ function launchFireworks() {
 
     function animate(now) {
         ctx.clearRect(0, 0, W, H);
+
+        if (rocketsLaunched < ROCKET_COUNT && now - lastLaunchTime > ROCKET_INTERVAL) {
+            launchRocket();
+            lastLaunchTime = now;
+        }
+
+        for (let i = rockets.length - 1; i >= 0; i--) {
+            rockets[i].update();
+            if (rockets[i].exploded) {
+                rockets.splice(i, 1);
+            }
+        }
+
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.update();
+            p.draw();
+
+            if (p.life <= 0) {
+                particlePool.push(p);
+                particles.splice(i, 1);
+            }
+        }
+
+        // === ⚡ ПЛАВНОЕ УГАСАНИЕ ВСПЫШКИ ===
+        if (flashLife > 0) {
+            flashLife--;
+            const t = flashLife / FLASH_LIFE; // 1 → 0
+            flash.style.opacity = FLASH_MAX_OPACITY * t;
+        }
+
+        ctx.globalAlpha = 1;
+
+        if (rockets.length || particles.length || rocketsLaunched < ROCKET_COUNT || flashLife > 0) {
+            requestAnimationFrame(animate);
+        } else {
+            // === Плавное исчезновение затемнения ===
+            overlay.style.backgroundColor = 'rgba(0,0,0,0)';
+            setTimeout(() => {
+                canvas.remove();
+                overlay.remove();
+            }, fadeDuration);
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+
+function launchFireworks2() {
+    // === НАСТРОЙКИ ===
+    const ROCKET_COUNT = 5;
+    const ROCKET_INTERVAL = 450;
+    const ROCKET_SPEED = -18;
+
+    const EXPLOSION_PARTS = 130;
+    const EXPLOSION_LIFE = 120;
+    const FADE_TIME = 45;
+
+    const COLORS = ['#fe3b3b','#f89b29','#fcde38','#3ffc3f','#41cfff','#2b94fc','#fa5baa','#c643ff'];
+    // const COLORS = ['#FF0000','#FF8C00','#FFD700','#00FF00','#00BFFF','#1E90FF','#FF69B4','#9400D3'];
+    // const COLORS = ['#fe3b3b','#f4a340','#f2dc5c','#6afa6a','#60d5fc','#2b94fc','#f684bd','#c659f4'];
+
+    const backgroundOpacity = 0.7;
+    const fadeDuration = 900;
+
+    // === FLASH SETTINGS ===
+    const FLASH_RADIUS = 600;      // максимальный радиус
+    const FLASH_LIFE = 10;         // время жизни (кадры)
+    const FLASH_ALPHA = 0.65;      // максимальная яркость
+
+
+    // === Создаем затемняющий слой ===
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0,0,0,0);
+        pointer-events: none;
+        z-index: 9998;
+        transition: background-color ${fadeDuration}ms linear;
+    `;
+    document.body.appendChild(overlay);
+
+    // === Канвас для салюта ===
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = `
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 9999;
+    `;
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+
+    const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+    const W = canvas.width = window.innerWidth * DPR;
+    const H = canvas.height = window.innerHeight * DPR;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.scale(DPR, DPR);
+
+    // === Pools ===
+    const rockets = [];
+    const particles = [];
+    const particlePool = [];
+    const flashes = []; // 💥 ДОБАВЛЕНО
+
+    let rocketsLaunched = 0;
+    let lastLaunchTime = performance.now();
+
+    // === Начинаем плавное затемнение ===
+    requestAnimationFrame(() => {
+        overlay.style.backgroundColor = `rgba(0,0,0,${backgroundOpacity})`;
+    });
+
+    // === Particle ===
+    function Particle() {}
+
+    Particle.prototype.reset = function (x, y, vx, vy, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.life = EXPLOSION_LIFE;
+        this.alpha = 1;
+        this.size = Math.random() * 2.5 + 2;
+        this.color = color;
+    };
+
+    Particle.prototype.update = function () {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.05;
+
+        if (this.life <= FADE_TIME) {
+            this.alpha = this.life / FADE_TIME; // плавное уменьшение прозрачности
+        }
+
+        this.life--;
+    };
+
+    Particle.prototype.draw = function () {
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    };
+
+    function getParticle() {
+        return particlePool.pop() || new Particle();
+    }
+
+    
+    // ✨ === FLASH === begin ✨
+    function Flash(x, y) {
+        this.x = x;
+        this.y = y;
+        this.life = FLASH_LIFE;
+    }
+
+    Flash.prototype.update = function () {
+        this.life--;
+    };
+
+    Flash.prototype.draw = function () {
+        const t = this.life / FLASH_LIFE;
+        const radius = FLASH_RADIUS;
+        const alpha = FLASH_ALPHA * t;
+
+        const g = ctx.createRadialGradient(
+            this.x, this.y, 0,
+            this.x, this.y, radius
+        );
+
+        g.addColorStop(0, `rgba(255,255,255,${alpha})`);
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+    }; // ✨ === FLASH === end ✨
+
+
+    function explode(x, y) {
+        flashes.push(new Flash(x, y)); // 💥 ДОБАВЛЕНО
+
+        for (let i = 0; i < EXPLOSION_PARTS; i++) {
+            const p = getParticle();
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 5 + 2;
+
+            p.reset(
+                x,
+                y,
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed,
+                COLORS[Math.random() * COLORS.length | 0]
+            );
+
+            particles.push(p);
+        }
+    }
+
+    // === Rocket ===
+    function Rocket(x) {
+        this.x = x;
+        this.y = H;
+        this.vy = ROCKET_SPEED;
+        this.exploded = false;
+
+        // 🎯 цель взрыва: 20% – 40% высоты экрана
+        this.targetY = H * (0.20 + Math.random() * 0.20);
+    }
+
+    Rocket.prototype.update = function () {
+        this.y += this.vy;
+        this.vy += 0.2;
+
+        ctx.fillStyle = '#b1eaf7';
+        ctx.fillRect(this.x - 1, this.y, 2, 10);
+
+        if (this.y <= this.targetY && !this.exploded) {
+            this.exploded = true;
+            explode(this.x, this.y);
+        }
+    };
+
+    // === ZONES ===
+    const ZONES = ['left','left','center','right','right'];
+
+    // shuffle
+    for (let i = ZONES.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ZONES[i], ZONES[j]] = [ZONES[j], ZONES[i]];
+    }
+
+    let zoneIndex = 0;
+
+    function launchRocket() {
+        const zone = ZONES[zoneIndex++]; 
+
+        const minX = W * 0.2;
+        const maxX = W * 0.8;
+        const width = maxX - minX;
+
+        let x;
+
+        if (zone === 'left') {
+            x = minX + Math.random() * (width * 0.22);
+        } 
+        else if (zone === 'center') {
+            x = minX + width * 0.22 + Math.random() * (width * 0.16);
+        } 
+        else { // right
+            x = minX + width * (0.22 + 0.16) + Math.random() * (width * 0.22);
+        }
+
+        rockets.push(new Rocket(x));
+        // rockets.push(new Rocket(Math.random() * (W * 0.45) + W * 0.2));
+        rocketsLaunched++;
+    }
+
+    function animate(now) {
+        ctx.clearRect(0, 0, W, H);
+
+        // ✨ === FLASHES (ПОД ФЕЙЕРВЕРКОМ) === ✨
+        for (let i = flashes.length - 1; i >= 0; i--) {
+            const f = flashes[i];
+            f.update();
+            f.draw();
+            if (f.life <= 0) flashes.splice(i, 1);
+        }
 
         if (rocketsLaunched < ROCKET_COUNT && now - lastLaunchTime > ROCKET_INTERVAL) {
             launchRocket();
