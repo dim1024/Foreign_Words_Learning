@@ -38,7 +38,6 @@ function startGame(fileData, uiTexts, pairs) { //Точка входа (вызы
     const closeBtn = document.createElement('button');
     closeBtn.className = 'game-close-btn';
     closeBtn.textContent = '✖';
-    closeBtn.style.color = 'red';
     closeBtn.onclick = closeGame;
 
     header.appendChild(title);
@@ -284,10 +283,10 @@ function shuffleArray(arr) {
 function startMemorizingGame(pairs, uiTexts, fileData) {
     closeGame();
 
-    const DEBUG_MEMORIZE_FINISH = 1; // <-- включить дебаг
-    const DEBUG_MODE = 'none'
+    const DEBUG_MEMORIZE_FINISH = 0; // <-- включить дебаг
+    // const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes'
-    // const DEBUG_MODE = 'frequent' 
+    const DEBUG_MODE = 'frequent' 
 
     let lastQuestionKey = null;
     let lastPairTerm = null;
@@ -297,27 +296,12 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
     gameContainer.className = 'memorize-game';
 
     const windowBox = document.createElement('div');
-    windowBox.className = 'game-window';
-    windowBox.style.padding = '20px';
-    windowBox.style.borderRadius = '10px';
-    windowBox.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
-    windowBox.style.backgroundColor = '#fff';
-    windowBox.style.display = 'flex';
-    windowBox.style.flexDirection = 'column';
-    windowBox.style.position = 'relative';
+    windowBox.className = 'game-window game-play-window';
 
     // Красный крестик
     const closeBtn = document.createElement('button');
     closeBtn.className = 'memorize-close-btn';
     closeBtn.textContent = '✖';
-    closeBtn.style.position = 'absolute';
-    closeBtn.style.top = '10px';
-    closeBtn.style.right = '10px';
-    closeBtn.style.backgroundColor = 'transparent';
-    closeBtn.style.border = 'none';
-    closeBtn.style.color = 'red';
-    closeBtn.style.fontSize = '20px';
-    closeBtn.style.cursor = 'pointer';
     closeBtn.onclick = () => {
         document.removeEventListener('click', handleOutsideClick);
         closeGame();
@@ -338,9 +322,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
     const settingsTitle = document.createElement('div');
     settingsTitle.textContent = uiTexts.word_repetitions;
-    settingsTitle.style.marginBottom = '6px';
-    settingsTitle.style.textAlign = 'center';
-    // settingsTitle.style.fontWeight = 'bold';
+    settingsTitle.className = 'word_repetitions_setting';
     settingsPanel.appendChild(settingsTitle);
 
     settingsBtn.onclick = () => {
@@ -351,11 +333,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
     const repeatRow = document.createElement('div');
     repeatRow.className = 'memorize-repeat-row';
     settingsPanel.appendChild(repeatRow);
-    repeatRow.style.display = 'flex';
-    repeatRow.style.justifyContent = 'center';
-    repeatRow.style.gap = '6px';
-    repeatRow.style.marginBottom = '10px';
-
+ 
     const repeatButtons = [];
     for (let i = 1; i <= 5; i++) {
         const btn = document.createElement('button');
@@ -395,9 +373,8 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
     // кнопка ОК для закрытия окна настроек
     const okBtn = document.createElement('button');
-    okBtn.textContent = 'OK';
-    okBtn.style.margin = '4px auto 0';
-    okBtn.style.display = 'block';
+    okBtn.textContent = uiTexts.ok;
+    okBtn.className = 'word_repetitions_setting_ok';
     okBtn.onclick = () => {
         settingsPanel.classList.add('hidden');
     };
@@ -430,43 +407,25 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
     // Вопрос
     const questionEl = document.createElement('div');
     questionEl.className = 'memorize-question';
-    questionEl.style.textAlign = 'center';
-    questionEl.style.fontSize = '24px';
-    questionEl.style.margin = '20px 0';
     windowBox.appendChild(questionEl);
 
     // Кнопки 2x2
     const answersEl = document.createElement('div');
     answersEl.className = 'memorize-answers';
-    answersEl.style.display = 'grid';
-    answersEl.style.gridTemplateColumns = '1fr 1fr';
-    answersEl.style.gap = '10px';
     windowBox.appendChild(answersEl);
 
     // ─── Progress бар цифры прогресса 4/12
     const progressText = document.createElement('div');
-    progressText.style.marginTop = '40px';
-    progressText.style.fontSize = '14px';
-    progressText.style.color = '#555';
-    progressText.style.textAlign = 'center';
+    progressText.className = 'memorize-progress-text';
     progressText.textContent = '0 / 0';
     windowBox.appendChild(progressText);
 
     // прогресс бар для вопросов в режиме memorize
     const progressWrapper = document.createElement('div');
-    progressWrapper.style.width = '100%';
-    progressWrapper.style.height = '10px';
-    progressWrapper.style.backgroundColor = '#eee';
-    progressWrapper.style.borderRadius = '5px';
-    progressWrapper.style.overflow = 'hidden';
-    progressWrapper.style.marginTop = '6px';
-    progressWrapper.style.marginBottom = '15px';
+    progressWrapper.className = 'progress-wrapper';
 
     const progressBar = document.createElement('div');
-    progressBar.style.height = '100%';
-    progressBar.style.width = '0%';
-    progressBar.style.backgroundColor = '#4CAF50';
-    progressBar.style.transition = 'width 0.3s';
+    progressBar.className = 'memorize-progress-bar';
 
     progressWrapper.appendChild(progressBar);
     windowBox.appendChild(progressWrapper);
@@ -605,18 +564,14 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
         options.forEach(opt => {
             const btn = document.createElement('button');
             btn.textContent = opt;
-            btn.style.padding = '10px';
-            btn.style.borderRadius = '6px';
-            btn.style.cursor = 'pointer';
+            btn.className = 'answer-btn';
             btn.onclick = () => handleAnswer(btn, opt === correctAnswer, key, correctAnswer, false);
             answersEl.appendChild(btn);
         });
 
         const dontKnowBtn = document.createElement('button');
         dontKnowBtn.textContent = uiTexts.dont_know;
-        dontKnowBtn.style.padding = '10px';
-        dontKnowBtn.style.borderRadius = '6px';
-        dontKnowBtn.style.cursor = 'pointer';
+        dontKnowBtn.className = 'answer-btn';
         dontKnowBtn.onclick = () => handleAnswer(dontKnowBtn, false, key, correctAnswer, true);
         answersEl.appendChild(dontKnowBtn);
     }
@@ -747,8 +702,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
         const closeBtnFinish = document.createElement('button');
         closeBtnFinish.textContent = uiTexts.close;
-        closeBtnFinish.style.padding = '10px';
-        closeBtnFinish.style.borderRadius = '6px';
+        closeBtnFinish.className = 'answer-btn';
         closeBtnFinish.onclick = () => {
             document.removeEventListener('click', handleOutsideClick);
             closeGame();
@@ -756,8 +710,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
         const repeatBtn = document.createElement('button');
         repeatBtn.textContent = uiTexts.repeat;
-        repeatBtn.style.padding = '10px';
-        repeatBtn.style.borderRadius = '6px';
+        repeatBtn.className = 'answer-btn';
         repeatBtn.onclick = () => {
             startMemorizingGame(pairs, uiTexts, fileData);
         };
@@ -771,8 +724,6 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
             const mistakesBlock = document.createElement('div');
             mistakesBlock.className = 'mistakes-list';
-            mistakesBlock.style.maxHeight = '200px';
-            mistakesBlock.style.overflowY = 'auto';
 
             frequentMistakesPairs.forEach(mp => {
                 const row = document.createElement('div');
@@ -801,12 +752,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
                     ${uiTexts.only_mistakes}
                 </div>
             `;
-            repeatMistakesBtn.style.padding = '10px';
-            repeatMistakesBtn.style.borderRadius = '6px';
-            repeatMistakesBtn.style.maxWidth = '140px';
-            repeatMistakesBtn.style.whiteSpace = 'normal';
-            repeatMistakesBtn.style.lineHeight = '1.2';
-            repeatMistakesBtn.style.textAlign = 'center';
+            repeatMistakesBtn.className = 'answer-btn';
 
             repeatMistakesBtn.onclick = () => {
                 startMemorizingGame(
@@ -819,24 +765,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             // кнопка сохранить ошибки в папку frequent Mistakes. С анимацией
             const saveMistakesBtn = document.createElement('button');
             saveMistakesBtn.textContent = uiTexts.save_to_frequent_mistakes;
-            saveMistakesBtn.style.alignSelf = 'center';
-            saveMistakesBtn.style.marginBottom = '30px';
-            saveMistakesBtn.style.padding = '10px';
-            saveMistakesBtn.style.borderRadius = '6px';
-            // saveMistakesBtn.style.maxWidth = '220px';
-            // saveMistakesBtn.style.whiteSpace = 'normal';
-            // saveMistakesBtn.style.lineHeight = '1.2';
-            saveMistakesBtn.style.whiteSpace = 'nowrap';   // ❗ запрет переноса
-            saveMistakesBtn.style.width = 'fit-content';  // ширина по тексту
-            saveMistakesBtn.style.maxWidth = '100%';       // защита от переполнения
-            saveMistakesBtn.style.width = '260px';     // 🔒 фиксируем ширину
-            saveMistakesBtn.style.height = '42px';     // 🔒 фиксируем высоту
-            saveMistakesBtn.style.display = 'flex';
-            saveMistakesBtn.style.alignItems = 'center';
-            saveMistakesBtn.style.justifyContent = 'center';
-            saveMistakesBtn.style.whiteSpace = 'nowrap';
-
-
+            saveMistakesBtn.className = 'save-mistakes-btn';
 
             // ВАЖНО: кнопка будет "живой" и менять текст/функцию
             saveMistakesBtn.onclick = async () => {
@@ -884,7 +813,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
             const finishActions = document.createElement('div');
             finishActions.className = 'game-actions';
-            finishActions.style.marginTop = 'auto';
+            
             finishActions.appendChild(repeatBtn);
             finishActions.appendChild(repeatMistakesBtn);
             finishActions.appendChild(closeBtnFinish);
@@ -912,7 +841,6 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 
         const finishActions = document.createElement('div');
         finishActions.className = 'game-actions';
-        finishActions.style.marginTop = 'auto';
         finishActions.appendChild(repeatBtn);
         finishActions.appendChild(closeBtnFinish);
 
@@ -933,77 +861,44 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
 
     const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
     // const DEBUG_MODE = 'none'
-    const DEBUG_MODE = 'mistakes' 
-    // const DEBUG_MODE = 'all_mistakes';
+    // const DEBUG_MODE = 'mistakes' 
+    const DEBUG_MODE = 'all_mistakes';
 
     gameContainer = document.createElement('div');
     gameContainer.className = 'memorize-game quick-check';
 
     const windowBox = document.createElement('div');
-    windowBox.className = 'game-window';
-    windowBox.style.padding = '20px';
-    windowBox.style.borderRadius = '10px';
-    windowBox.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
-    windowBox.style.backgroundColor = '#fff';
-    windowBox.style.display = 'flex';
-    windowBox.style.flexDirection = 'column';
-    windowBox.style.position = 'relative';
+    windowBox.className = 'game-window game-play-window';
 
     // Красный крестик
     const closeBtn = document.createElement('button');
     closeBtn.className = 'memorize-close-btn';
     closeBtn.textContent = '✖';
-    closeBtn.style.position = 'absolute';
-    closeBtn.style.top = '10px';
-    closeBtn.style.right = '10px';
-    closeBtn.style.backgroundColor = 'transparent';
-    closeBtn.style.border = 'none';
-    closeBtn.style.color = 'red';
-    closeBtn.style.fontSize = '20px';
-    closeBtn.style.cursor = 'pointer';
     closeBtn.onclick = closeGame;
     windowBox.appendChild(closeBtn);
 
     // Вопрос
     const questionEl = document.createElement('div');
     questionEl.className = 'memorize-question';
-    questionEl.style.textAlign = 'center';
-    questionEl.style.fontSize = '24px';
-    questionEl.style.margin = '20px 0';
     windowBox.appendChild(questionEl);
 
     // Кнопки 2x2
     const answersEl = document.createElement('div');
     answersEl.className = 'memorize-answers';
-    answersEl.style.display = 'grid';
-    answersEl.style.gridTemplateColumns = '1fr 1fr';
-    answersEl.style.gap = '10px';
     windowBox.appendChild(answersEl);
 
     // ─── Progress бар цифры прогресса 4/12
     const progressText = document.createElement('div');
-    progressText.style.marginTop = '40px';
-    progressText.style.fontSize = '14px';
-    progressText.style.color = '#555';
-    progressText.style.textAlign = 'center';
+    progressText.className = 'memorize-progress-text';
     progressText.textContent = '0 / 0';
     windowBox.appendChild(progressText);
 
     // прогресс бар для вопросов в режиме memorize
     const progressWrapper = document.createElement('div');
-    progressWrapper.style.width = '100%';
-    progressWrapper.style.height = '10px';
-    progressWrapper.style.backgroundColor = '#eee';
-    progressWrapper.style.borderRadius = '5px';
-    progressWrapper.style.overflow = 'hidden';
-    progressWrapper.style.marginTop = '6px';
-    progressWrapper.style.marginBottom = '15px';
+    progressWrapper.className = 'progress-wrapper';
 
     const progressBar = document.createElement('div');
-    progressBar.style.height = '100%';
-    progressBar.style.width = '0%';
-    progressBar.style.backgroundColor = '#4CAF50';
-    progressBar.style.transition = 'width 0.3s';
+    progressBar.className = 'memorize-progress-bar';
 
     progressWrapper.appendChild(progressBar);
     windowBox.appendChild(progressWrapper);
@@ -1115,8 +1010,7 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
         options.forEach(opt => {
             const btn = document.createElement('button');
             btn.textContent = opt;
-            btn.style.padding = '10px';
-            btn.style.borderRadius = '6px';
+            btn.className = 'answer-btn';
             btn.onclick = () =>
                 handleAnswer(btn, opt === correctAnswer, key, correctAnswer, false);
             answersEl.appendChild(btn);
@@ -1125,8 +1019,7 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
         // dont know — НУЖЕН
         const dontKnowBtn = document.createElement('button');
         dontKnowBtn.textContent = uiTexts.dont_know;
-        dontKnowBtn.style.padding = '10px';
-        dontKnowBtn.style.borderRadius = '6px';
+        dontKnowBtn.className = 'answer-btn';
         dontKnowBtn.onclick = () =>
             handleAnswer(dontKnowBtn, false, key, correctAnswer, true);
 
@@ -1167,8 +1060,8 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
     }
 
     function showFinishedQuickCheck() {
-        progressText.style.display = 'none';
-        progressWrapper.style.display = 'none';
+        progressText.classList.add('hidden');
+        progressWrapper.classList.add('hidden');
 
         answersEl.innerHTML = '';
 
@@ -1261,9 +1154,7 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
         // 🔴 ЕСТЬ ОШИБКИ
         // =========================
         questionEl.textContent = uiTexts.quick_check_mistakes;
-        questionEl.style.marginTop = '10px';
-        questionEl.style.marginBottom = '5px';
-
+        questionEl.classList.add('memorize-result');
 
         const mistakesPairs = [];
 
@@ -1281,8 +1172,6 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
 
         const mistakesBlock = document.createElement('div');
         mistakesBlock.className = 'mistakes-list';
-        mistakesBlock.style.maxHeight = '200px';
-        mistakesBlock.style.overflowY = 'auto';
 
         mistakesPairs.forEach(mp => {
             const row = document.createElement('div');

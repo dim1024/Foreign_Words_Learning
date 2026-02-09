@@ -11,78 +11,45 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     closeGame();
 
     const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
-    const DEBUG_MODE = 'none'
+    // const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes' 
-    // const DEBUG_MODE = 'all_mistakes';
+    const DEBUG_MODE = 'all_mistakes';
 
     gameContainer = document.createElement('div');
     gameContainer.className = 'memorize-game quick-check';
 
     const windowBox = document.createElement('div');
-    windowBox.className = 'game-window';
-    windowBox.style.padding = '20px';
-    windowBox.style.borderRadius = '10px';
-    windowBox.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
-    windowBox.style.backgroundColor = '#fff';
-    windowBox.style.display = 'flex';
-    windowBox.style.flexDirection = 'column';
-    windowBox.style.position = 'relative';
+    windowBox.className = 'game-window game-play-window';
 
     // Красный крестик
     const closeBtn = document.createElement('button');
     closeBtn.className = 'memorize-close-btn';
     closeBtn.textContent = '✖';
-    closeBtn.style.position = 'absolute';
-    closeBtn.style.top = '10px';
-    closeBtn.style.right = '10px';
-    closeBtn.style.backgroundColor = 'transparent';
-    closeBtn.style.border = 'none';
-    closeBtn.style.color = 'red';
-    closeBtn.style.fontSize = '20px';
-    closeBtn.style.cursor = 'pointer';
     closeBtn.onclick = closeGame;
     windowBox.appendChild(closeBtn);
 
     // Вопрос
     const questionEl = document.createElement('div');
     questionEl.className = 'memorize-question';
-    questionEl.style.textAlign = 'center';
-    questionEl.style.fontSize = '24px';
-    questionEl.style.margin = '20px 0';
     windowBox.appendChild(questionEl);
 
     // Кнопки 2x2
     const answersEl = document.createElement('div');
     answersEl.className = 'memorize-answers';
-    answersEl.style.display = 'grid';
-    answersEl.style.gridTemplateColumns = '1fr 1fr';
-    answersEl.style.gap = '10px';
     windowBox.appendChild(answersEl);
 
     // ─── Progress бар цифры прогресса 4/12
     const progressText = document.createElement('div');
-    progressText.style.marginTop = '40px';
-    progressText.style.fontSize = '14px';
-    progressText.style.color = '#555';
-    progressText.style.textAlign = 'center';
+    progressText.className = 'memorize-progress-text';
     progressText.textContent = '0 / 0';
     windowBox.appendChild(progressText);
 
     // прогресс бар для вопросов в режиме memorize
     const progressWrapper = document.createElement('div');
-    progressWrapper.style.width = '100%';
-    progressWrapper.style.height = '10px';
-    progressWrapper.style.backgroundColor = '#eee';
-    progressWrapper.style.borderRadius = '5px';
-    progressWrapper.style.overflow = 'hidden';
-    progressWrapper.style.marginTop = '6px';
-    progressWrapper.style.marginBottom = '15px';
+    progressWrapper.className = 'progress-wrapper';
 
     const progressBar = document.createElement('div');
-    progressBar.style.height = '100%';
-    progressBar.style.width = '0%';
-    progressBar.style.backgroundColor = '#4CAF50';
-    progressBar.style.transition = 'width 0.3s';
+    progressBar.className = 'memorize-progress-bar';
 
     progressWrapper.appendChild(progressBar);
     windowBox.appendChild(progressWrapper);
@@ -93,9 +60,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     // Счётчик ошибок
     let mistakesCount = {};
 
-    // ============================
     // QUICK CHECK: список вопросов
-    // ============================
     let questions = [];
 
     pairs.forEach(p => {
@@ -194,8 +159,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         options.forEach(opt => {
             const btn = document.createElement('button');
             btn.textContent = opt;
-            btn.style.padding = '10px';
-            btn.style.borderRadius = '6px';
+            btn.className = 'answer-btn';
             btn.onclick = () =>
                 handleAnswer(btn, opt === correctAnswer, key, correctAnswer, false);
             answersEl.appendChild(btn);
@@ -204,8 +168,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         // dont know — НУЖЕН
         const dontKnowBtn = document.createElement('button');
         dontKnowBtn.textContent = uiTexts.dont_know;
-        dontKnowBtn.style.padding = '10px';
-        dontKnowBtn.style.borderRadius = '6px';
+        dontKnowBtn.className = 'answer-btn';
         dontKnowBtn.onclick = () =>
             handleAnswer(dontKnowBtn, false, key, correctAnswer, true);
 
@@ -239,8 +202,8 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     }
 
     function showFinishedQuickCheck() {
-        progressText.style.display = 'none';
-        progressWrapper.style.display = 'none';
+        progressText.classList.add('hidden');
+        progressWrapper.classList.add('hidden');
 
         answersEl.innerHTML = '';
 
@@ -355,10 +318,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
             .replace('{total}', totalPairs)
             .replace('{percent}', percent);
 
-        questionEl.style.marginTop = '25px';
-        questionEl.style.marginBottom = '5px';
-
-
+        questionEl.classList.add('memorize-result');
         const mistakesPairs = [];
 
         pairs.forEach(p => {
@@ -375,9 +335,6 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
 
         const mistakesBlock = document.createElement('div');
         mistakesBlock.className = 'mistakes-list';
-        mistakesBlock.style.maxHeight = '200px';
-        mistakesBlock.style.overflowY = 'auto';
-        mistakesBlock.style.marginBottom = '8px';
 
         mistakesPairs.forEach(mp => {
             const row = document.createElement('div');
@@ -417,16 +374,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         saveMistakesBtn.textContent = uiTexts.save_to_frequent_mistakes;
 
         // стили — 1 в 1 из MEMORIZE
-        saveMistakesBtn.style.alignSelf = 'center';
-        saveMistakesBtn.style.margin = '6px 0 10px';
-        saveMistakesBtn.style.padding = '10px';
-        saveMistakesBtn.style.borderRadius = '6px';
-        saveMistakesBtn.style.width = '260px';
-        saveMistakesBtn.style.height = '42px';
-        saveMistakesBtn.style.display = 'flex';
-        saveMistakesBtn.style.alignItems = 'center';
-        saveMistakesBtn.style.justifyContent = 'center';
-        saveMistakesBtn.style.whiteSpace = 'nowrap';
+        saveMistakesBtn.className = 'save-mistakes-btn';    
 
         // 👇 ВАЖНО: сохраняем ВСЕ слова из таблицы ошибок
         saveMistakesBtn.onclick = () => {
@@ -467,10 +415,6 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         };
 
         windowBox.appendChild(saveMistakesBtn);
-
-
-
-
 
         // кнопки
         const actions = document.createElement('div');
@@ -677,5 +621,3 @@ function launchFireworks() {
 
     requestAnimationFrame(animate);
 }
-
-

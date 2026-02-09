@@ -1,0 +1,406 @@
+.hidden {
+  display: none !important;
+}
+
+.memorize-game {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+.game-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.game-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: red;
+}
+
+.game-window {
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+
+  padding: 16px;
+  box-sizing: border-box;
+
+  border-radius: 8px;
+
+  width: fit-content;
+  min-width: 280px;           /* минимальная ширина для 2 колонок */
+  max-width: 500px;           /* ограничение на слишком широкое окно */
+  max-height: 90vh;
+}
+
+.game-play-window {
+  padding: 20px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.answer-btn {
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.memorize-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  background-color: transparent;
+  border: none;
+
+  color: red;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.memorize-question {
+  text-align: center;
+  font-size: 24px;
+  margin: 20px 0;
+}
+
+.memorize-answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.memorize-result {
+  margin-top: 25px;
+  margin-bottom: 5px;
+}
+
+.memorize-progress-text {
+  margin-top: 40px;
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+}
+
+.memorize-repeat-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  justify-content: center; 
+}
+
+.word_repetitions_setting {
+  margin-bottom: 6px;
+  text-align: center; 
+  /* font-weight: bold; */
+}
+
+.word_repetitions_setting_ok {
+  margin: 4px auto 0;
+  display: block;
+}
+
+.progress-wrapper {
+  width: 100%;
+  height: 10px;
+  background-color: #eee;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 6px;
+  margin-bottom: 15px;
+}
+
+.memorize-progress-bar {
+  height: 100%;
+  width: 0%;
+  background-color: #4CAF50;
+  transition: width 0.3s;
+}
+
+.mistakes-list {
+    width: 100%;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    padding: 8px;
+    /* padding-left: 60px; */
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.save-mistakes-btn {
+  align-self: center;
+  margin-bottom: 8px; 
+  width: 260px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.save-animate {
+  transition: background-color 0.9s ease, transform 0.1s ease;
+}
+
+.save-animate.success {
+  background-color: #47c04b !important;
+  color: #fff !important;
+  transform: scale(1.02);
+}
+
+.game-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 22px; 
+}
+
+.game-actions button {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.mistakes-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* без кнопки справа */
+    gap: 10px;
+    padding: 6px 8px;
+    align-items: center;
+
+    /* width: 100%; */
+}
+
+.mistakes-cell {
+    text-align: center;
+    padding: 4px 8px;
+    min-width: 0;                 /* очень важно */
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* ===== ПОДСВЕТКА КОНКРЕТНОЙ ЯЧЕЙКИ С ОШИБКОЙ ===== */
+.mistakes-cell.has-mistake {
+    background: #ffd6d6;      
+    color: #8b0000;           
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-weight: 600;
+
+    animation: mistakeFadeIn 1s ease-out both;
+}
+
+
+/* ===== ИЗ MAIN.JS ======== */
+.words-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    overflow-y: auto;      /* скролл для длинного списка */
+    /* margin: 12px 0; */
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    padding: 8px;   
+}
+
+/* одна строка */
+.word-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 40px; /* слово | перевод | кнопка */
+    gap: 24px;
+
+    padding: 6px 8px;
+    align-items: center;
+
+    position: relative; /* опора для линии */
+    box-sizing: border-box;
+}
+
+/* ячейки слова и перевода */
+.word-cell {
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    text-align: left;
+    padding-left: 18px;
+    padding-right: 8px;
+    position: relative;
+    color: #000;
+}
+
+/* последнюю линию убираем */
+.word-row:last-child { 
+    border-bottom: none;
+}
+
+.words-table-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  margin: 12px 0;
+  border: 1px solid #ddd;
+
+  display: flex;                /* центрируем таблицу в контейнере */
+  justify-content: center;      /* таблица в середине */
+}
+
+@media (max-width: 768px) {
+  .words-table td {
+    max-width: none;
+    padding: 6px 4px;
+    word-break: break-word;
+  }
+}
+
+/* ========= 🔹 КНОПКА УДАЛИТЬ/ВЕРНУТЬ СЛОВО ============= */
+.word-disabled {
+    color: #999;
+    position: relative;
+}
+
+/* кнопка действия */
+.word-toggle-btn {
+    display: flex;    /* центрируем emoji */
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    font-size: 18px;
+    line-height: 1;    /* 🔑 фикс для emoji */
+    padding: 0;
+
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    background: transparent;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.word-toggle-btn:hover {
+    transform: scale(1.1);
+}
+
+/* удалить */
+.word-toggle-btn.delete {
+    color: #e53935;
+}
+
+.word-toggle-btn.delete:hover {
+    background: rgba(229, 57, 53, 0.15);
+}
+
+/* вернуть */
+.word-toggle-btn.restore {
+    color: #1b5e20;              /* тёмный, читаемый */
+}
+
+.word-toggle-btn.restore:hover {
+    background: rgba(76, 175, 80, 0.4);
+}
+
+/* ================== STRIKETHROUGH (GRID) ========================= */
+/* линия */
+.word-row::after {
+    content: '';
+    position: absolute;
+
+    left: 12px;          /* отступ слева (как у текста) */
+    right: 52px;         /* не заходим на кнопку */
+
+    top: 50%; /* позиция линии */
+    transform: translateY(-50%) scaleX(0);
+
+    height: 3px; /* толщина линии */
+    background: #e53935;
+
+    transform-origin: left;
+    transition: transform 0.4s ease; /* скорость анимации */
+    
+    pointer-events: none;
+    z-index: 1;
+
+    will-change: transform;
+}
+
+/* активируем линию */
+.word-row.word-disabled::after {
+    transform: translateY(-50%) scaleX(1);
+}
+
+/* приглушаем текст */
+.word-row.word-disabled .word-cell {
+    color: #999;
+}
+
+.memorize-settings-btn {
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.memorize-settings-panel {
+  position: absolute;
+  top: 40px;
+  right: 8px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+
+  z-index: 10;
+}
+
+.memorize-settings-panel button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.memorize-settings-panel button.active {
+  background: #4CAF50;
+  color: white;
+}
+

@@ -439,9 +439,7 @@ function renderLevel(level) {
         if (item.type === 'file') {
             // обёртка для файла + кнопки удаления
             const wrapper = document.createElement('div');
-            wrapper.style.display = 'flex';
-            wrapper.style.alignItems = 'center';
-            wrapper.style.gap = '6px';
+            wrapper.classList.add('file-row');
 
             btn.onclick = () => {
                 if (item.userFile) {
@@ -537,14 +535,11 @@ function createSelfCheckFolder(folder) {
     const wrapper = document.createElement('div');
 
     const header = document.createElement('div');
-    header.style.display = 'flex';
-    header.style.alignItems = 'center';
-    header.style.gap = '6px';
+    header.classList.add('self-check-folder-header');
 
     const toggle = document.createElement('span');
-    toggle.textContent = '▶';
-    toggle.style.cursor = 'pointer';
-    toggle.style.width = '14px';
+    toggle.classList.add('self-check-toggle');
+    toggle.textContent = '⮞';
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -555,13 +550,11 @@ function createSelfCheckFolder(folder) {
     header.append(toggle, checkbox, label);
 
     const childrenBox = document.createElement('div');
-    childrenBox.style.marginLeft = '20px';
-    childrenBox.style.display = 'none';
+    childrenBox.classList.add('self-check-children');
 
     toggle.onclick = () => {
-        const open = childrenBox.style.display === 'none';
-        childrenBox.style.display = open ? 'block' : 'none';
-        toggle.textContent = open ? '▼' : '▶';
+        childrenBox.classList.toggle('open');
+        toggle.textContent = childrenBox.classList.contains('open') ? '⮟' : '⮞';
     };
 
     checkbox.onchange = async () => {
@@ -597,7 +590,7 @@ function createSelfCheckFolder(folder) {
 // Для рисования дерева файлов
 function createSelfCheckFile(file) {
     const row = document.createElement('div');
-    row.style.marginLeft = '20px';
+    row.classList.add('self-check-file');
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -1116,12 +1109,12 @@ function showUserWordsPreview(pairs, onConfirm) {
 
         // Подсветка подозрительных строк (пустой перевод)
         if (!p.translation) {
-            right.style.backgroundColor = '#fe8a8aff';
+            right.classList.add('preview-translation-error');
             right.title = uiTexts.empty_translation_tooltip;
         }
 
         if (!p.term) {
-            left.style.backgroundColor = '#f6dd92ff';
+            left.classList.add('preview-term-error');
             left.title = uiTexts.empty_term_tooltip;
         }
 

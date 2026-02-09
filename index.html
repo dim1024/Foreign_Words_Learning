@@ -7,7 +7,13 @@ git reset HEAD~1 -->
 <head>
     <meta charset="UTF-8">
     <title>Foreign Words Learning</title>
-    <link rel="stylesheet" href="style.css">
+
+    <!-- <link rel="stylesheet" href="style.css"> -->
+
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/game.css">
+
 </head>
 <body>
 
@@ -46,8 +52,6 @@ git reset HEAD~1 -->
 
     </header>
     <!-- ===== /HEADER ===== -->
-
-
     <!-- <h1 data-i18n="app_title"></h1> -->
 
     <!-- Контейнер для папок и файлов -->
@@ -92,14 +96,14 @@ git reset HEAD~1 -->
         </div>
     </div>
 
-        <!-- МОДАЛКА ЗАГРУЗКИ СВОИХ СЛОВ -->
+    <!-- МОДАЛКА ЗАГРУЗКИ СВОИХ СЛОВ -->
     <div id="uploadModal" style="display:none;">
         <div id="uploadBox">
 
             <!-- ВИЗУАЛЬНЫЙ ПРИМЕР -->
             <div id="formatExamples">
 
-                            <!-- DOWNLOAD EXAMPLES -->
+            <!-- DOWNLOAD EXAMPLES -->
             <div>         
                 <div>
                     <p data-i18n="download_examples"></p>
@@ -170,8 +174,6 @@ git reset HEAD~1 -->
                         <span>lo siento</span>
                         <span class="icon">✅</span>
                     </div>
-                 
-
 
                     <!-- Ошибка: пустой перевод -->
                     <div class="example-row error">
@@ -198,7 +200,6 @@ git reset HEAD~1 -->
 
                 </div>
                 
-
                 <div class="example-block">
                     <div class="example-title" data-i18n="format_xlsx"></div>
 
@@ -278,7 +279,6 @@ git reset HEAD~1 -->
                 </div>
             </div>
             
-
             <!-- DOWNLOAD EXAMPLES
             <div id="downloadExamples">
                 <p>Скачайте примеры файлов для загрузки:</p>
@@ -299,7 +299,6 @@ git reset HEAD~1 -->
         </div>
     </div>
 
-
     <!-- Подключаем SheetJS для xlsx -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <script src="games/words_game.js"></script>
@@ -309,7 +308,4 @@ git reset HEAD~1 -->
     <script src="script.js"></script>
     
 </body>
-
-
-
 </html>

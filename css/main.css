@@ -1,0 +1,530 @@
+/* ===== TOP PANEL ===== 🔹 ОБЩИЙ LAYOUT И НАВИГАЦИЯ */
+.top-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 20px;
+  background: #1e1e1e;
+  color: #fff;
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.top-panel__left,
+.top-panel__center,
+.top-panel__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.site-title {
+  cursor: pointer;
+  font-size: 18px;
+  margin: 0;
+}
+
+/* ===== Main content ===== */
+.main-content {
+  padding: 20px;
+}
+
+/* ============= 🔹 КНОПКИ И ЭЛЕМЕНТЫ ШАПКИ */
+
+#homeBtn {}
+
+#backBtn {}
+
+#selfCheckBtn {
+  padding: 6px 10px;
+  background: #2b2b2b;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#selfCheckBtn::before {
+  content: "✅ ";
+}
+
+#addWordsBtn {
+  padding: 6px 10px;
+  background: #2b2b2b;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#addWordsBtn::before {
+  content: "➕ ";
+}
+
+
+/* ============= Language dropdown 🔹 ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА */
+.lang-select {
+  position: relative;
+}
+
+.lang-dropdown {
+  position: absolute;
+  right: 0;
+  top: 110%;
+
+  background: #2b2b2b;
+  border: 1px solid #444;
+  border-radius: 6px;
+
+  min-width: 120px;
+}
+
+.lang-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  color: #fff;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+#currentLangBtn {}
+#currentLangLabel {}
+
+/* =============  🔹 КОНТЕЙНЕР СТИЛЬ ФАЙЛОВ И ДЕРЕВА ПАПОК */
+/* Общий стиль кнопок */
+.main-content button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fefefe;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.15s;
+}
+
+.main-content button:hover {
+  background: #f0f0f0;
+}
+
+/* Папки */
+.main-content button.folder::before {
+  content: "📁";  /* иконка папки */
+  margin-right: 6px;
+}
+
+/* Файлы */
+.main-content button.file::before {
+  content: "📄";  /* иконка файла */
+  margin-right: 6px;
+}
+
+#fileContainer {}
+.folder {}
+.file {}
+
+
+/* =============  🔹 КНОПКА «ДОБАВИТЬ СЛОВА» ДЛЯ ПАПКИ "МОИ СЛОВА" */
+.main-content .add-words-btn {
+    background-color: #7ad27e; /* зелёная */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex; /* чтобы flex внутри main-content не ломал текст */
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+
+    margin-bottom: 12px;
+    transition: background-color 0.2s;
+}
+
+.main-content .add-words-btn:hover {
+    background-color: #45a049;
+}
+
+.add-words-btn::before {
+    content: '+';
+    margin-right: 6px;
+    font-size: 28px;       /* маленький */
+    color: white;           
+    font-weight: normal;   /* не жирный */
+    vertical-align: middle;
+}
+
+/* =============  🔹 МОДАЛКА ЗАГРУЗКИ СЛОВ (UPLOAD) */
+#uploadModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#uploadBox {
+  background: #fff;
+
+  /* 🔑 ограничение относительно окна */
+  width: min(900px, 95vw);
+  max-height: 90vh;
+
+  padding: 20px;
+  border-radius: 6px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  box-sizing: border-box;
+
+  /* 🔑 ВКЛЮЧАЕМ СКРОЛЛ */
+  overflow: auto;
+}
+
+/* ========================= EXAMPLES В МОДАЛКЕ ========================= */
+
+#formatExamples {
+  display: flex;
+  gap: 20px;
+}
+
+.example-block {
+  border: 1px solid #ddd;
+  padding: 10px;
+  /* width: 100%; */
+  width: 290px;
+}
+
+.example-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.example-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+}
+
+.example-row.ok {
+  color: #2e7d32;
+}
+
+.example-row.error {
+  color: #c62828;
+}
+
+.example-row .arrow {
+  opacity: 0.6;
+}
+
+.example-row .icon {
+  margin-left: auto;
+}
+
+
+/* ========= 🔹 XLSX TABLE примеры формата (часть upload) ====== */
+
+.xlsx-wrapper {
+  display: flex;
+  align-items: stretch;
+}
+
+.example-table {
+  border-collapse: collapse;
+  table-layout: fixed;        /* 🔑 важно */
+  width: 270px;               /* изменение ширины колонок*/
+}
+
+.example-table col.col-term {
+  width: 50%;
+}
+
+.example-table col.col-translation {
+  width: 50%;
+}
+
+.example-table td {
+  border: 1px solid #ccc;
+  padding: 6px 8px;
+  height: 18px;               /* одинаковая высота строк */
+  font-size: 15px; 
+  vertical-align: middle;
+  white-space: normal;          /* разрешаем перенос */
+  word-break: break-word;       /* ломаем длинные слова */
+  overflow-wrap: anywhere;      /* современный вариант */
+}
+
+/* ИКОНКИ */
+.xlsx-icons {
+  display: flex;
+  flex-direction: column;
+  margin-left: 8px;
+}
+
+.xlsx-icons span {
+  height: 32px;               /* синхронизация со строкой */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.xlsx-icons .ok {
+  color: #2e7d32;
+}
+
+.xlsx-icons .error {
+  color: #c62828;
+}
+
+/* =========== 🔹 DOWNLOAD EXAMPLES ============ */
+
+#downloadExamples {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+}
+
+#downloadExamples button {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+
+/* =========== 🔹 DRAG & DROP (UPLOAD) ============ */
+#dropZone {
+  grid-column: 1 / -1;
+  border: 2px dashed #aaa;
+  border-radius: 6px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #777;
+  transition: 0.15s;
+}
+
+#dropZone.valid {
+  border-color: #2e7d32;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+#dropZone.invalid {
+  border-color: #c62828;
+  background: #fdecea;
+  color: #c62828;
+}
+
+#dropZone.dragging {
+  border-color: #4da3ff;
+  background: #f0f7ff;
+  color: #4da3ff;
+}
+
+#dropIcon {}
+
+
+/* ========== 🔹 КНОПКИ UPLOAD-МОДАЛКИ ACTION BUTTONS  ======== */
+
+.upload-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.upload-actions button {
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+/* ======== 🔹 МОДАЛКА ПРЕДПРОСМОТРА (PREVIEW)L ========== */
+#previewModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#previewBox {
+  background: #fff;
+  width: 90%;
+  max-width: 330px;
+  max-height: 80vh;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+#previewList {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  margin: 10px 0;
+}
+
+.preview-row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 12px;
+  padding: 6px 8px;
+  border-bottom: 1px solid #eee;
+  align-items: start;
+}
+
+.preview-row span {
+  /* white-space: nowrap;        длиные слова не ломаются, а заменяются точками */
+  overflow: hidden;
+  text-align: left;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.preview-actions {}
+
+
+
+
+
+/* ==== 🔹 SELF CHECK MODAL — ТОЛЬКО ВЫБОР ФАЙЛОВ (ДО START) ==== */
+#selfCheckModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4000;
+}
+
+.self-check-box {
+  background: #fff;
+  width: 420px;
+  max-width: 95vw;
+  max-height: 80vh;
+
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+#selfCheckStats {}
+
+#selfCheckTree {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  margin: 10px 0;
+  padding: 8px;
+}
+
+/* ========================= SELF CHECK FILE SELECTION ========================= */
+.self-check-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.self-check-tree-item {
+    margin-left: 16px;
+}
+
+.self-check-folder {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.self-check-toggle {
+    width: 16px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.self-check-children {
+    margin-left: 18px;
+    display: none;
+}
+
+.self-check-children.open {
+    display: block;
+}
+
+
+
+
+
+
+
+
+
+/* ЭТИ СТИЛИ ПЕРЕНЕСЕНЫ ИЗ JS, ИХ НУЖНО ЛИБО ПЕРЕНЕСТИ В ОДНУ ИЗ ГЛАВ, ЛИБО СДЕЛАТЬ ДЛЯ НИХ ОТДЕЛЬНУЮ ГЛАВУ */
+
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ============ для рисования дерева папок */
+.self-check-folder-header {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.self-check-toggle {
+  cursor: pointer;
+  width: 14px;
+}
+
+.self-check-children {
+  margin-left: 20px;
+  display: none;
+}
+
+.self-check-children.open {
+  display: block;
+}
+
+/* Для рисования дерева файлов */
+.self-check-file {
+  margin-left: 16px;
+}
+
+
+/* ========= */
+.preview-translation-error {
+  background-color: #fe8a8aff;
+}
+
+.preview-term-error {
+  background-color: #f6dd92ff;
+}
+
+
+

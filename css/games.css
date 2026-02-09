@@ -1,0 +1,483 @@
+/* ======== 🔹 GAME MODAL (mode chooser) ============ */
+/* .game-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.45);
+} */
+
+/* ===== WINDOW: выбор слов ===== */
+/* .game-window {
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+
+  padding: 16px;
+  box-sizing: border-box;
+
+  border-radius: 8px;
+
+  width: fit-content;
+  min-width: 280px;           /* минимальная ширина для 2 колонок */
+ /* max-width: 500px;           /* ограничение на слишком широкое окно */
+  /*max-height: 90vh;
+} */
+
+/* ===== WINDOW: игровой процесс ===== */
+/* .game-play-window {
+  padding: 20px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+  display: flex;
+  flex-direction: column;
+  position: relative;
+} */
+
+/* .game-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+} */
+
+/* .game-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.game-actions button {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 16px;
+} */
+
+/* ================ GAME STUB ================= */
+
+.game-stub {
+  position: fixed;
+  inset: 0;
+  background: #f5f5f5;
+  z-index: 2100;
+  padding: 20px;
+}
+
+/* ============ 🔹 WORDS LIST (GRID VERSION) ============== */
+/* .words-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    overflow-y: auto;      
+
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    padding: 8px;   
+}
+
+
+.word-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 40px; 
+    gap: 24px;
+
+    padding: 6px 8px;
+    align-items: center;
+
+    position: relative; 
+    box-sizing: border-box;
+}
+
+
+.word-cell {
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    text-align: left;
+    padding-left: 18px;
+    padding-right: 8px;
+    position: relative;
+    color: #000;
+}
+
+
+.word-row:last-child { 
+    border-bottom: none;
+}
+
+.words-table-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  margin: 12px 0;
+  border: 1px solid #ddd;
+
+  display: flex;                
+  justify-content: center;      
+} */
+
+/* ========= 🔹 КНОПКА УДАЛИТЬ/ВЕРНУТЬ СЛОВО ============= */
+.word-disabled {
+    color: #999;
+    position: relative;
+}
+
+
+/* .word-toggle-btn {
+    display: flex;    
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    font-size: 18px;
+    line-height: 1;    
+    padding: 0;
+
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    background: transparent;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.word-toggle-btn:hover {
+    transform: scale(1.1);
+}
+
+
+.word-toggle-btn.delete {
+    color: #e53935;
+}
+
+.word-toggle-btn.delete:hover {
+    background: rgba(229, 57, 53, 0.15);
+}
+
+
+.word-toggle-btn.restore {
+    color: #1b5e20;              
+}
+
+.word-toggle-btn.restore:hover {
+    background: rgba(76, 175, 80, 0.4);
+} */
+
+/* ================== STRIKETHROUGH (GRID) ========================= */
+/* линия */
+/* .word-row::after {
+    content: '';
+    position: absolute;
+
+    left: 12px;          
+    right: 52px;        
+
+    top: 50%;
+    transform: translateY(-50%) scaleX(0);
+
+    height: 3px; 
+    background: #e53935;
+
+    transform-origin: left;
+    transition: transform 0.4s ease;
+    
+    pointer-events: none;
+    z-index: 1;
+
+    will-change: transform;
+}
+
+
+.word-row.word-disabled::after {
+    transform: translateY(-50%) scaleX(1);
+}
+
+
+.word-row.word-disabled .word-cell {
+    color: #999;
+} */
+
+/* ============= 🔹 STUDY MODE (MODAL) =================== */
+.study-game {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 3000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.study-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 24px;
+  width: 320px;
+  max-width: 90vw;
+
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+
+  position: relative; /* важно для крестика */
+}
+
+.study-term {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.study-translation {
+  font-size: 20px;
+  color: #555;
+}
+
+/* кнопки перелистывания */
+.study-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.study-controls button {
+  font-size: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+/* нижняя кнопка */
+.study-bottom {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;              /* ⬅️ отступ между кнопками */
+  justify-content: center;
+}
+
+.study-bottom button {
+  padding: 10px 16px;     /* ⬅️ крупнее */
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* крестик */
+.study-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  background: none;
+  border: none;
+  color: #d32f2f;
+
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.study-close-btn:hover {
+  color: #ff0000;
+}
+
+/* ============= 🔹 MEMORIZE MODE (MODAL) ================ */
+/* .memorize-game {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+} */
+
+.memorize-window {
+  background: #fff;
+  width: 320px;
+  min-height: 200px;
+  border-radius: 10px;
+  position: relative;
+}
+
+/* .memorize-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  background-color: transparent;
+  border: none;
+
+  color: red;
+  font-size: 20px;
+  cursor: pointer;
+} */
+
+/* Кнопка ⚙️ настройки MEMORIZE */
+/* .memorize-settings-btn {
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.memorize-settings-panel {
+  position: absolute;
+  top: 40px;
+  right: 8px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+
+  z-index: 10;
+} */
+
+/* .memorize-question {
+  text-align: center;
+  font-size: 24px;
+  margin: 20px 0;
+}  */
+
+/* .memorize-answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+} */
+
+/* .memorize-progress-text {
+  margin-top: 40px;
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+} */
+
+/* .memorize-repeat-row {
+  display: flex;
+  gap: 6px;
+} */
+
+/* .memorize-settings-panel button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.memorize-settings-panel button.active {
+  background: #4CAF50;
+  color: white;
+} */
+
+/* Расстояние кнопок от списка с ошибками только в QUICK CHECK */
+.memorize-game.quick-check .game-actions {
+    margin-top: 48px;
+}
+
+/* ======= 🔹 ОТДЕЛЬНЫЙ СТИЛЬ ДЛЯ ОКНА "ЧАСТЫЕ ОШИБКИ" ==== */
+/* .mistakes-list {
+    width: 100%;
+    margin: 12px 0;
+    padding: 8px;
+    /* padding-left: 60px; */
+    /*box-sizing: border-box;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+} */
+
+/* .save-mistakes-btn {
+  align-self: center;
+  margin-bottom: 8px; 
+  width: 260px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  cursor: pointer;
+} */
+
+.memorize-game:not(.quick-check) .mistakes-list {
+    padding-left: 60px;
+}
+
+.memorize-game.quick-check .mistakes-list {
+    padding-left: 30px;
+}
+
+/* .mistakes-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;  
+    gap: 10px;
+    padding: 6px 8px;
+    align-items: center;
+
+
+}
+
+.mistakes-cell {
+    text-align: left;
+    padding: 4px 8px;
+    min-width: 0;                 
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+
+.mistakes-cell.has-mistake {
+    background: #ffd6d6;      
+    color: #8b0000;           
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-weight: 600;
+
+    animation: mistakeFadeIn 1s ease-out both; 
+}*/
+
+@keyframes mistakeFadeIn {
+    from {
+        background-color: transparent;
+        color: inherit;
+        transform: scale(0.96);
+    }
+    to {
+        background-color: #ffd6d6;
+        color: #8b0000;
+        transform: scale(1);
+    }
+}
+
+
+/* 🔹 анимация для кнопки "Сохранено" [в частые ошибки] */
+/* .save-animate {
+  transition: background-color 0.9s ease, transform 0.1s ease;
+}
+
+.save-animate.success {
+  background-color: #47c04b !important;
+  color: #fff !important;
+  transform: scale(1.02);
+} */
