@@ -18,7 +18,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     // const DEBUG_MODE = 'all_mistakes';
 
     gameContainer = document.createElement('div');
-    gameContainer.className = 'memorize-game quick-check';
+    gameContainer.className = 'memorize-game';
 
     const windowBox = document.createElement('div');
     windowBox.className = 'game-window game-play-window';
@@ -269,6 +269,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
         // --- кнопки ---
         const repeatBtn = document.createElement('button');
         repeatBtn.textContent = uiTexts.repeat;
+        repeatBtn.className = 'answer-btn';
         repeatBtn.onclick = () => {
             counter++;
             startSelfCheckExam(pairs, uiTexts, fileData);
@@ -276,6 +277,7 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
 
         const okBtn = document.createElement('button');
         okBtn.textContent = uiTexts.ok;
+        okBtn.className = 'answer-btn';
         okBtn.onclick = closeGame;      
 
         // =========================

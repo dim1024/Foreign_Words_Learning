@@ -102,6 +102,7 @@ function startGame(fileData, uiTexts, pairs) { //Точка входа (вызы
 
     const studyBtn = document.createElement('button');
     studyBtn.textContent = uiTexts.study;
+    studyBtn.className = 'answer-btn';
     studyBtn.onclick = () => {
         const activePairs = localPairs.filter(p => !p.disabled);
         if (!activePairs.length) {
@@ -114,6 +115,7 @@ function startGame(fileData, uiTexts, pairs) { //Точка входа (вызы
 
     const memorizeBtn = document.createElement('button');
     memorizeBtn.textContent = uiTexts.memorize;
+    memorizeBtn.className = 'answer-btn';
     memorizeBtn.onclick = () => {
         const activePairs = localPairs.filter(p => !p.disabled);
         if (!activePairs.length) {
@@ -125,6 +127,7 @@ function startGame(fileData, uiTexts, pairs) { //Точка входа (вызы
 
     const quickCheckBtn = document.createElement('button');
     quickCheckBtn.textContent = uiTexts.quick_check;
+    quickCheckBtn.className = 'answer-btn';
     quickCheckBtn.onclick = () => {
         const activePairs = localPairs.filter(p => !p.disabled);
         if (!activePairs.length) {
@@ -521,7 +524,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
         progressBar.style.width = percent + '%';
 
         // текст прогресса в цифрах 4/12
-        progressText.textContent = `${current} / ${MAX_PROGRESS}`;
+        progressText.textContent = `${uiTexts.correct_answers}: ${current}/${MAX_PROGRESS}`;
     }
 
     function nextQuestion() {
@@ -529,7 +532,6 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
         if (!next) return showFinished();
 
         const { pair: p, direction } = next;
-
 
         let question, correctAnswer, key;
         if (direction === 'word') {
@@ -865,7 +867,7 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
     const DEBUG_MODE = 'all_mistakes';
 
     gameContainer = document.createElement('div');
-    gameContainer.className = 'memorize-game quick-check';
+    gameContainer.className = 'memorize-game';
 
     const windowBox = document.createElement('div');
     windowBox.className = 'game-window game-play-window';
@@ -1125,12 +1127,14 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
         // --- кнопки ---
         const repeatBtn = document.createElement('button');
         repeatBtn.textContent = uiTexts.repeat;
+        repeatBtn.className = 'answer-btn';
         repeatBtn.onclick = () => {
             startQuickCheckGame(pairs, uiTexts, fileData);
         };
 
         const okBtn = document.createElement('button');
         okBtn.textContent = uiTexts.ok;
+        okBtn.className = 'answer-btn';
         okBtn.onclick = closeGame;      
 
         // =========================
@@ -1208,6 +1212,7 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
         // кнопка запуска MEMORIZE со всеми словами
         const memorizeBtn = document.createElement('button');
         memorizeBtn.textContent = uiTexts.memorize;
+        memorizeBtn.className = 'answer-btn';
         memorizeBtn.onclick = () => {
             startMemorizingGame(pairs, uiTexts, fileData);
         };
