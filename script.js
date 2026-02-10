@@ -663,7 +663,7 @@ selfCheckBtn.onclick = () => {
 };
 
 /***********************
- * ЗАГЛУШКА ИГРЫ
+ * ЗАГРУЗКА ИГРЫ
  ***********************/
 async function loadAndRunGame(file) {
     try {
@@ -673,7 +673,7 @@ async function loadAndRunGame(file) {
         // Закрываем игру, если она открыта, чтобы навигация работала
         closeGame();
 
-        // Вызываем игру-заглушку с данными
+        // Вызываем игру с данными
         window.startGame(file, uiTexts, pairs);
         
         // Лог для разработчика

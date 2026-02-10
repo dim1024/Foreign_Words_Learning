@@ -1,50 +1,180 @@
-/* ========================= PREVIEW MODAL ========================= */
-#previewModal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+/* ========================
+         MAIN PAGE    
+=========================== */
+
+/* ===== TOP PANEL ===== 🔹 ОБЩИЙ LAYOUT И НАВИГАЦИЯ */
+.top-panel {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 20px;
+  background: #1e1e1e;
+  color: #fff;
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-#previewBox {
-  background: #fff;
-  width: 90%;
-  max-width: 330px;
-  max-height: 80vh;
-  padding: 16px;
+.top-panel__left,
+.top-panel__center,
+.top-panel__right {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
-#previewList {
-  flex: 1;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  margin: 10px 0;
+.site-title {
+  cursor: pointer;
+  font-size: 18px;
+  margin: 0;
 }
 
-.preview-row {
-  display: grid;
-  grid-template-columns: 140px minmax(0, 1fr);
-  gap: 12px;
-  padding: 6px 8px;
-  border-bottom: 1px solid #eee;
-  align-items: start;
+/* ===== Main content ===== */
+.main-content {
+  padding: 20px;
 }
 
-.preview-row span {
-  /* white-space: nowrap;        длиные слова не ломаются, а заменяются точками */
-  overflow: hidden;
+/* ============= 🔹 КНОПКИ И ЭЛЕМЕНТЫ ШАПКИ */
+
+#homeBtn {}
+
+#backBtn {}
+
+#selfCheckBtn {
+  padding: 6px 10px;
+  background: #2b2b2b;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#selfCheckBtn::before {
+  content: "✅ ";
+}
+
+#addWordsBtn {
+  padding: 6px 10px;
+  background: #2b2b2b;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#addWordsBtn::before {
+  content: "➕ ";
+}
+
+
+/* ============= Language dropdown 🔹 ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА */
+.lang-select {
+  position: relative;
+}
+
+.lang-dropdown {
+  position: absolute;
+  right: 0;
+  top: 110%;
+
+  background: #2b2b2b;
+  border: 1px solid #444;
+  border-radius: 6px;
+
+  min-width: 120px;
+}
+
+.lang-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  color: #fff;
+  border: none;
   text-align: left;
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
+  cursor: pointer;
 }
 
-/* ==== UPLOAD MODAL (MINIMAL) ============================ */
+#currentLangBtn {}
+#currentLangLabel {}
 
+/* =============  🔹 КОНТЕЙНЕР СТИЛЬ ФАЙЛОВ И ДЕРЕВА ПАПОК */
+/* Общий стиль кнопок */
+.main-content button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fefefe;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.15s;
+}
+
+.main-content button:hover {
+  background: #f0f0f0;
+}
+
+/* Папки */
+.main-content button.folder::before {
+  content: "📁";  /* иконка папки */
+  margin-right: 6px;
+}
+
+/* Файлы */
+.main-content button.file::before {
+  content: "📄";  /* иконка файла */
+  margin-right: 6px;
+}
+
+#fileContainer {}
+.folder {}
+.file {}
+
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* =============  🔹 КНОПКА «ДОБАВИТЬ СЛОВА» ДЛЯ ПАПКИ "МОИ СЛОВА" */
+.main-content .add-words-btn {
+    background-color: #7ad27e; /* зелёная */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex; /* чтобы flex внутри main-content не ломал текст */
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+
+    margin-bottom: 12px;
+    transition: background-color 0.2s;
+}
+
+.main-content .add-words-btn:hover {
+    background-color: #45a049;
+}
+
+.add-words-btn::before {
+    content: '+';
+    margin-right: 6px;
+    font-size: 28px;       /* маленький */
+    color: white;           
+    font-weight: normal;   /* не жирный */
+    vertical-align: middle;
+}
+
+/* =============  🔹 МОДАЛКА ЗАГРУЗКИ СЛОВ (UPLOAD) */
 #uploadModal {
   position: fixed;
   inset: 0;
@@ -75,8 +205,7 @@
   overflow: auto;
 }
 
-
-/* ========================= EXAMPLES ========================= */
+/* ========================= EXAMPLES В МОДАЛКЕ ========================= */
 
 #formatExamples {
   display: flex;
@@ -118,7 +247,8 @@
   margin-left: auto;
 }
 
-/* ==================== XLSX TABLE ========================= */
+
+/* ========= 🔹 XLSX TABLE примеры формата (часть upload) ====== */
 
 .xlsx-wrapper {
   display: flex;
@@ -172,7 +302,7 @@
   color: #c62828;
 }
 
-/* =========== DOWNLOAD EXAMPLES ========================= */
+/* =========== 🔹 DOWNLOAD EXAMPLES ============ */
 
 #downloadExamples {
   grid-column: 1 / -1;
@@ -185,8 +315,8 @@
   cursor: pointer;
 }
 
-/* ================ DROP ZONE  ========================= */
 
+/* =========== 🔹 DRAG & DROP (UPLOAD) ============ */
 #dropZone {
   grid-column: 1 / -1;
   border: 2px dashed #aaa;
@@ -212,7 +342,16 @@
   color: #c62828;
 }
 
-/* =============== ACTION BUTTONS  ========================= */
+#dropZone.dragging {
+  border-color: #4da3ff;
+  background: #f0f7ff;
+  color: #4da3ff;
+}
+
+#dropIcon {}
+
+
+/* ========== 🔹 КНОПКИ UPLOAD-МОДАЛКИ ACTION BUTTONS  ======== */
 
 .upload-actions {
   grid-column: 1 / -1;
@@ -226,31 +365,156 @@
   cursor: pointer;
 }
 
-#dropZone.dragging {
-  border-color: #4da3ff;
-  background: #f0f7ff;
-  color: #4da3ff;
+/* ======== 🔹 МОДАЛКА ПРЕДПРОСМОТРА (PREVIEW)L ========== */
+#previewModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* =================== отсутствуют в других файлах есть только тут  ========================= */
-
-/* #langSwitcher {
+#previewBox {
+  background: #fff;
+  width: 90%;
+  max-width: 330px;
+  max-height: 80vh;
+  padding: 16px;
   display: flex;
-  gap: 6px;
+  flex-direction: column;
+}
+
+#previewList {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #ccc;
   margin: 10px 0;
 }
 
-#langSwitcher button {
-  font-size: 18px;
+.preview-row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 12px;
+  padding: 6px 8px;
+  border-bottom: 1px solid #eee;
+  align-items: start;
+}
+
+.preview-row span {
+  /* white-space: nowrap;        длиные слова не ломаются, а заменяются точками */
+  overflow: hidden;
+  text-align: left;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.preview-actions {}
+
+.preview-translation-error {
+  background-color: #fe8a8aff;
+}
+
+.preview-term-error {
+  background-color: #f6dd92ff;
+}
+
+/* ==== 🔹 SELF CHECK MODAL — ТОЛЬКО ВЫБОР ФАЙЛОВ (ДО START) ==== */
+#selfCheckModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4000;
+}
+
+.self-check-box {
+  background: #fff;
+  width: 420px;
+  max-width: 95vw;
+  max-height: 80vh;
+
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+#selfCheckStats {}
+
+#selfCheckTree {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  margin: 10px 0;
+  padding: 8px;
+}
+
+/* ========================= SELF CHECK FILE SELECTION ========================= */
+.self-check-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.self-check-tree-item {
+    margin-left: 16px;
+}
+
+.self-check-folder {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* ============ для рисования дерева папок */
+.self-check-folder-header {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.self-check-toggle {
   cursor: pointer;
-  background: none;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 4px 6px;
-} */
+  width: 14px;
+  text-align: center;
+}
 
-/* ========================= GAME MODAL (mode chooser) ========================= */
+.self-check-children {
+  margin-left: 20px;
+  display: none;
+}
 
+.self-check-children.open {
+  display: block;
+}
+
+/* Для рисования дерева файлов */
+.self-check-file {
+  margin-left: 16px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+
+
+
+
+
+
+/* ========================
+         GAMES    
+=========================== */
+
+/* ======== 🔹 GAME MODAL (mode chooser) ============ */
 .game-modal {
   position: fixed;
   inset: 0;
@@ -263,6 +527,7 @@
   background: rgba(0, 0, 0, 0.45);
 }
 
+/* ===== WINDOW: выбор слов ===== */
 .game-window {
   background: #ffffff;
   display: flex;
@@ -279,6 +544,24 @@
   max-height: 90vh;
 }
 
+/* ===== WINDOW: игровой процесс ===== */
+.game-play-window {
+  padding: 20px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.answer-btn {
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 .game-modal-header {
   display: flex;
   justify-content: space-between;
@@ -290,10 +573,23 @@
   border: none;
   font-size: 20px;
   cursor: pointer;
+  color: red;
 }
 
-/* ========================= WORDS LIST (GRID VERSION) ========================= */
+.game-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 22px; 
+}
 
+.game-actions button {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* ============ 🔹 WORDS LIST (GRID VERSION) ============== */
 .words-list {
     display: flex;
     flex-direction: column;
@@ -331,6 +627,10 @@
     color: #000;
 }
 
+.word-row:last-child { 
+    border-bottom: none;
+}
+
 /* последнюю линию убираем */
 .word-row:last-child { 
     border-bottom: none;
@@ -346,155 +646,388 @@
   justify-content: center;      /* таблица в середине */
 }
 
-@media (max-width: 768px) {
-  .words-table td {
-    max-width: none;
-    padding: 6px 4px;
-    word-break: break-word;
-  }
+/* ========= 🔹 КНОПКА УДАЛИТЬ/ВЕРНУТЬ СЛОВО ============= */
+.word-disabled {
+    color: #999;
+    position: relative;
 }
 
-.game-actions {
+/* кнопка действия */
+.word-toggle-btn {
+    display: flex;    /* центрируем emoji */
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    font-size: 18px;
+    line-height: 1;    /* 🔑 фикс для emoji */
+    padding: 0;
+
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    background: transparent;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.word-toggle-btn:hover {
+    transform: scale(1.1);
+}
+
+/* удалить */
+.word-toggle-btn.delete {
+    color: #e53935;
+}
+
+.word-toggle-btn.delete:hover {
+    background: rgba(229, 57, 53, 0.15);
+}
+
+
+.word-toggle-btn.restore {
+    color: #1b5e20;              /* тёмный, читаемый */
+}
+
+.word-toggle-btn.restore:hover {
+    background: rgba(76, 175, 80, 0.4);
+} 
+
+/* ================== STRIKETHROUGH (GRID) ========================= */
+/* линия */
+.word-row::after {
+    content: '';
+    position: absolute;
+
+    left: 12px;          /* отступ слева (как у текста) */
+    right: 52px;         /* не заходим на кнопку */
+
+    top: 50%; /* позиция линии */
+    transform: translateY(-50%) scaleX(0);
+
+    height: 3px; /* толщина линии */
+    background: #e53935;
+
+    transform-origin: left;
+    transition: transform 0.4s ease; /* скорость анимации */
+    
+    pointer-events: none;
+    z-index: 1;
+
+    will-change: transform;
+}
+
+/* активируем линию */
+.word-row.word-disabled::after {
+    transform: translateY(-50%) scaleX(1);
+}
+
+/* приглушаем текст */
+.word-row.word-disabled .word-cell {
+    color: #999;
+}
+
+/* ============= 🔹 STUDY MODE (MODAL) =================== */
+.study-game {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 3000;
+
   display: flex;
-  gap: 12px;
+  align-items: center;
   justify-content: center;
 }
 
-.game-actions button {
-  padding: 10px 16px;
-  cursor: pointer;
-  font-size: 16px;
+.study-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 24px;
+  width: 320px;
+  max-width: 90vw;
+
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+
+  position: relative; /* важно для крестика */
 }
 
-/* ========================= GAME STUB ========================= */
+.study-term {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
 
-.game-stub {
+.study-translation {
+  font-size: 20px;
+  color: #555;
+}
+
+/* кнопки перелистывания */
+.study-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.study-controls button {
+  font-size: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+/* нижняя кнопка */
+.study-bottom {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;              /* ⬅️ отступ между кнопками */
+  justify-content: center;
+}
+
+.study-bottom button {
+  padding: 10px 16px;     /* ⬅️ крупнее */
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* крестик */
+.study-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  background: none;
+  border: none;
+  color: #d32f2f;
+
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.study-close-btn:hover {
+  color: #ff0000;
+}
+
+/* ============= 🔹 MEMORIZE MODE (MODAL) ================ */
+.memorize-game {
   position: fixed;
   inset: 0;
-  background: #f5f5f5;
-  z-index: 2100;
-  padding: 20px;
-}
-
-@media (max-width: 400px) {
-  .game-modal {
-    align-items: stretch;
-  }
-
-  .game-window {
-    width: 100%;
-    max-width: 100%;
-    height: 100%;
-    max-height: 100%;
-    border-radius: 0;
-  }
-
-  .words-table-wrapper {
-    flex: 1;
-  }
-
-  .game-actions {
-    flex-direction: column;
-  }
-}
-
-/* ===== Top panel ===== */
-.top-panel {
+  background: rgba(0,0,0,0.45);
   display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
-
-  padding: 12px 20px;
-  background: #1e1e1e;
-  color: #fff;
-
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  z-index: 3000;
 }
 
-.top-panel__left,
-.top-panel__center,
-.top-panel__right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.site-title {
-  cursor: pointer;
-  font-size: 18px;
-  margin: 0;
-}
-
-/* ===== Main content ===== */
-.main-content {
-  padding: 20px;
-}
-
-/* ===== Language dropdown ===== */
-.lang-select {
+.memorize-window {
+  background: #fff;
+  width: 320px;
+  min-height: 200px;
+  border-radius: 10px;
   position: relative;
 }
 
-.lang-dropdown {
+.memorize-close-btn {
   position: absolute;
-  right: 0;
-  top: 110%;
+  top: 10px;
+  right: 10px;
 
-  background: #2b2b2b;
-  border: 1px solid #444;
-  border-radius: 6px;
-
-  min-width: 120px;
-}
-
-.lang-dropdown button {
-  display: block;
-  width: 100%;
-  padding: 8px 12px;
-  background: none;
-  color: #fff;
+  background-color: transparent;
   border: none;
-  text-align: left;
+
+  color: red;
+  font-size: 20px;
   cursor: pointer;
 }
 
-.lang-dropdown button:hover {
-  background: #3a3a3a;
+/* Кнопка ⚙️ настройки MEMORIZE */
+.memorize-settings-btn {
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
 }
 
-#addWordsBtn {
-  padding: 6px 10px;
-  background: #2b2b2b;
-  color: #fff;
-  border: 1px solid #444;
-  border-radius: 6px;
-  cursor: pointer;
+.memorize-settings-panel {
+  position: absolute;
+  top: 40px;
+  right: 8px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+
+  z-index: 10;
+}
+
+.word_repetitions_setting {
+  margin-bottom: 6px;
+  text-align: center; 
+  /* font-weight: bold; */
+}
+
+.word_repetitions_setting_ok {
+  margin: 4px auto 0;
+  display: block;
+}
+
+.memorize-question {
+  text-align: center;
+  font-size: 24px;
+  margin: 20px 0;
+}  
+
+.memorize-answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.memorize-result {
+  margin-top: 25px;
+  margin-bottom: 5px;
+}
+
+.progress-wrapper {
+  width: 100%;
+  height: 10px;
+  background-color: #eee;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 6px;
+  margin-bottom: 15px;
+}
+
+.memorize-progress-bar {
+  height: 100%;
+  width: 0%;
+  background-color: #4CAF50;
+  transition: width 0.3s;
+}
+
+.memorize-progress-text {
+  margin-top: 40px;
   font-size: 14px;
+  color: #555;
+  text-align: center;
 }
 
-#addWordsBtn::before {
-  content: "➕ ";
+.memorize-repeat-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  justify-content: center; 
+}
+
+.memorize-settings-panel button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.memorize-settings-panel button.active {
+  background: #4CAF50;
+  color: white;
+}
+
+/* ======= 🔹 ОТДЕЛЬНЫЙ СТИЛЬ ДЛЯ ОКНА "ЧАСТЫЕ ОШИБКИ" ==== */
+.mistakes-list {
+    width: 100%;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    padding: 8px;
+    /* padding-left: 60px; */
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.save-mistakes-btn {
+  align-self: center;
+  margin-bottom: 8px; 
+  width: 260px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.memorize-game:not(.quick-check) .mistakes-list {
+    padding-left: 60px;
+}
+
+.memorize-game.quick-check .mistakes-list {
+    padding-left: 30px;
+}
+
+.mistakes-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* без кнопки справа */
+    gap: 10px;
+    padding: 6px 8px;
+    align-items: center;
+
+    /* width: 100%; */
+}
+
+.mistakes-cell {
+    text-align: center;
+    padding: 4px 8px;
+    min-width: 0;                 /* очень важно */
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 
+/*  ПОДСВЕТКА КОНКРЕТНОЙ ЯЧЕЙКИ С ОШИБКОЙ  */
+.mistakes-cell.has-mistake {
+    background: #ffd6d6;      
+    color: #8b0000;           
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-weight: 600;
+
+    animation: mistakeFadeIn 1s ease-out both;
+}
+
+@keyframes mistakeFadeIn {
+    from {
+        background-color: transparent;
+        color: inherit;
+        transform: scale(0.96);
+    }
+    to {
+        background-color: #ffd6d6;
+        color: #8b0000;
+        transform: scale(1);
+    }
+}
 
 
+/* 🔹 анимация для кнопки "Сохранено" [в частые ошибки] */
+.save-animate {
+  transition: background-color 0.9s ease, transform 0.1s ease;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.save-animate.success {
+  background-color: #47c04b !important;
+  color: #fff !important;
+  transform: scale(1.02);
+}
