@@ -286,7 +286,7 @@ function shuffleArray(arr) {
 function startMemorizingGame(pairs, uiTexts, fileData) {
     closeGame();
 
-    const DEBUG_MEMORIZE_FINISH = 0; // <-- включить дебаг
+    const DEBUG_MEMORIZE_FINISH = 1; // <-- включить дебаг
     // const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes'
     const DEBUG_MODE = 'frequent' 

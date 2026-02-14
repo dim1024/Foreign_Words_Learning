@@ -1161,13 +1161,14 @@
   cursor: pointer;
 }
 
-.memorize-game:not(.quick-check) .mistakes-list {
+/* Без этих двух стилей все нормально, а с 60рх вообще все едет */
+/* .memorize-game:not(.quick-check) .mistakes-list {
     padding-left: 60px;
-}
+} */
 
-.memorize-game.quick-check .mistakes-list {
+/* .memorize-game.quick-check .mistakes-list {
     padding-left: 30px;
-}
+} */
 
 .mistakes-row {
     display: grid;
