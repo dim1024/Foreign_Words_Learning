@@ -503,6 +503,198 @@
   display: none !important;
 }
 
+/* =========================
+   📱 MOBILE ADAPTIVE
+   ========================= */
+
+@media (max-width: 768px) {
+
+  /* ===== HEADER ===== */
+  .top-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    flex-wrap: nowrap;          /* ❗ шапка в одну строку */
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .top-panel__left,
+  .top-panel__right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: nowrap;          /* ❗ не переносим группы */
+    min-width: 0;
+  }
+
+  .top-panel button {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+
+  #selfCheckBtn::before,
+  #addWordsBtn::before {
+    margin-right: 4px;
+  }
+
+  #selfCheckBtn {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    z-index: 4000;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 16px;
+  }
+
+   /* ===== КНОПКА В ШАПКЕ (Add Words) ===== */
+  #addWordsBtn {
+    display: flex;   
+    align-items: center; 
+    justify-content: center;
+    white-space: normal;        /* разрешаем перенос */
+    line-height: 1.1;           /* компактные строки */
+    font-size: 12px;
+    padding: 6px 8px;
+
+    min-width: 90px;
+    max-width: 120px;           /* ограничиваем ширину */
+    text-align: center;
+    word-break: break-word;
+  }
+
+
+  /* ===== MAIN CONTENT ===== */
+  .main-content {
+    padding: 12px;
+    padding-bottom: 100px; /* чтобы список файлов не оказался под кнопкой Self Check */
+  }
+
+  .main-content button {
+    width: 100%;
+    justify-content: flex-start;
+    font-size: 15px;
+    padding: 10px 12px;
+  }
+
+  .file-row {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  /* Основная кнопка файла */
+  .file-row > button.file {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Кнопка удаления (корзина) */
+  .file-row > button:not(.file) {
+    flex: 0 0 42px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+
+  /* ===== UPLOAD MODAL ===== */
+  #uploadBox {
+    grid-template-columns: 1fr;   /* одна колонка */
+    gap: 16px;
+    padding: 16px;
+  }
+
+  #formatExamples {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .example-block {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .example-table {
+    width: 100%;
+  }
+
+  #downloadExamples {
+    flex-direction: column;
+  }
+
+  #dropZone {
+    height: 100px;
+    font-size: 24px;
+  }
+
+  .upload-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .upload-actions button {
+    width: 100%;
+  }
+
+  /* ===== PREVIEW MODAL ===== */
+  #previewBox {
+    width: 95%;
+    max-width: 95%;
+  }
+
+  .preview-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  /* ===== SELF CHECK MODAL ===== */
+  .self-check-box {
+    width: 95%;
+    max-height: 90vh;
+    padding: 12px;
+  }
+
+  #selfCheckTree {
+    font-size: 14px;
+  }
+
+  .self-check-actions {
+    flex-direction: column;
+  }
+
+  .self-check-actions button {
+    width: 100%;
+  }
+
+}
+
+@media (max-width: 360px) {
+
+  .top-panel {
+    align-items: stretch;
+  }
+
+  .top-panel__left,
+  .top-panel__right {
+    align-items: stretch;
+  }
+
+  .top-panel button {
+    white-space: normal;      /* разрешаем 2 строки */
+    line-height: 1.2;
+    padding: 8px 6px;         /* чуть выше кнопки */
+    text-align: center;
+  }
+
+  /* addWordsBtn можно оставить как есть */
+}
+
 
 
 

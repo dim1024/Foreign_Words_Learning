@@ -13,8 +13,8 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     closeGame();
 
     const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
-    const DEBUG_MODE = 'none'
-    // const DEBUG_MODE = 'mistakes' 
+    // const DEBUG_MODE = 'none'
+    const DEBUG_MODE = 'mistakes' 
     // const DEBUG_MODE = 'all_mistakes';
 
     gameContainer = document.createElement('div');
