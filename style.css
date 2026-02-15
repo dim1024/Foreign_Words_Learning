@@ -479,6 +479,24 @@
   gap: 2px;
 }
 
+.self-check-folder-header input[type="checkbox"],
+.self-check-file input[type="checkbox"] {
+  margin: 6px;
+  transform: translateY(1px); /* микрокоррекция */
+}
+
+.self-check-folder-header,
+.self-check-file {
+  display: flex;
+  align-items: center; /* важно */
+  
+}
+
+.self-check-folder-header:active,
+.self-check-file:active {
+  background: #f2f2f2;
+}
+
 .self-check-toggle {
   cursor: pointer;
   width: 14px;
@@ -654,22 +672,116 @@
   }
 
   /* ===== SELF CHECK MODAL ===== */
+
+  #selfCheckModal {
+    padding: 24px;
+    backdrop-filter: blur(2px);
+    background: rgba(0, 0, 0, 0.55);
+    align-items: flex-end; /* модалка снизу */
+  }
+
+  #selfCheckStats {
+    font-size: 14px;
+    padding: 6px 0;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 2;
+  }
+  
   .self-check-box {
-    width: 95%;
-    max-height: 90vh;
-    padding: 12px;
+    width: 100%;
+    max-width: 100%;
+    height: 80vh;   /* почти весь экран */
+    max-height: 80vh;
+
+    background: #ffffff;
+    border-radius: 18px;
+
+    border: 1px solid rgba(0, 0, 0, 0.06);
+
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.25),
+      0 8px 20px rgba(0, 0, 0, 0.12);
+
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    animation: slideUp 0.45s ease-out;
   }
 
   #selfCheckTree {
     font-size: 14px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    background: #fafafa;
+    padding: 10px;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+
+  @keyframes modalAppear {
+    from {
+      transform: translateY(12px) scale(0.98);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  .self-check-children {
+    margin-left: 16px;
+  }
+
+  .self-check-tree-item {
+    margin-left: 0;
+  }
+
+  .self-check-folder-header,
+  .self-check-file {
+    display: flex;
+    align-items: center;
+    padding: 10px;   /* больше высота */
+  }
+
+  /* Резервируем место под toggle даже если его нет, чтобы выровнять файлы с папками */
+  .self-check-file::before {
+    content: "";
+    width: 8px; /* ширина toggle */
+    flex-shrink: 0;
+  }
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+  }
+
+  .self-check-toggle {
+    width: 22px;
+    font-size: 18px;
   }
 
   .self-check-actions {
-    flex-direction: column;
+    flex-direction: row;
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding-top: 10px;
+    gap: 8px;
   }
 
   .self-check-actions button {
     width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 12px;
   }
 
 }
