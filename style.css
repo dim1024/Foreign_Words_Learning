@@ -675,7 +675,7 @@
 
   #selfCheckModal {
     padding: 24px;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(4px);
     background: rgba(0, 0, 0, 0.55);
     align-items: flex-end; /* модалка снизу */
   }
@@ -899,7 +899,7 @@
     flex-direction: column;
     gap: 6px;
     width: 100%;
-    overflow-y: auto;      /* скролл для длинного списка */
+    /* overflow-y: auto;      скролл для длинного списка */
     /* margin: 12px 0; */
     border: 1px solid #ddd;
     box-sizing: border-box;
@@ -1335,4 +1335,56 @@
   background-color: #47c04b !important;
   color: #fff !important;
   transform: scale(1.02);
+}
+
+@media (max-width: 768px) {
+
+  .game-modal {
+    align-items: flex-end;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .game-window {
+    width: 100%;
+    max-width: 100%;
+    height: 85vh;
+    max-height: 85vh;
+
+    border-radius: 20px 20px 0 0;
+    padding: 18px;
+
+    animation: slideUpGame 0.35s ease-out;
+  }
+
+  @keyframes slideUpGame {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+
+    .game-actions {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .game-actions .answer-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+
+  .game-modal-header h3 {
+    font-size: 16px;
+    flex: 1;
+    margin-right: 10px;
+  }
+
+  .game-close-btn {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+  }
 }
