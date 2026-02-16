@@ -13,8 +13,8 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     closeGame();
 
     const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
-    // const DEBUG_MODE = 'none'
-    const DEBUG_MODE = 'mistakes' 
+    const DEBUG_MODE = 'none'
+    // const DEBUG_MODE = 'mistakes' 
     // const DEBUG_MODE = 'all_mistakes';
 
     gameContainer = document.createElement('div');
@@ -668,6 +668,7 @@ function launchFireworks2() {
     const ROCKET_COUNT = 5;
     const ROCKET_INTERVAL = 450;
     const ROCKET_SPEED = -18;
+    const FLIGHT_TIME = 1200
 
     const EXPLOSION_PARTS = 130;
     const EXPLOSION_LIFE = 120;
@@ -759,11 +760,23 @@ function launchFireworks2() {
 
     Particle.prototype.draw = function () {
         ctx.globalAlpha = this.alpha;
+
+        // включаем blur только пока частица яркая для экономии рендера
+        if (this.life > FADE_TIME) {
+            ctx.shadowBlur = 25;
+            ctx.shadowColor = this.color;
+        } else {
+            ctx.shadowBlur = 0;
+        }
+
         ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
+
+        ctx.shadowBlur = 0;
     };
+
 
     function getParticle() {
         return particlePool.pop() || new Particle();
@@ -801,13 +814,14 @@ function launchFireworks2() {
     }; // ✨ === FLASH === end ✨
 
 
-    function explode(x, y) {
-        flashes.push(new Flash(x, y)); // 💥 ДОБАВЛЕНО
+    function explode(x, y, isSecondary = false) {
+        // 25% частиц взрывается чуть чуть позже
+        const parts = isSecondary ? 25 : EXPLOSION_PARTS;
 
-        for (let i = 0; i < EXPLOSION_PARTS; i++) {
+        for (let i = 0; i < parts; i++) {
             const p = getParticle();
             const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 5 + 2;
+            const speed = Math.random() * (isSecondary ? 3 : 5) + 2;
 
             p.reset(
                 x,
@@ -816,33 +830,79 @@ function launchFireworks2() {
                 Math.sin(angle) * speed,
                 COLORS[Math.random() * COLORS.length | 0]
             );
+            // эти строки чтобы размер был разный, но и так там выше размер через рандом задается
+            // const depth = Math.random();
 
+            // p.reset(
+            //     x,
+            //     y,
+            //     Math.cos(angle) * speed * (0.6 + depth),
+            //     Math.sin(angle) * speed * (0.6 + depth),
+            //     COLORS[Math.random() * COLORS.length | 0]
+            // );
+
+            // p.size *= (0.8 + depth/2);
+
+            p.isSecondary = false;
             particles.push(p);
+        }
+
+        // вторичный взрыв
+        if (!isSecondary) {
+            setTimeout(() => {
+                explode(x, y, true);
+            }, 120);
         }
     }
 
     // === Rocket ===
     function Rocket(x) {
         this.x = x;
-        this.y = H;
-        this.vy = ROCKET_SPEED;
-        this.exploded = false;
-
+        this.startY = H;
         // 🎯 цель взрыва: 20% – 40% высоты экрана
         this.targetY = H * (0.20 + Math.random() * 0.20);
+        this.y = this.startY;
+
+        this.duration = FLIGHT_TIME; // время полета в мс
+        this.startTime = performance.now();
+
+        this.exploded = false;
     }
 
-    Rocket.prototype.update = function () {
-        this.y += this.vy;
-        this.vy += 0.2;
+    Rocket.prototype.update = function (now) {
+        const progress = (now - this.startTime) / this.duration;
 
-        ctx.fillStyle = '#b1eaf7';
-        ctx.fillRect(this.x - 1, this.y, 2, 10);
-
-        if (this.y <= this.targetY && !this.exploded) {
+        if (progress >= 1 && !this.exploded) {
+            this.y = this.targetY;
             this.exploded = true;
             explode(this.x, this.y);
+            return;
         }
+
+        // линейное движение
+        // this.y = this.startY + (this.targetY - this.startY) * progress;
+        // Легкое зависание перед взрывом
+        const eased = 1 - Math.pow(1 - progress, 3);
+        this.y = this.startY + (this.targetY - this.startY) * eased;
+
+        // 🔥 ДЫМ от ракеты
+        if (Math.random() < 0.6) {
+            const p = getParticle();
+            p.reset(
+                this.x,
+                this.y,
+                (Math.random() - 0.5) * 0.5,
+                Math.random() * 0.5,
+                'rgba(200,200,200,0.4)'
+            );
+            p.life = 30;
+            p.size = 3;
+            particles.push(p);
+        }
+
+        // рисуем ракету
+        ctx.fillStyle = '#b1eaf7';
+        ctx.fillRect(this.x - 1, this.y, 2, 10);
     };
 
     // === ZONES ===
@@ -897,7 +957,7 @@ function launchFireworks2() {
         }
 
         for (let i = rockets.length - 1; i >= 0; i--) {
-            rockets[i].update();
+            rockets[i].update(now);
             if (rockets[i].exploded) {
                 rockets.splice(i, 1);
             }
