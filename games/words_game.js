@@ -178,7 +178,7 @@ function startStudyGame(pairs, uiTexts, fileData) {
 
     // красный крестик закрытия (внутри окна)
     const closeBtn = document.createElement('button');
-    closeBtn.className = 'study-close-btn';
+    closeBtn.className = 'memorize-close-btn';
     closeBtn.textContent = '✖';
     closeBtn.onclick = closeGame;
 

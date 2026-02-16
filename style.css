@@ -1111,10 +1111,6 @@
   cursor: pointer;
 }
 
-.study-close-btn:hover {
-  color: #ff0000;
-}
-
 /* ============= 🔹 MEMORIZE MODE (MODAL) ================ */
 .memorize-game {
   position: fixed;
@@ -1339,6 +1335,8 @@
 
 @media (max-width: 768px) {
 
+  /* ===== MOBILE ПРЕВЬЮ ЗАПУСКА ИГР ====== */
+
   .game-modal {
     align-items: flex-end;
     background: rgba(0,0,0,0.55);
@@ -1355,7 +1353,7 @@
     border-radius: 20px 20px 0 0;
     padding: 18px;
 
-    animation: slideUpGame 0.35s ease-out;
+    animation: slideUpGame 0.45s ease-out;
   }
 
   @keyframes slideUpGame {
@@ -1387,4 +1385,94 @@
     width: 40px;
     height: 40px;
   }
+
+  /* ===== MOBILE РЕЖИМ STUDY ====== */
+
+  .study-game {
+    align-items: flex-end;
+    background: rgba(0,0,0,0.55);
+
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .study-card {
+    width: 100%;
+    max-width: 100%;
+
+    height: 85vh;
+    max-height: 85vh;
+
+    border-radius: 20px 20px 0 0;
+    padding: 18px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+
+    animation: slideUpGame 0.45s ease-out;
+  }
+
+  @keyframes studySlideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+
+  /* слово */
+  .study-term {
+    font-size: 28px;
+    margin-top: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: auto;
+  }
+
+  /* перевод */
+  .study-translation {
+    font-size: 22px;
+    margin-bottom: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: auto;
+  }
+
+  /* стрелки */
+  .study-controls {
+    margin-top: auto;
+    margin-bottom: 10px;
+  }
+
+  .study-controls button {
+    font-size: 26px;
+    padding: 14px 22px;
+    border-radius: 14px;
+  }
+
+  /* нижние кнопки */
+  .study-bottom {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .study-bottom button {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    border-radius: 14px;
+  }
+
+  /* крестик */
+  .memorize-close-btn {
+    font-size: 26px;
+    top: 16px;
+    right: 16px;
+  }
+
+
+
+
+
+
 }
