@@ -1,5 +1,3 @@
-console.log('MEMORIZE.JS LOADED');
-
 let gameContainer = null;
 
 function closeGame() { //Закрытие любого игрового окна
@@ -286,7 +284,7 @@ function shuffleArray(arr) {
 function startMemorizingGame(pairs, uiTexts, fileData) {
     closeGame();
 
-    const DEBUG_MEMORIZE_FINISH = 1; // <-- включить дебаг
+    const DEBUG_MEMORIZE_FINISH = 0; // <-- включить дебаг
     // const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes'
     const DEBUG_MODE = 'frequent' 
@@ -862,9 +860,9 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
     closeGame();
 
     const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
-    // const DEBUG_MODE = 'none'
+    const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes' 
-    const DEBUG_MODE = 'all_mistakes';
+    // const DEBUG_MODE = 'all_mistakes';
 
     gameContainer = document.createElement('div');
     gameContainer.className = 'memorize-game';

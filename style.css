@@ -1243,14 +1243,17 @@
 /* ======= 🔹 ОТДЕЛЬНЫЙ СТИЛЬ ДЛЯ ОКНА "ЧАСТЫЕ ОШИБКИ" ==== */
 .mistakes-list {
     width: 100%;
-    margin-top: 12px;
-    margin-bottom: 12px;
+    /* margin-top: 12px;
+    margin-bottom: 12px;  раньше так было потом стало нижняя строка*/
+    margin: 12px 0;
     padding: 8px;
     /* padding-left: 60px; */
     box-sizing: border-box;
     border: 1px solid #ddd;
-    max-height: 200px;
-    overflow-y: auto;
+
+    flex: 1;              /* 🔥 занимает всё свободное место */
+    overflow-y: auto;     /* скролл только если реально не влезает */
+    min-height: 0;        /* КРИТИЧЕСКИ важно для flex */
 }
 
 .save-mistakes-btn {
@@ -1381,9 +1384,11 @@
   }
 
   .game-close-btn {
-    font-size: 24px;
-    width: 40px;
-    height: 40px;
+    font-size: 26px;
+    top: 18px;
+    right: 18px;
+    width: 44px;
+    height: 44px;
   }
 
   /* ===== MOBILE РЕЖИМ STUDY ====== */
@@ -1466,13 +1471,101 @@
   /* крестик */
   .memorize-close-btn {
     font-size: 26px;
-    top: 16px;
-    right: 16px;
+    top: 18px;
+    right: 18px;
+    width: 44px;
+    height: 44px;
   }
 
 
+  /* 🔹 QUICK CHECK модалка */ 
+  .memorize-game {
+    align-items: flex-end;
+    background: rgba(0,0,0,0.55);
 
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
 
+  .game-play-window {
+    width: 100%;
+    max-width: 100%;
+
+    height: 90vh;
+    max-height: 90vh;
+
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+
+    animation: slideUpGame 0.4s ease-out;
+
+    display: flex;
+    flex-direction: column;
+  }
+
+  .memorize-question {
+    font-size: 26px;
+    margin-top: 40px;
+    margin-bottom: 30px;
+    padding: 0 10px;
+
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .memorize-answers {
+    grid-template-columns: 1fr;  /* 🔥 одна колонка */
+    gap: 14px;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .answer-btn {
+    padding: 18px;
+    font-size: 17px;
+    border-radius: 14px;
+  }
+
+  .memorize-progress-text {
+    margin-top: 10px;
+    font-size: 15px;
+  }
+
+  .progress-wrapper {
+    height: 12px;
+    border-radius: 8px;
+  }
+
+  /* QUICK CHECK finish window */
+
+  .mistakes-list {
+    max-height: 35vh;
+    font-size: 15px;
+  }
+
+  .mistakes-row {
+    /* grid-template-columns: 1fr; */
+    gap: 4px;
+    text-align: center;
+  }
+
+  .mistakes-cell {
+    text-align: center;
+    padding: 6px 10px;
+    min-width: 0;
+
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .game-actions {
+    margin-top: 14px;
+  }
+
+  .game-actions .answer-btn {
+    width: 100%;
+  }
+  
 
 
 }
