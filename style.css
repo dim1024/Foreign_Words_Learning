@@ -814,6 +814,21 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* ========================
          GAMES    
 =========================== */
@@ -1521,7 +1536,6 @@
     grid-template-columns: 1fr;  /* 🔥 одна колонка */
     gap: 14px;
     margin-top: auto;
-    margin-bottom: auto;
   }
 
   .answer-btn {
@@ -1531,13 +1545,15 @@
   }
 
   .memorize-progress-text {
-    margin-top: 10px;
+    margin-top: 50px;
     font-size: 15px;
   }
 
   .progress-wrapper {
     height: 12px;
     border-radius: 8px;
+    margin-top: 10px;
+    margin-bottom: 20px;
   }
 
   /* QUICK CHECK finish window */
