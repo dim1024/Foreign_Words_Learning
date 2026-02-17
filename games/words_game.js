@@ -543,7 +543,10 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             correctAnswer = p.term;
             key = `${p.translation}|translation`;
         }
+        questionEl.classList.remove('question-transition');
+        void questionEl.offsetWidth; // перезапуск анимации
         questionEl.textContent = question;
+        questionEl.classList.add('question-transition');
 
         // 3 варианта + "не знаю"
         let options = [correctAnswer];
@@ -579,6 +582,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
     function handleAnswer(button, correct, key, correctAnswer, isDontKnow) {
         if (correct) {
             button.style.backgroundColor = '#8BC34A';
+            button.classList.add('correct-pop'); // правильный ответ подпрыгивает
             memorizeProgress[key] = Math.min(REQUIRED_CORRECT_ANSWERS_PER_ITEM, memorizeProgress[key] + 1);
             updateProgressBar();
         } else if (!isDontKnow) {
@@ -859,10 +863,10 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
 function startQuickCheckGame(pairs, uiTexts, fileData) {
     closeGame();
 
-    const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
-    const DEBUG_MODE = 'none'
+    const DEBUG_QUICK_CHECK_FINISH = 0; // <-- включить дебаг
+    // const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes' 
-    // const DEBUG_MODE = 'all_mistakes';
+    const DEBUG_MODE = 'all_mistakes';
 
     gameContainer = document.createElement('div');
     gameContainer.className = 'memorize-game';
@@ -990,7 +994,11 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
             key = `${p.translation}|translation`;
         }
 
+        questionEl.classList.remove('question-transition');
+        void questionEl.offsetWidth; // перезапуск анимации
         questionEl.textContent = question;
+        questionEl.classList.add('question-transition');
+
 
         let options = [correctAnswer];
 
@@ -1030,6 +1038,7 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
     function handleAnswer(button, correct, key, correctAnswer, isDontKnow) {
         if (correct) {
             button.style.backgroundColor = '#8BC34A';
+            button.classList.add('correct-pop'); // правильный ответ подпрыгивает
         } else if (!isDontKnow) {
             button.style.backgroundColor = '#F44336';
         }

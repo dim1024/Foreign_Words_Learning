@@ -879,6 +879,25 @@
   padding: 10px;
   border-radius: 6px;
   cursor: pointer;
+
+    transition: 
+    transform 0.08s ease,
+    box-shadow 0.12s ease,
+    background-color 0.2s ease;
+}
+
+.answer-btn:active {
+  transform: scale(0.97);
+}
+
+.answer-btn.correct-pop {
+  animation: correctPop 0.5s ease;
+}
+
+@keyframes correctPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 .game-modal-header {
@@ -1209,6 +1228,23 @@
   gap: 10px;
 }
 
+/* плавная смена вопроса */
+.question-transition {
+  animation: questionFade 0.45s ease;
+}
+
+@keyframes questionFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
 .memorize-result {
   margin-top: 25px;
   margin-bottom: 5px;
@@ -1228,7 +1264,7 @@
   height: 100%;
   width: 0%;
   background-color: #4CAF50;
-  transition: width 0.3s;
+  transition: width 0.6s;
 }
 
 .memorize-progress-text {
@@ -1287,15 +1323,6 @@
   white-space: nowrap;
   cursor: pointer;
 }
-
-/* Без этих двух стилей все нормально, а с 60рх вообще все едет */
-/* .memorize-game:not(.quick-check) .mistakes-list {
-    padding-left: 60px;
-} */
-
-/* .memorize-game.quick-check .mistakes-list {
-    padding-left: 30px;
-} */
 
 .mistakes-row {
     display: grid;

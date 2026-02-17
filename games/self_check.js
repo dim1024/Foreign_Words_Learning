@@ -12,7 +12,7 @@ function shuffleArray(arr) {
 window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     closeGame();
 
-    const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
+    const DEBUG_QUICK_CHECK_FINISH = 0; // <-- включить дебаг
     const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes' 
     // const DEBUG_MODE = 'all_mistakes';
@@ -141,7 +141,10 @@ window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
             key = `${p.translation}|translation`;
         }
 
+        questionEl.classList.remove('question-transition');
+        void questionEl.offsetWidth; // перезапуск анимации
         questionEl.textContent = question;
+        questionEl.classList.add('question-transition');
 
         let options = [correctAnswer];
 
