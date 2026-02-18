@@ -270,9 +270,11 @@ currentLangBtn.addEventListener('click', () => {
  ***********************/
 async function loadFileTree() {
     try {
-        // cache-busting (пока захардкожен)
-        const commitHash = 'dev';
-        const response = await fetch(`files.json?v=${commitHash}`);
+        // cache-busting по времени загрузки страницы по дате
+        const version = Date.now();
+        const response = await fetch(`files.json?v=${version}`, {
+            cache: 'no-store'
+        });
         return await response.json();
     } catch (err) {
         console.error('Ошибка загрузки files.json', err);
