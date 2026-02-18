@@ -6,6 +6,10 @@ START_DIR = "data"  # имя стартовой папки
 def scan_folder(folder):
     items = []
     for entry in os.listdir(folder):
+        # пропускаем скрытые файлы и папки
+        if entry.startswith('.'):
+            continue
+
         path = os.path.join(folder, entry)
         if os.path.isdir(path):
             items.append({
@@ -16,8 +20,9 @@ def scan_folder(folder):
         else:
             # фильтруем только нужные файлы
             if entry.endswith((".txt", ".csv", ".xlsx")):
+                name_without_ext = os.path.splitext(entry)[0]
                 items.append({
-                    "name": entry,
+                    "name": name_without_ext,
                     "type": "file",
                     "path": os.path.relpath(path, START_DIR)
                 })
