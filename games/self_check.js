@@ -12,7 +12,7 @@ function shuffleArray(arr) {
 window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     closeGame();
 
-    const DEBUG_QUICK_CHECK_FINISH = 0; // <-- включить дебаг
+    const DEBUG_QUICK_CHECK_FINISH = 1; // <-- включить дебаг
     const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes' 
     // const DEBUG_MODE = 'all_mistakes';
@@ -684,10 +684,8 @@ function launchFireworks2() {
     const backgroundOpacity = 0.7;
     const fadeDuration = 900;
 
-    // === FLASH SETTINGS ===
-    const FLASH_RADIUS = 600;      // максимальный радиус
-    const FLASH_LIFE = 10;         // время жизни (кадры)
-    const FLASH_ALPHA = 0.65;      // максимальная яркость
+    const FLASH_MAX_OPACITY = 0.35; // яркость
+    const FLASH_LIFE = 30;          // длительность (кадры)
 
 
     // === Создаем затемняющий слой ===
@@ -701,6 +699,18 @@ function launchFireworks2() {
         transition: background-color ${fadeDuration}ms linear;
     `;
     document.body.appendChild(overlay);
+
+    // ⚡ Вспышка всего экрана (ЛЁГКАЯ)
+    const flash = document.createElement('div');
+    flash.style.cssText = `
+        position: fixed;
+        inset: 0;
+        background-color: white;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 9999;
+    `;
+    document.body.appendChild(flash);
 
     // === Канвас для салюта ===
     const canvas = document.createElement('canvas');
@@ -725,10 +735,10 @@ function launchFireworks2() {
     const rockets = [];
     const particles = [];
     const particlePool = [];
-    const flashes = []; // 💥 ДОБАВЛЕНО
 
     let rocketsLaunched = 0;
     let lastLaunchTime = performance.now();
+    let flashLife = 0;
 
     // === Начинаем плавное затемнение ===
     requestAnimationFrame(() => {
@@ -762,62 +772,29 @@ function launchFireworks2() {
     };
 
     Particle.prototype.draw = function () {
-        ctx.globalAlpha = this.alpha;
-
-        // включаем blur только пока частица яркая для экономии рендера
-        if (this.life > FADE_TIME) {
-            ctx.shadowBlur = 25;
-            ctx.shadowColor = this.color;
-        } else {
-            ctx.shadowBlur = 0;
-        }
-
+        ctx.globalAlpha = this.alpha * 0.2; 
+        // 🔆 Лёгкое свечение (большой полупрозрачный круг)
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, this.size * 1.7, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.shadowBlur = 0;
+        // 🎯 Основная яркая частица
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 0.85, 0, Math.PI * 2);
+        ctx.fill();
     };
-
 
     function getParticle() {
         return particlePool.pop() || new Particle();
     }
 
-    
-    // ✨ === FLASH === begin ✨
-    function Flash(x, y) {
-        this.x = x;
-        this.y = y;
-        this.life = FLASH_LIFE;
-    }
-
-    Flash.prototype.update = function () {
-        this.life--;
-    };
-
-    Flash.prototype.draw = function () {
-        const t = this.life / FLASH_LIFE;
-        const radius = FLASH_RADIUS;
-        const alpha = FLASH_ALPHA * t;
-
-        const g = ctx.createRadialGradient(
-            this.x, this.y, 0,
-            this.x, this.y, radius
-        );
-
-        g.addColorStop(0, `rgba(255,255,255,${alpha})`);
-        g.addColorStop(1, 'rgba(255,255,255,0)');
-
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
-        ctx.fill();
-    }; // ✨ === FLASH === end ✨
-
-
     function explode(x, y, isSecondary = false) {
+        // ⚡ ВСПЫШКА В МОМЕНТ ВЗРЫВА
+        flashLife = FLASH_LIFE;
+        flash.style.opacity = FLASH_MAX_OPACITY;
+
         // 25% частиц взрывается чуть чуть позже
         const parts = isSecondary ? 25 : EXPLOSION_PARTS;
 
@@ -889,7 +866,7 @@ function launchFireworks2() {
         this.y = this.startY + (this.targetY - this.startY) * eased;
 
         // 🔥 ДЫМ от ракеты
-        if (Math.random() < 0.6) {
+        if (Math.random() < 0.6) { // вероятность появления дыма
             const p = getParticle();
             p.reset(
                 this.x,
@@ -898,8 +875,8 @@ function launchFireworks2() {
                 Math.random() * 0.5,
                 'rgba(200,200,200,0.4)'
             );
-            p.life = 30;
-            p.size = 3;
+            p.life = 22;
+            p.size = 2;
             particles.push(p);
         }
 
@@ -946,14 +923,6 @@ function launchFireworks2() {
     function animate(now) {
         ctx.clearRect(0, 0, W, H);
 
-        // ✨ === FLASHES (ПОД ФЕЙЕРВЕРКОМ) === ✨
-        for (let i = flashes.length - 1; i >= 0; i--) {
-            const f = flashes[i];
-            f.update();
-            f.draw();
-            if (f.life <= 0) flashes.splice(i, 1);
-        }
-
         if (rocketsLaunched < ROCKET_COUNT && now - lastLaunchTime > ROCKET_INTERVAL) {
             launchRocket();
             lastLaunchTime = now;
@@ -978,6 +947,13 @@ function launchFireworks2() {
             }
         }
 
+        // ⚡ Плавное угасание вспышки
+        if (flashLife > 0) {
+            flashLife--;
+            const t = flashLife / FLASH_LIFE;
+            flash.style.opacity = FLASH_MAX_OPACITY * t;
+        }
+
         ctx.globalAlpha = 1;
 
         if (rockets.length || particles.length || rocketsLaunched < ROCKET_COUNT) {
@@ -988,9 +964,339 @@ function launchFireworks2() {
             setTimeout(() => {
                 canvas.remove();
                 overlay.remove();
+                flash.remove();
             }, fadeDuration);
         }
     }
 
     requestAnimationFrame(animate);
 }
+
+// function launchFireworks3() { // круглые вспышки
+//     // === НАСТРОЙКИ ===
+//     const ROCKET_COUNT = 5;
+//     const ROCKET_INTERVAL = 450;
+//     const ROCKET_SPEED = -18;
+//     const FLIGHT_TIME = 1200
+
+//     const EXPLOSION_PARTS = 130;
+//     const EXPLOSION_LIFE = 120;
+//     const FADE_TIME = 45;
+
+//     const COLORS = ['#fe3b3b','#f89b29','#fcde38','#3ffc3f','#41cfff','#2b94fc','#fa5baa','#c643ff'];
+//     // const COLORS = ['#FF0000','#FF8C00','#FFD700','#00FF00','#00BFFF','#1E90FF','#FF69B4','#9400D3'];
+//     // const COLORS = ['#fe3b3b','#f4a340','#f2dc5c','#6afa6a','#60d5fc','#2b94fc','#f684bd','#c659f4'];
+
+//     const backgroundOpacity = 0.7;
+//     const fadeDuration = 900;
+
+//     // === FLASH SETTINGS ===
+//     const FLASH_RADIUS = 600;      // максимальный радиус
+//     const FLASH_LIFE = 10;         // время жизни (кадры)
+//     const FLASH_ALPHA = 0.65;      // максимальная яркость
+
+
+//     // === Создаем затемняющий слой ===
+//     const overlay = document.createElement('div');
+//     overlay.style.cssText = `
+//         position: fixed;
+//         inset: 0;
+//         background-color: rgba(0,0,0,0);
+//         pointer-events: none;
+//         z-index: 9998;
+//         transition: background-color ${fadeDuration}ms linear;
+//     `;
+//     document.body.appendChild(overlay);
+
+//     // === Канвас для салюта ===
+//     const canvas = document.createElement('canvas');
+//     canvas.style.cssText = `
+//         position: fixed;
+//         inset: 0;
+//         pointer-events: none;
+//         z-index: 9999;
+//     `;
+//     document.body.appendChild(canvas);
+
+//     const ctx = canvas.getContext('2d');
+
+//     const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+//     const W = canvas.width = window.innerWidth * DPR;
+//     const H = canvas.height = window.innerHeight * DPR;
+//     canvas.style.width = window.innerWidth + 'px';
+//     canvas.style.height = window.innerHeight + 'px';
+//     ctx.scale(DPR, DPR);
+
+//     // === Pools ===
+//     const rockets = [];
+//     const particles = [];
+//     const particlePool = [];
+//     const flashes = []; // 💥 ДОБАВЛЕНО
+
+//     let rocketsLaunched = 0;
+//     let lastLaunchTime = performance.now();
+
+//     // === Начинаем плавное затемнение ===
+//     requestAnimationFrame(() => {
+//         overlay.style.backgroundColor = `rgba(0,0,0,${backgroundOpacity})`;
+//     });
+
+//     // === Particle ===
+//     function Particle() {}
+
+//     Particle.prototype.reset = function (x, y, vx, vy, color) {
+//         this.x = x;
+//         this.y = y;
+//         this.vx = vx;
+//         this.vy = vy;
+//         this.life = EXPLOSION_LIFE;
+//         this.alpha = 1;
+//         this.size = Math.random() * 2.5 + 2;
+//         this.color = color;
+//     };
+
+//     Particle.prototype.update = function () {
+//         this.x += this.vx;
+//         this.y += this.vy;
+//         this.vy += 0.05;
+
+//         if (this.life <= FADE_TIME) {
+//             this.alpha = this.life / FADE_TIME; // плавное уменьшение прозрачности
+//         }
+
+//         this.life--;
+//     };
+
+//     Particle.prototype.draw = function () {
+//         ctx.globalAlpha = this.alpha;
+
+//         // включаем blur только пока частица яркая для экономии рендера
+//         if (this.life > FADE_TIME) {
+//             ctx.shadowBlur = 25;
+//             ctx.shadowColor = this.color;
+//         } else {
+//             ctx.shadowBlur = 0;
+//         }
+
+//         ctx.fillStyle = this.color;
+//         ctx.beginPath();
+//         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+//         ctx.fill();
+
+//         ctx.shadowBlur = 0;
+//     };
+
+
+//     function getParticle() {
+//         return particlePool.pop() || new Particle();
+//     }
+
+    
+//     // ✨ === FLASH === begin ✨
+//     function Flash(x, y) {
+//         this.x = x;
+//         this.y = y;
+//         this.life = FLASH_LIFE;
+//     }
+
+//     Flash.prototype.update = function () {
+//         this.life--;
+//     };
+
+//     Flash.prototype.draw = function () {
+//         const t = this.life / FLASH_LIFE;
+//         const radius = FLASH_RADIUS;
+//         const alpha = FLASH_ALPHA * t;
+
+//         const g = ctx.createRadialGradient(
+//             this.x, this.y, 0,
+//             this.x, this.y, radius
+//         );
+
+//         g.addColorStop(0, `rgba(255,255,255,${alpha})`);
+//         g.addColorStop(1, 'rgba(255,255,255,0)');
+
+//         ctx.fillStyle = g;
+//         ctx.beginPath();
+//         ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
+//         ctx.fill();
+//     }; // ✨ === FLASH === end ✨
+
+
+//     function explode(x, y, isSecondary = false) {
+//         // 25% частиц взрывается чуть чуть позже
+//         const parts = isSecondary ? 25 : EXPLOSION_PARTS;
+
+//         for (let i = 0; i < parts; i++) {
+//             const p = getParticle();
+//             const angle = Math.random() * Math.PI * 2;
+//             const speed = Math.random() * (isSecondary ? 3 : 5) + 2;
+
+//             p.reset(
+//                 x,
+//                 y,
+//                 Math.cos(angle) * speed,
+//                 Math.sin(angle) * speed,
+//                 COLORS[Math.random() * COLORS.length | 0]
+//             );
+//             // эти строки чтобы размер был разный, но и так там выше размер через рандом задается
+//             // const depth = Math.random();
+
+//             // p.reset(
+//             //     x,
+//             //     y,
+//             //     Math.cos(angle) * speed * (0.6 + depth),
+//             //     Math.sin(angle) * speed * (0.6 + depth),
+//             //     COLORS[Math.random() * COLORS.length | 0]
+//             // );
+
+//             // p.size *= (0.8 + depth/2);
+
+//             p.isSecondary = false;
+//             particles.push(p);
+//         }
+
+//         // вторичный взрыв
+//         if (!isSecondary) {
+//             setTimeout(() => {
+//                 explode(x, y, true);
+//             }, 120);
+//         }
+//     }
+
+//     // === Rocket ===
+//     function Rocket(x) {
+//         this.x = x;
+//         this.startY = H;
+//         // 🎯 цель взрыва: 20% – 40% высоты экрана
+//         this.targetY = H * (0.20 + Math.random() * 0.20);
+//         this.y = this.startY;
+
+//         this.duration = FLIGHT_TIME; // время полета в мс
+//         this.startTime = performance.now();
+
+//         this.exploded = false;
+//     }
+
+//     Rocket.prototype.update = function (now) {
+//         const progress = (now - this.startTime) / this.duration;
+
+//         if (progress >= 1 && !this.exploded) {
+//             this.y = this.targetY;
+//             this.exploded = true;
+//             explode(this.x, this.y);
+//             return;
+//         }
+
+//         // линейное движение
+//         // this.y = this.startY + (this.targetY - this.startY) * progress;
+//         // Легкое зависание перед взрывом
+//         const eased = 1 - Math.pow(1 - progress, 3);
+//         this.y = this.startY + (this.targetY - this.startY) * eased;
+
+//         // 🔥 ДЫМ от ракеты
+//         if (Math.random() < 0.6) {
+//             const p = getParticle();
+//             p.reset(
+//                 this.x,
+//                 this.y,
+//                 (Math.random() - 0.5) * 0.5,
+//                 Math.random() * 0.5,
+//                 'rgba(200,200,200,0.4)'
+//             );
+//             p.life = 30;
+//             p.size = 3;
+//             particles.push(p);
+//         }
+
+//         // рисуем ракету
+//         ctx.fillStyle = '#b1eaf7';
+//         ctx.fillRect(this.x - 1, this.y, 2, 10);
+//     };
+
+//     // === ZONES ===
+//     const ZONES = ['left','left','center','right','right'];
+
+//     // shuffle
+//     for (let i = ZONES.length - 1; i > 0; i--) {
+//         const j = Math.floor(Math.random() * (i + 1));
+//         [ZONES[i], ZONES[j]] = [ZONES[j], ZONES[i]];
+//     }
+
+//     let zoneIndex = 0;
+
+//     function launchRocket() {
+//         const zone = ZONES[zoneIndex++]; 
+
+//         const minX = W * 0.2;
+//         const maxX = W * 0.8;
+//         const width = maxX - minX;
+
+//         let x;
+
+//         if (zone === 'left') {
+//             x = minX + Math.random() * (width * 0.22);
+//         } 
+//         else if (zone === 'center') {
+//             x = minX + width * 0.22 + Math.random() * (width * 0.16);
+//         } 
+//         else { // right
+//             x = minX + width * (0.22 + 0.16) + Math.random() * (width * 0.22);
+//         }
+
+//         rockets.push(new Rocket(x));
+//         // rockets.push(new Rocket(Math.random() * (W * 0.45) + W * 0.2));
+//         rocketsLaunched++;
+//     }
+
+//     function animate(now) {
+//         ctx.clearRect(0, 0, W, H);
+
+//         // ✨ === FLASHES (ПОД ФЕЙЕРВЕРКОМ) === ✨
+//         for (let i = flashes.length - 1; i >= 0; i--) {
+//             const f = flashes[i];
+//             f.update();
+//             f.draw();
+//             if (f.life <= 0) flashes.splice(i, 1);
+//         }
+
+//         if (rocketsLaunched < ROCKET_COUNT && now - lastLaunchTime > ROCKET_INTERVAL) {
+//             launchRocket();
+//             lastLaunchTime = now;
+//         }
+
+//         for (let i = rockets.length - 1; i >= 0; i--) {
+//             rockets[i].update(now);
+//             if (rockets[i].exploded) {
+//                 rockets.splice(i, 1);
+//             }
+//         }
+
+
+//         for (let i = particles.length - 1; i >= 0; i--) {
+//             const p = particles[i];
+//             p.update();
+//             p.draw();
+
+//             if (p.life <= 0) {
+//                 particlePool.push(p);
+//                 particles.splice(i, 1);
+//             }
+//         }
+
+//         ctx.globalAlpha = 1;
+
+//         if (rockets.length || particles.length || rocketsLaunched < ROCKET_COUNT) {
+//             requestAnimationFrame(animate);
+//         } else {
+//             // === Плавное исчезновение затемнения ===
+//             overlay.style.backgroundColor = 'rgba(0,0,0,0)';
+//             setTimeout(() => {
+//                 canvas.remove();
+//                 overlay.remove();
+//             }, fadeDuration);
+//         }
+//     }
+
+//     requestAnimationFrame(animate);
+// }
