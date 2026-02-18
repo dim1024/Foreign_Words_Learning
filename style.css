@@ -137,6 +137,11 @@
 .folder {}
 .file {}
 
+.file,
+.folder {
+  unicode-bidi: plaintext;
+}
+
 .file-row {
   display: flex;
   align-items: center;
@@ -927,6 +932,20 @@
   font-size: 16px;
 }
 
+.memorize-question,
+.answer-btn,
+.mistakes-cell,
+.study-term,
+.study-translation,
+.word-cell {
+  font-family:
+    "Inter",
+    "Noto Sans Arabic",
+    "Noto Sans",
+    system-ui,
+    sans-serif;
+}
+
 /* ============ 🔹 WORDS LIST (GRID VERSION) ============== */
 .words-list {
     display: flex;
@@ -958,7 +977,7 @@
     white-space: normal;
     word-break: break-word;
     overflow-wrap: anywhere;
-    text-align: left;
+    text-align: center;
     padding-left: 18px;
     padding-right: 8px;
     position: relative;
@@ -1411,7 +1430,7 @@
     to   { transform: translateY(0); }
   }
 
-    .game-actions {
+  d.game-actions {
     flex-direction: column;
     gap: 10px;
     margin-top: 16px;
@@ -1436,6 +1455,10 @@
     right: 18px;
     width: 44px;
     height: 44px;
+  }
+
+  .word-cell {
+    font-size: 18px;
   }
 
   /* ===== MOBILE РЕЖИМ STUDY ====== */
