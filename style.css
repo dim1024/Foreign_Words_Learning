@@ -940,6 +940,7 @@
 .word-cell {
   font-family:
     "Inter",
+    "Scheherazade New",
     "Noto Sans Arabic",
     "Noto Sans",
     system-ui,
@@ -962,8 +963,8 @@
 /* одна строка */
 .word-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 40px; /* слово | перевод | кнопка */
-    gap: 24px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px; /* слово | перевод | кнопка */
+    gap: 14px;
 
     padding: 6px 8px;
     align-items: center;
@@ -977,9 +978,9 @@
     white-space: normal;
     word-break: break-word;
     overflow-wrap: anywhere;
-    text-align: center;
-    padding-left: 18px;
-    padding-right: 8px;
+    text-align: left;
+    /* padding-left: 8px;
+    padding-right: 8px; */
     position: relative;
     color: #000;
 }
@@ -1001,7 +1002,7 @@
   border: 1px solid #ddd;
 
   display: flex;                /* центрируем таблицу в контейнере */
-  justify-content: center;      /* таблица в середине */
+  justify-content: stretch;      /* 🔹 растягиваем список на всю ширину */
 }
 
 /* ========= 🔹 КНОПКА УДАЛИТЬ/ВЕРНУТЬ СЛОВО ============= */

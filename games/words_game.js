@@ -208,14 +208,14 @@ function startStudyGame(pairs, uiTexts, fileData) {
     controls.className = 'study-controls';
 
     const prevBtn = document.createElement('button');
-    prevBtn.textContent = '⮜';
+    prevBtn.textContent = '❮'; // ‹ ›
     prevBtn.onclick = () => {
         index = (index - 1 + shuffled.length) % shuffled.length;
         renderCard();
     };
 
     const nextBtn = document.createElement('button');
-    nextBtn.textContent = '⮞';
+    nextBtn.textContent = '❯'; 
     nextBtn.onclick = () => {
         index = (index + 1) % shuffled.length;
         renderCard();

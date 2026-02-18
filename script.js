@@ -541,7 +541,7 @@ function createSelfCheckFolder(folder) {
 
     const toggle = document.createElement('span');
     toggle.classList.add('self-check-toggle');
-    toggle.textContent = '▶';
+    toggle.textContent = '▸';
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -556,7 +556,7 @@ function createSelfCheckFolder(folder) {
 
     toggle.onclick = () => {
         childrenBox.classList.toggle('open');
-        toggle.textContent = childrenBox.classList.contains('open') ? '▼' : '▶';
+        toggle.textContent = childrenBox.classList.contains('open') ? '▾' : '▸';
     };
 
     checkbox.onchange = async () => {
