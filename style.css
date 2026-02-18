@@ -1524,6 +1524,58 @@
     height: 44px;
   }
 
+    /* шестерёнка настроек рядом с крестиком */
+  .memorize-settings-btn {
+    top: 24px;
+    right: 70px;      /* крестик 44px + 8px gap + подстраховка */
+    font-size: 22px;
+  }
+
+    /* панель настроек */
+  .memorize-settings-panel {
+    top: 60px;        /* чуть ниже шестерёнки */
+    right: 20px;
+    min-width: 180px;
+    max-width: 90vw;
+    padding: 8px;
+    gap: 6px;
+    border-radius: 8px;
+  }
+
+  .word_repetitions_setting {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .memorize-repeat-row {
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+
+    .memorize-settings-panel button {
+    padding: 6px 10px;
+    font-size: 14px;
+    border-radius: 6px;
+  }
+
+  .memorize-settings-panel button.active {
+    background: #4CAF50;
+    color: #fff;
+  }
+
+  .word_repetitions_setting_ok {
+    margin-top: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80px;
+    font-size: 14px;
+    padding: 6px 0;
+  }
+
+
+
 
   /* 🔹 QUICK CHECK модалка */ 
   .memorize-game {

@@ -752,7 +752,7 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             const repeatMistakesBtn = document.createElement('button');
             repeatMistakesBtn.innerHTML = `
                 <div>${uiTexts.repeat}</div>
-                <div style="font-size: 11px; opacity: 0.7;">
+                <div style="font-size: 12px; opacity: 0.7;">
                     ${uiTexts.only_mistakes}
                 </div>
             `;
