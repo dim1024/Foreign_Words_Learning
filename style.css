@@ -536,9 +536,9 @@
   .top-panel {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
 
-    flex-wrap: nowrap;          /* ❗ шапка в одну строку */
+   
     gap: 8px;
     padding: 10px;
   }
@@ -546,15 +546,18 @@
   .top-panel__left,
   .top-panel__right {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: 4px;
-    flex-wrap: nowrap;          /* ❗ не переносим группы */
     min-width: 0;
   }
 
   .top-panel button {
-    font-size: 12px;
-    padding: 6px 8px;
+    white-space: normal;    /* разрешаем перенос */
+    line-height: 1.2;
+    padding: 10px 8px;      /* выше кнопки */
+    font-size: 14px;
+    text-align: center;
+    min-height: 44px;       /* 🔥 комфортный tap-size */
   }
 
   #selfCheckBtn::before,
@@ -588,6 +591,38 @@
     text-align: center;
     word-break: break-word;
   }
+
+  #currentLangBtn {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+
+  .lang-select {
+    display: flex;
+    align-items: center;
+  }
+
+  .lang-dropdown button {
+    padding: 14px 16px;
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  .lang-dropdown {
+    top: 120%;
+  }
+
+  .top-panel__right {
+    gap: 8px;
+  }
+
+  #homeBtn {}
+
+  #backBtn {}
+
+
 
 
   /* ===== MAIN CONTENT ===== */
@@ -1459,7 +1494,7 @@
   }
 
   .word-cell {
-    font-size: 18px;
+    font-size: 14px;
   }
 
   /* ===== MOBILE РЕЖИМ STUDY ====== */
