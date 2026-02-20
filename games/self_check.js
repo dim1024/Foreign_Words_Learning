@@ -1,21 +1,21 @@
 let counter = 0;
 
-function shuffleArray(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-}
+// function shuffleArray(arr) {
+//     const a = [...arr];
+//     for (let i = a.length - 1; i > 0; i--) {
+//         const j = Math.floor(Math.random() * (i + 1));
+//         [a[i], a[j]] = [a[j], a[i]];
+//     }
+//     return a;
+// }
 
 window.startSelfCheckExam = function (pairs, uiTexts, fileData) {
     closeGame();
 
     const DEBUG_QUICK_CHECK_FINISH = 0; // <-- включить дебаг
-    const DEBUG_MODE = 'none'
+    // const DEBUG_MODE = 'none'
     // const DEBUG_MODE = 'mistakes' 
-    // const DEBUG_MODE = 'all_mistakes';
+    const DEBUG_MODE = 'all_mistakes';
 
     gameContainer = document.createElement('div');
     gameContainer.className = 'memorize-game';
