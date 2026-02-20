@@ -538,7 +538,6 @@
     justify-content: space-between;
     align-items: stretch;
 
-   
     gap: 8px;
     padding: 10px;
   }
@@ -601,13 +600,16 @@
 
   .lang-select {
     display: flex;
-    align-items: center;
+    align-items: stretch;  /* Выровнять по высоте */
+    flex-grow: 1;          /* Занять всё доступное пространство */
   }
 
   .lang-dropdown button {
     padding: 14px 16px;
     font-size: 16px;
     min-height: 44px;
+    display: flex;
+    align-items: center;   /* Выравнивание по центру */
   }
 
   .lang-dropdown {
@@ -1494,7 +1496,7 @@
   }
 
   .word-cell {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   /* ===== MOBILE РЕЖИМ STUDY ====== */
