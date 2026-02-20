@@ -79,15 +79,15 @@ function saveMistakesFile(mistakesPairs, sourceFileName, mode = 'mistakes') {
     const mistakesFiles = loadFrequentMistakesFiles();
 
     const date = new Date();
-    const dateStr = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}_${date.getHours().toString().padStart(2,'0')}-${date.getMinutes().toString().padStart(2,'0')}`;
+    const dateStr = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`;
 
     // 🧠 префикс по режиму
-    const prefix = mode === 'self_check' ? 'self_check' : 'mistakes';
+    const prefix = mode === 'self_check' ? 'Self check' : 'Mistakes';
 
     // ✅ 1. сначала чистим имя источника
     let cleanSourceName =
         typeof sourceFileName === 'string'
-            ? sourceFileName.replace(/[^\w\s-]/g, '').trim()
+            ? sourceFileName.replace(/[^\p{L}\d\s-]/gu, '').trim()
             : '';
 
     // ✅ 2. если после очистки пусто — считаем, что имени нет
@@ -95,10 +95,12 @@ function saveMistakesFile(mistakesPairs, sourceFileName, mode = 'mistakes') {
         cleanSourceName = null;
     }
 
-    // ✅ 3. собираем имя БЕЗ __ при любых условиях
-    const baseName = cleanSourceName
-        ? `${prefix}_${cleanSourceName}_${dateStr}`
-        : `${prefix}_${dateStr}`;
+    // ✅ 3. собираем имя 
+    if (mode === 'self_check') {
+        baseName = `${prefix} [${dateStr}]`;
+    } else {
+        baseName = `${prefix} ➔ ${cleanSourceName} [${dateStr}]`;
+    }
 
     let name = baseName;
     let i = 1;
