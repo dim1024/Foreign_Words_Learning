@@ -85,9 +85,15 @@ function saveMistakesFile(mistakesPairs, sourceFileName, mode = 'mistakes') {
     const prefix = mode === 'self_check' ? 'Self check' : 'Mistakes';
 
     // ✅ 1. сначала чистим имя источника
-    let cleanSourceName =
+    let cleanSourceName = 
         typeof sourceFileName === 'string'
-            ? sourceFileName.replace(/[^\p{L}\d\s-]/gu, '').trim()
+            ? sourceFileName
+                // Убираем "Click Me" и скобки
+                .replace(/^Click Me\s?\((.*)\)$/, '$1')
+                // Очищаем от всех неалфавитных символов (кроме букв, цифр, пробела и дефиса)
+                .replace(/[^\p{L}\d\s-]/gu, '')
+                // Убираем пробелы в начале и конце.
+                .trim()
             : '';
 
     // ✅ 2. если после очистки пусто — считаем, что имени нет
