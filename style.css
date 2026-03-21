@@ -117,8 +117,20 @@
   transition: 0.15s;
 }
 
-.main-content button:hover {
-  background: #f0f0f0;
+@media (hover: hover) and (pointer: fine) {
+
+  .self-check-folder-header:active,
+  .self-check-file:active {
+    background: #f2f2f2;
+  }
+
+  .main-content button:hover {
+    background: #f0f0f0;
+  }
+
+  .main-content .add-words-btn:hover {
+    background-color: #45a049;
+  }
 }
 
 /* Папки */
@@ -164,10 +176,6 @@
 
     margin-bottom: 12px;
     transition: background-color 0.2s;
-}
-
-.main-content .add-words-btn:hover {
-    background-color: #45a049;
 }
 
 .add-words-btn::before {
@@ -495,11 +503,6 @@
   display: flex;
   align-items: center; /* важно */
   
-}
-
-.self-check-folder-header:active,
-.self-check-file:active {
-  background: #f2f2f2;
 }
 
 .self-check-toggle {
@@ -1727,4 +1730,8 @@
   
 
 
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
 }
