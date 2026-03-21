@@ -599,7 +599,10 @@ function startMemorizingGame(pairs, uiTexts, fileData) {
             if (btn.textContent === correctAnswer) btn.style.backgroundColor = '#8BC34A';
         });
 
-        setTimeout(nextQuestion, 800);
+        // В MEMORIZE идет обучение, нужно запомнить правильный ответ, поэтому задержка после неправильных ответов больше чем в квик чек.
+        const delay = correct ? 800 : (isDontKnow ? 1800 : 2300);
+
+        setTimeout(nextQuestion, delay);
     }
 
     function showFinished() {
@@ -1059,13 +1062,15 @@ function startQuickCheckGame(pairs, uiTexts, fileData) {
         // ✅ И СРАЗУ обновляем прогресс
         updateProgressBar();
 
+        const delay = correct ? 800 : (isDontKnow ? 1500 : 2000);
+
         setTimeout(() => {
             if (currentQuestionIndex >= TOTAL_QUESTIONS) {
                 showFinishedQuickCheck();
             } else {
                 nextQuestion();
             }
-        }, 800);
+        }, delay);
     }
 
     function showFinishedQuickCheck() {
